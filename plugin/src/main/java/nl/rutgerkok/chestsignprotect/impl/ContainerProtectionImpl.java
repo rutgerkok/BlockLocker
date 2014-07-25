@@ -9,6 +9,7 @@ import nl.rutgerkok.chestsignprotect.profile.Profile;
 import nl.rutgerkok.chestsignprotect.protection.ContainerProtection;
 import nl.rutgerkok.chestsignprotect.protection.Protection;
 
+import org.apache.commons.lang.Validate;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 
@@ -64,7 +65,7 @@ class ContainerProtectionImpl implements ContainerProtection {
             Collection<Sign> signs) {
         ContainerProtectionImpl protection = new ContainerProtectionImpl(block,
                 signFinder);
-        protection.fetchOwnerAndAllowed(signs);
+        protection.fetchMainSignAndAllowed(signs);
         return protection;
     }
 
@@ -80,30 +81,43 @@ class ContainerProtectionImpl implements ContainerProtection {
         this.signFinder = signFinder;
     }
 
+    private void fetchMainSignAndAllowed(Collection<Sign> signs) {
+        Collection<Profile> allAllowed = Lists.newArrayList();
+        for (Sign sign : signs) {
+            // Check for main sign
+            Optional<SignType> type = signFinder.getSignParser().getSignType(
+                    sign.getLine(0));
+            if (type.isPresent() && type.get().isMainSign()) {
+                mainSign = Optional.of(sign);
+            }
+
+            // Parse it
+            signFinder.getSignParser().parseSign(sign, allAllowed);
+        }
+        this.allAllowed = Optional.of(allAllowed);
+    }
+
     private void fetchOwner() {
         if (!mainSign.isPresent()) {
             // Need information about the main sign
-            fetchOwnerAndAllowed(fetchSigns());
+            fetchMainSignAndAllowed(fetchSigns());
+        }
+
+        if (!mainSign.isPresent()) {
+            // Still no main sign, it must be missing
+            return;
         }
 
         // We have a hint, grab the first name on it
         Sign mainSign = this.mainSign.get();
         Collection<Profile> profiles = new ArrayList<Profile>(4);
-        parseSign(mainSign, profiles);
+        signFinder.getSignParser().parseSign(mainSign, profiles);
 
         Iterator<Profile> iterator = profiles.iterator();
         if (iterator.hasNext()) {
             owner = Optional.of(iterator.next());
         }
 
-    }
-
-    private void fetchOwnerAndAllowed(Collection<Sign> signs) {
-        Collection<Profile> allAllowed = Lists.newArrayList();
-        for (Sign sign : signs) {
-            parseSign(sign, allAllowed);
-        }
-        this.allAllowed = Optional.of(allAllowed);
     }
 
     private Collection<Sign> fetchSigns() {
@@ -115,7 +129,7 @@ class ContainerProtectionImpl implements ContainerProtection {
         if (allAllowed.isPresent()) {
             return allAllowed.get();
         }
-        fetchOwnerAndAllowed(fetchSigns());
+        fetchMainSignAndAllowed(fetchSigns());
         return allAllowed.get();
     }
 
@@ -131,16 +145,15 @@ class ContainerProtectionImpl implements ContainerProtection {
 
     @Override
     public boolean isOwner(Profile profile) {
-        return profile.equals(owner.orNull());
-    }
+        Validate.notNull(profile);
 
-    private void parseSign(Sign sign, Collection<Profile> addTo) {
-        Optional<SignType> type = signFinder.getSignParser().getSignType(
-                sign.getLine(0));
-        if (type.isPresent() && type.get().isMainSign()) {
-            mainSign = Optional.of(sign);
+        Optional<Profile> owner = getOwner();
+
+        if (!owner.isPresent()) {
+            return false;
         }
-        signFinder.getSignParser().parseSign(sign, addTo);
+
+        return owner.get().includes(profile);
     }
 
 }

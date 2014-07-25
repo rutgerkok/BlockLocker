@@ -22,4 +22,15 @@ public interface Profile {
      * @return The name as it should be saved.
      */
     String getSaveName();
+
+    /**
+     * Gets whether this profile includes another profile. For example,
+     * "[Everyone]" includes all other profiles, and "jeb_" includes everyone
+     * with the name jeb_.
+     *
+     * @param other
+     *            The other profile.
+     * @return True if this profile includes the other profile, false otherwise.
+     */
+    boolean includes(Profile other);
 }

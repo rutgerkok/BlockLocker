@@ -66,4 +66,22 @@ class PlayerProfile implements Profile {
         return displayName.hashCode();
     }
 
+    @Override
+    public boolean includes(Profile other) {
+        if (!(other instanceof PlayerProfile)) {
+            return false;
+        }
+
+        PlayerProfile otherProfile = (PlayerProfile) other;
+        if (uuid.isPresent() && otherProfile.uuid.isPresent()) {
+            return uuid.equals(otherProfile.uuid);
+        }
+        return displayName.equalsIgnoreCase(otherProfile.displayName);
+    }
+
+    @Override
+    public String toString() {
+        return "Player:" + uuid + ":" + displayName;
+    }
+
 }

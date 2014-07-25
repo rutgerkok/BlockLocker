@@ -21,7 +21,7 @@ public interface ProfileFactory {
 
     /**
      * Creates a new profile representing the online player.
-     * 
+     *
      * @param player
      *            The online player.
      * @return The profile.
