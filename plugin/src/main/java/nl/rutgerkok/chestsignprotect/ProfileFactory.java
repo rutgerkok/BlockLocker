@@ -4,6 +4,8 @@ import java.util.UUID;
 
 import nl.rutgerkok.chestsignprotect.profile.Profile;
 
+import org.bukkit.entity.Player;
+
 public interface ProfileFactory {
 
     /**
@@ -16,4 +18,13 @@ public interface ProfileFactory {
      * @return The profile.
      */
     Profile fromNameAndUniqueId(String name, UUID uuid);
+
+    /**
+     * Creates a new profile representing the online player.
+     * 
+     * @param player
+     *            The online player.
+     * @return The profile.
+     */
+    Profile fromPlayer(Player player);
 }

@@ -30,4 +30,13 @@ public interface Protection {
      */
     Optional<Profile> getOwner();
 
+    /**
+     * Checks if the given profile is the owner of this chest.
+     * 
+     * @param profile
+     *            The profile to check.
+     * @return True if it is the owner, false otherwise.
+     */
+    boolean isOwner(Profile profile);
+
 }

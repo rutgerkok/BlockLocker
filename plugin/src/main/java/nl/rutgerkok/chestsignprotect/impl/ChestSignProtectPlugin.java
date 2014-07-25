@@ -6,9 +6,11 @@ import nl.rutgerkok.chestsignprotect.ChestSignProtect;
 import nl.rutgerkok.chestsignprotect.ProfileFactory;
 import nl.rutgerkok.chestsignprotect.ProtectionFinder;
 import nl.rutgerkok.chestsignprotect.SignParser;
+import nl.rutgerkok.chestsignprotect.impl.event.BlockDestroyListener;
 import nl.rutgerkok.chestsignprotect.impl.profile.ProfileFactoryImpl;
 
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class ChestSignProtectPlugin extends JavaPlugin implements
@@ -44,6 +46,9 @@ public class ChestSignProtectPlugin extends JavaPlugin implements
                 profileFactory);
         SignFinder signFinder = new SignFinder(signParser);
         protectionFinder = new ProtectionFinderImpl(signFinder, chestSettings);
+
+        PluginManager plugins = Bukkit.getPluginManager();
+        plugins.registerEvents(new BlockDestroyListener(this), this);
     }
 
     /**

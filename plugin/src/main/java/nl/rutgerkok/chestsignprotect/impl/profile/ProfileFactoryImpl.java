@@ -6,6 +6,7 @@ import nl.rutgerkok.chestsignprotect.ProfileFactory;
 import nl.rutgerkok.chestsignprotect.profile.Profile;
 
 import org.apache.commons.lang.Validate;
+import org.bukkit.entity.Player;
 
 import com.google.common.base.Optional;
 
@@ -26,6 +27,11 @@ public class ProfileFactoryImpl implements ProfileFactory {
         Validate.notNull(name);
         Validate.notNull(uuid);
         return new PlayerProfile(name, Optional.of(uuid));
+    }
+
+    @Override
+    public Profile fromPlayer(Player player) {
+        return fromNameAndUniqueId(player.getName(), player.getUniqueId());
     }
 
     public Optional<Profile> fromSavedText(String text) {

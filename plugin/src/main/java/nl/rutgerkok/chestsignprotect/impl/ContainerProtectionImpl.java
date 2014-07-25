@@ -129,6 +129,11 @@ class ContainerProtectionImpl implements ContainerProtection {
         return owner;
     }
 
+    @Override
+    public boolean isOwner(Profile profile) {
+        return profile.equals(owner.orNull());
+    }
+
     private void parseSign(Sign sign, Collection<Profile> addTo) {
         Optional<SignType> type = signFinder.getSignParser().getSignType(
                 sign.getLine(0));

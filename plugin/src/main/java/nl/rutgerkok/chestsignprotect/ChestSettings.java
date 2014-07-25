@@ -46,7 +46,7 @@ public interface ChestSettings {
 
     /**
      * Gets the localized header for the given sign type, includes brackets.
-     * 
+     *
      * @param signType
      *            The type of the sign.
      * @return The header.
