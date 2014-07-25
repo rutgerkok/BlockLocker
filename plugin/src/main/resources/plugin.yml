@@ -1,0 +1,5 @@
+name: ${project.name}
+version: ${project.version}
+main: nl.rutgerkok.chestsignprotect.impl.ChestSignProtectPlugin
+author: Rutger Kok
+load: startup
