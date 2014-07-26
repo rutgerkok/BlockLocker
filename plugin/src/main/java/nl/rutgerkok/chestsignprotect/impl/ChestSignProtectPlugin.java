@@ -1,26 +1,28 @@
 package nl.rutgerkok.chestsignprotect.impl;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.logging.Level;
 
 import nl.rutgerkok.chestsignprotect.ChestSignProtect;
 import nl.rutgerkok.chestsignprotect.ProfileFactory;
 import nl.rutgerkok.chestsignprotect.ProtectionFinder;
 import nl.rutgerkok.chestsignprotect.SignParser;
+import nl.rutgerkok.chestsignprotect.Translator;
 import nl.rutgerkok.chestsignprotect.impl.event.BlockDestroyListener;
 import nl.rutgerkok.chestsignprotect.impl.event.PlayerInteractListener;
 import nl.rutgerkok.chestsignprotect.impl.profile.ProfileFactoryImpl;
 
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.google.common.io.ByteStreams;
+import com.google.common.base.Charsets;
 
 public class ChestSignProtectPlugin extends JavaPlugin implements
         ChestSignProtect {
@@ -29,45 +31,28 @@ public class ChestSignProtectPlugin extends JavaPlugin implements
     private ProtectionFinderImpl protectionFinder;
 
     /**
-     * Gets the file with the given name in the data folder of this plugin. If
-     * the file does not exist yet, but the JAR file contains it, it is exported
-     * first.
+     * Gets a configuration file from the jar file. Unlike
+     * {@link #getFileConfig(String)}, the configuration file is not exported to
+     * the data folder.
      *
-     * @param name
-     *            Name of the file.
-     * @return The file.
+     * @param path
+     *            Path in the jar file.
+     * @return The configuration file.
      */
-    private File getOrExportFile(String name) {
+    private Configuration getJarConfig(String path) {
+        InputStream resource = getResource(path);
+        if (resource == null) {
+            // Not found
+            return new YamlConfiguration();
+        }
+        Reader reader = new InputStreamReader(resource, Charsets.UTF_8);
+        Configuration config = YamlConfiguration.loadConfiguration(reader);
         try {
-            return getOrExportFile0(name);
+            resource.close();
         } catch (IOException e) {
-            severe("Failed to copy file from jar to data folder", e);
-            return new File(getDataFolder(), name);
+            severe("Failed to close stream", e);
         }
-    }
-
-    private File getOrExportFile0(String name) throws IOException {
-        File file = new File(getDataFolder(), name);
-        if (!file.exists()) {
-            InputStream resource = null;
-            OutputStream output = null;
-            try {
-                resource = getResource(name);
-                if (resource == null) {
-                    return file;
-                }
-                output = new FileOutputStream(file);
-                ByteStreams.copy(resource, output);
-            } finally {
-                if (resource != null) {
-                    resource.close();
-                }
-                if (output != null) {
-                    output.close();
-                }
-            }
-        }
-        return file;
+        return config;
     }
 
     @Override
@@ -78,6 +63,23 @@ public class ChestSignProtectPlugin extends JavaPlugin implements
     @Override
     public ProtectionFinder getProtectionFinder() {
         return protectionFinder;
+    }
+
+    private Translator loadTranslations(String fileName) {
+        File file = new File(getDataFolder(), fileName);
+        Configuration config = YamlConfiguration.loadConfiguration(file);
+        config.addDefaults(getJarConfig(Config.DEFAULT_TRANSLATIONS_FILE));
+
+        ConfigTranslator translator = new ConfigTranslator(config);
+        if (translator.needsSave()) {
+            getLogger().info("Saving translations");
+            try {
+                translator.save(file);
+            } catch (IOException e) {
+                severe("Failed to save translation file", e);
+            }
+        }
+        return translator;
     }
 
     @Override
@@ -95,9 +97,9 @@ public class ChestSignProtectPlugin extends JavaPlugin implements
         // Configuration
         saveDefaultConfig();
         Config config = new Config(getConfig());
-        File translationFile = getOrExportFile(config.getLanguageFileName());
-        ConfigTranslator translator = new ConfigTranslator(
-                YamlConfiguration.loadConfiguration(translationFile));
+
+        // Translation
+        Translator translator = loadTranslations(config.getLanguageFileName());
 
         // Parsers and finders
         profileFactory = new ProfileFactoryImpl(translator);
