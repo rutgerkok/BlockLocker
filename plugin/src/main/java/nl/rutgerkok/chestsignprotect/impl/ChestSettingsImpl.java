@@ -1,15 +1,20 @@
 package nl.rutgerkok.chestsignprotect.impl;
 
 import nl.rutgerkok.chestsignprotect.ChestSettings;
+import nl.rutgerkok.chestsignprotect.Translator;
+import nl.rutgerkok.chestsignprotect.Translator.Translation;
 
 import org.bukkit.Material;
 
 import com.google.common.base.Optional;
 
-public class ChestSettingsImpl implements ChestSettings {
+class ChestSettingsImpl implements ChestSettings {
 
-    private static final String MORE_USERS = "[More Users]";
-    private static final String PRIVATE = "[Private]";
+    private final Translator translator;
+
+    ChestSettingsImpl(Translator translator) {
+        this.translator = translator;
+    }
 
     @Override
     public boolean canProtect(ProtectionType type, Material material) {
@@ -24,9 +29,9 @@ public class ChestSettingsImpl implements ChestSettings {
     public String getHeader(SignType signType) {
         switch (signType) {
             case MORE_USERS:
-                return MORE_USERS;
+                return translator.get(Translation.TAG_MORE_USERS);
             case PRIVATE:
-                return PRIVATE;
+                return translator.get(Translation.TAG_PRIVATE);
         }
         throw new AssertionError("Unknown type: " + signType);
     }

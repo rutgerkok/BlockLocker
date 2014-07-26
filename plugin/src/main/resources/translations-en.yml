@@ -1,3 +1,5 @@
 # Translations file for the English language
 tag:
   everyone: "[Everyone]"
+  private: "[Private]"
+  more_users: "[More Users]"

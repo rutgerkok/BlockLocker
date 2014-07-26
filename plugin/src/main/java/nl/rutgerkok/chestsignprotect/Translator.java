@@ -9,7 +9,13 @@ import org.bukkit.ChatColor;
 public interface Translator {
 
     public enum Translation {
-        TAG_EVERYONE;
+        TAG_EVERYONE, TAG_MORE_USERS {
+            @Override
+            public String toString() {
+                return "tag.more_users";
+            }
+        },
+        TAG_PRIVATE;
 
         /**
          * Gets the key used in configuration files.

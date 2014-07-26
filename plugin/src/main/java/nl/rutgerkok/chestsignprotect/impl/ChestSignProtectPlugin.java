@@ -32,7 +32,7 @@ public class ChestSignProtectPlugin extends JavaPlugin implements
      * Gets the file with the given name in the data folder of this plugin. If
      * the file does not exist yet, but the JAR file contains it, it is exported
      * first.
-     * 
+     *
      * @param name
      *            Name of the file.
      * @return The file.
@@ -101,7 +101,7 @@ public class ChestSignProtectPlugin extends JavaPlugin implements
 
         // Parsers and finders
         profileFactory = new ProfileFactoryImpl(translator);
-        ChestSettingsImpl chestSettings = new ChestSettingsImpl();
+        ChestSettingsImpl chestSettings = new ChestSettingsImpl(translator);
         SignParser signParser = new SignParserImpl(chestSettings, nms,
                 profileFactory);
         SignFinder signFinder = new SignFinder(signParser);
