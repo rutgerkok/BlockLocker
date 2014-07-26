@@ -3,23 +3,36 @@ package nl.rutgerkok.chestsignprotect.impl.profile;
 import java.util.UUID;
 
 import nl.rutgerkok.chestsignprotect.ProfileFactory;
+import nl.rutgerkok.chestsignprotect.Translator;
+import nl.rutgerkok.chestsignprotect.Translator.Translation;
 import nl.rutgerkok.chestsignprotect.profile.Profile;
 
 import org.apache.commons.lang.Validate;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import com.google.common.base.Optional;
 
 public class ProfileFactoryImpl implements ProfileFactory {
+    private final String everyoneTagWithoutColor;
+    private final Translator translator;
 
-    public Profile fromDisplayText(String text) {
-        return fromName(text);
-        // Group support will come later
+    public ProfileFactoryImpl(Translator translator) {
+        Validate.notNull(translator);
+        this.translator = translator;
+        everyoneTagWithoutColor = translator
+                .getWithoutColor(Translation.TAG_EVERYONE);
     }
 
-    private Profile fromName(String name) {
-        Validate.notNull(name);
-        return new PlayerProfile(name, Optional.<UUID> absent());
+    public Profile fromDisplayText(String text) {
+        text = ChatColor.stripColor(text.trim());
+
+        if (text.equalsIgnoreCase(everyoneTagWithoutColor)) {
+            return new EveryoneProfile(translator.get(Translation.TAG_EVERYONE));
+        }
+        // Group support will come later
+
+        return fromPlayerName(text);
     }
 
     @Override
@@ -32,6 +45,11 @@ public class ProfileFactoryImpl implements ProfileFactory {
     @Override
     public Profile fromPlayer(Player player) {
         return fromNameAndUniqueId(player.getName(), player.getUniqueId());
+    }
+
+    private Profile fromPlayerName(String name) {
+        Validate.notNull(name);
+        return new PlayerProfile(name, Optional.<UUID> absent());
     }
 
     public Optional<Profile> fromSavedText(String text) {

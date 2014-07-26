@@ -1,0 +1,5 @@
+# Config file of ${project.name}.
+# This file was originally created by version ${project.version}.
+
+# The language file used by the plugin. Must be placed next to this file.
+languageFile: translations-en.yml
