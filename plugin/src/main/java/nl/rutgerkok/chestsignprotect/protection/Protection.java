@@ -18,6 +18,7 @@ public interface Protection {
      * list includes the {@link #getOwner() owner}.
      *
      * @return The allowed profiles.
+     * @see #isAllowed(Profile)
      */
     Collection<Profile> getAllowed();
 
@@ -27,8 +28,19 @@ public interface Protection {
      * been corrupted by for example a world editor.
      *
      * @return The owner.
+     * @see #isOwner(Profile)
      */
     Optional<Profile> getOwner();
+
+    /**
+     * Checks if the given profile has been allowed to this protection.
+     *
+     * @param profile
+     *            The profile to check.
+     * @return True if the profile is allowed, false otherwise.
+     * @see #getAllowed()
+     */
+    boolean isAllowed(Profile profile);
 
     /**
      * Checks if the given profile is the owner of this chest.
@@ -36,6 +48,7 @@ public interface Protection {
      * @param profile
      *            The profile to check.
      * @return True if it is the owner, false otherwise.
+     * @see #getOwner()
      */
     boolean isOwner(Profile profile);
 

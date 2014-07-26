@@ -144,6 +144,16 @@ class ContainerProtectionImpl implements ContainerProtection {
     }
 
     @Override
+    public boolean isAllowed(Profile profile) {
+        for (Profile allowed : getAllowed()) {
+            if (allowed.includes(profile)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
     public boolean isOwner(Profile profile) {
         Validate.notNull(profile);
 

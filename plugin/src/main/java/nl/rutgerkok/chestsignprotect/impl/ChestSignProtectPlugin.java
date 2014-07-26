@@ -7,6 +7,7 @@ import nl.rutgerkok.chestsignprotect.ProfileFactory;
 import nl.rutgerkok.chestsignprotect.ProtectionFinder;
 import nl.rutgerkok.chestsignprotect.SignParser;
 import nl.rutgerkok.chestsignprotect.impl.event.BlockDestroyListener;
+import nl.rutgerkok.chestsignprotect.impl.event.PlayerInteractListener;
 import nl.rutgerkok.chestsignprotect.impl.profile.ProfileFactoryImpl;
 
 import org.bukkit.Bukkit;
@@ -49,6 +50,7 @@ public class ChestSignProtectPlugin extends JavaPlugin implements
 
         PluginManager plugins = Bukkit.getPluginManager();
         plugins.registerEvents(new BlockDestroyListener(this), this);
+        plugins.registerEvents(new PlayerInteractListener(this), this);
     }
 
     /**
