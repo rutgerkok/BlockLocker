@@ -1,6 +1,8 @@
 package nl.rutgerkok.chestsignprotect.impl.event;
 
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 import nl.rutgerkok.chestsignprotect.ChestSignProtect;
 import nl.rutgerkok.chestsignprotect.profile.Profile;
@@ -114,23 +116,29 @@ public class BlockDestroyListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityExplodeEvent(EntityExplodeEvent event) {
-        if (anyProtected(event.blockList())) {
-            event.setCancelled(true);
+        for (Iterator<Block> it = event.blockList().iterator(); it.hasNext();) {
+            Block block = it.next();
+            if (isProtected(block)) {
+                it.remove();
+            }
         }
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onStructureGrow(StructureGrowEvent event) {
         // Check deleted blocks
-        for (BlockState blockState : event.getBlocks()) {
+        List<BlockState> blocks = event.getBlocks();
+        for (Iterator<BlockState> it = blocks.iterator(); it.hasNext();) {
+            BlockState blockState = it.next();
+
             if (blockState.getType() == Material.AIR) {
                 // Almost all replaced blocks are air, so this is a cheap,
                 // zero-allocation way out
                 continue;
             }
+
             if (isProtected(blockState.getBlock())) {
-                event.setCancelled(true);
-                return;
+                it.remove();
             }
         }
     }
