@@ -19,13 +19,13 @@ import org.bukkit.material.MaterialData;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
-class SignFinder {
+class BlockFinder {
     private static BlockFace[] MAIN_FACES = { BlockFace.NORTH, BlockFace.EAST,
             BlockFace.SOUTH, BlockFace.WEST };
 
     private SignParser parser;
 
-    SignFinder(SignParser parser) {
+    BlockFinder(SignParser parser) {
         this.parser = parser;
     }
 

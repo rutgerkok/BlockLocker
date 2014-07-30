@@ -20,10 +20,10 @@ import com.google.common.base.Optional;
 
 class ProtectionFinderImpl implements ProtectionFinder {
     private final ChestSettings settings;
-    private final SignFinder signFinder;
+    private final BlockFinder blockFinder;
 
-    ProtectionFinderImpl(SignFinder lookup, ChestSettings settings) {
-        signFinder = lookup;
+    ProtectionFinderImpl(BlockFinder lookup, ChestSettings settings) {
+        blockFinder = lookup;
         this.settings = settings;
     }
 
@@ -32,18 +32,18 @@ class ProtectionFinderImpl implements ProtectionFinder {
         if (!settings.canProtect(ProtectionType.CONTAINER, blockMaterial)) {
             return Optional.absent();
         }
-        List<Block> blocks = signFinder.findContainerNeighbors(block);
-        Collection<Sign> signs = signFinder.findAttachedSigns(blocks);
+        List<Block> blocks = blockFinder.findContainerNeighbors(block);
+        Collection<Sign> signs = blockFinder.findAttachedSigns(blocks);
         if (signs.isEmpty()) {
             return Optional.absent();
         }
         return Optional.of(ContainerProtectionImpl.fromBlocksWithSigns(blocks,
-                signFinder, signs));
+                blockFinder, signs));
     }
 
     private Optional<Protection> findForSign(Sign sign) {
         // Get type of sign
-        Optional<SignType> signType = signFinder.getSignParser().getSignType(
+        Optional<SignType> signType = blockFinder.getSignParser().getSignType(
                 sign.getLine(0));
         if (!signType.isPresent()) {
             return Optional.absent();
@@ -100,12 +100,12 @@ class ProtectionFinderImpl implements ProtectionFinder {
      */
     private Protection newContainerProtection(Block containerBlock, Sign sign,
             boolean isMainSign) {
-        List<Block> blocks = signFinder.findContainerNeighbors(containerBlock);
+        List<Block> blocks = blockFinder.findContainerNeighbors(containerBlock);
         if (isMainSign) {
             return ContainerProtectionImpl.fromBlocksWithMainSign(blocks,
-                    signFinder, sign);
+                    blockFinder, sign);
         } else {
-            return ContainerProtectionImpl.fromBlocks(blocks, signFinder);
+            return ContainerProtectionImpl.fromBlocks(blocks, blockFinder);
         }
     }
 

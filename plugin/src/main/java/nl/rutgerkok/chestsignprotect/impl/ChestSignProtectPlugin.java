@@ -120,8 +120,8 @@ public class ChestSignProtectPlugin extends JavaPlugin implements
         ChestSettingsImpl chestSettings = new ChestSettingsImpl(translator);
         SignParser signParser = new SignParserImpl(chestSettings, nms,
                 profileFactory);
-        SignFinder signFinder = new SignFinder(signParser);
-        protectionFinder = new ProtectionFinderImpl(signFinder, chestSettings);
+        BlockFinder blockFinder = new BlockFinder(signParser);
+        protectionFinder = new ProtectionFinderImpl(blockFinder, chestSettings);
         signConverter = new SignConverter(this, signParser, nms);
 
         // Events
