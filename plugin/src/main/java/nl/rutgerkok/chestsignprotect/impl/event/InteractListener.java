@@ -12,11 +12,11 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 import com.google.common.base.Optional;
 
-public class PlayerInteractListener implements Listener {
+public class InteractListener implements Listener {
 
     private final ChestSignProtect plugin;
 
-    public PlayerInteractListener(ChestSignProtect plugin) {
+    public InteractListener(ChestSignProtect plugin) {
         Validate.notNull(plugin);
         this.plugin = plugin;
     }

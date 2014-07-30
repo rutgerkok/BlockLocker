@@ -14,7 +14,7 @@ import nl.rutgerkok.chestsignprotect.SignParser;
 import nl.rutgerkok.chestsignprotect.Translator;
 import nl.rutgerkok.chestsignprotect.impl.converter.SignConverter;
 import nl.rutgerkok.chestsignprotect.impl.event.BlockDestroyListener;
-import nl.rutgerkok.chestsignprotect.impl.event.PlayerInteractListener;
+import nl.rutgerkok.chestsignprotect.impl.event.InteractListener;
 import nl.rutgerkok.chestsignprotect.impl.profile.ProfileFactoryImpl;
 import nl.rutgerkok.chestsignprotect.protection.Protection;
 
@@ -134,7 +134,7 @@ public class ChestSignProtectPlugin extends JavaPlugin implements
     private void registerEvents() {
         PluginManager plugins = Bukkit.getPluginManager();
         plugins.registerEvents(new BlockDestroyListener(this), this);
-        plugins.registerEvents(new PlayerInteractListener(this), this);
+        plugins.registerEvents(new InteractListener(this), this);
     }
 
     @Override
