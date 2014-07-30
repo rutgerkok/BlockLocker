@@ -20,6 +20,8 @@ import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 
 import com.google.common.base.Optional;
@@ -104,6 +106,20 @@ public class BlockDestroyListener implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
+    public void onEntityChangeBlock(EntityChangeBlockEvent event) {
+        if (isProtected(event.getBlock())) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onEntityExplodeEvent(EntityExplodeEvent event) {
+        if (anyProtected(event.blockList())) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
     public void onStructureGrow(StructureGrowEvent event) {
         // Check deleted blocks
         for (BlockState blockState : event.getBlocks()) {
@@ -118,5 +134,4 @@ public class BlockDestroyListener implements Listener {
             }
         }
     }
-
 }
