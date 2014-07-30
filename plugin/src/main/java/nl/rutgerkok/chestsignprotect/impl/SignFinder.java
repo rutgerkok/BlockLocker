@@ -2,6 +2,8 @@ package nl.rutgerkok.chestsignprotect.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import nl.rutgerkok.chestsignprotect.SignParser;
 
@@ -10,6 +12,12 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.material.Attachable;
+import org.bukkit.material.Chest;
+import org.bukkit.material.Directional;
+import org.bukkit.material.MaterialData;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 class SignFinder {
     private static BlockFace[] MAIN_FACES = { BlockFace.NORTH, BlockFace.EAST,
@@ -28,7 +36,7 @@ class SignFinder {
      *            The block to check attached signs on.
      * @return The signs.
      */
-    Collection<Sign> findAttachedSigns(Block block) {
+    private Collection<Sign> findAttachedSigns(Block block) {
         Collection<Sign> signs = new ArrayList<Sign>();
         for (BlockFace face : MAIN_FACES) {
             Block atPosition = block.getRelative(face);
@@ -43,6 +51,74 @@ class SignFinder {
             signs.add(sign);
         }
         return signs;
+    }
+
+    Collection<Sign> findAttachedSigns(List<Block> blocks) {
+        if (blocks.size() == 1) {
+            // Avoid creating a builder, iterator and extra set
+            return findAttachedSigns(blocks.get(0));
+        }
+
+        ImmutableSet.Builder<Sign> signs = ImmutableSet.builder();
+        for (Block block : blocks) {
+            signs.addAll(findAttachedSigns(block));
+        }
+        return signs.build();
+    }
+
+    /**
+     * Searches for containers of the same type attached to this container.
+     *
+     * @param block
+     *            The container.
+     * @return List of attached containers, including the given container.
+     */
+    List<Block> findContainerNeighbors(Block block) {
+        // Currently only chests share an inventory
+        // Minecraft connects two chests next to each other that have the same
+        // direction. We simply check for that condition, taking both normal
+        // and trapped chests into account
+        if (!(getData(block) instanceof Chest)) {
+            return Collections.singletonList(block);
+        }
+
+        Material chestMaterial = block.getType(); // CHEST or TRAPPED_CHEST
+        BlockFace chestFacing = ((Directional) getData(block)).getFacing();
+
+        for (BlockFace face : MAIN_FACES) {
+            Block atPosition = block.getRelative(face);
+            if (atPosition.getType() != chestMaterial) {
+                continue;
+            }
+
+            MaterialData materialData = getData(atPosition);
+            if (!(materialData instanceof Directional)) {
+                continue;
+            }
+
+            BlockFace facing = ((Directional) materialData).getFacing();
+            if (!facing.equals(chestFacing)) {
+                continue;
+            }
+
+            return ImmutableList.of(block, atPosition);
+        }
+
+        return Collections.singletonList(block);
+    }
+
+    /**
+     * Fast alternative for the slow {@code block.getState().getData()} call.
+     * This method skips the part where unnecessary BlockStates are created. For
+     * chests this is quite slow, as all items need to be copied.
+     *
+     * @param block
+     *            The block.
+     * @return The material data of the block.
+     */
+    @SuppressWarnings("deprecation")
+    private MaterialData getData(Block block) {
+        return block.getType().getNewData(block.getData());
     }
 
     /**

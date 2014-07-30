@@ -3,6 +3,7 @@ package nl.rutgerkok.chestsignprotect.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import nl.rutgerkok.chestsignprotect.ChestSettings.SignType;
 import nl.rutgerkok.chestsignprotect.profile.PlayerProfile;
@@ -22,14 +23,15 @@ class ContainerProtectionImpl implements ContainerProtection {
     /**
      * Creates a new protection for the protected block.
      *
-     * @param block
-     *            The block that is protected.
+     * @param blocks
+     *            The blocks that are protected. (Usually one block, multiple
+     *            for double chests.)
      * @param signFinder
      *            The sign finder.
      * @return The protection.
      */
-    static Protection fromBlock(Block block, SignFinder signFinder) {
-        return new ContainerProtectionImpl(block, signFinder);
+    static Protection fromBlocks(List<Block> blocks, SignFinder signFinder) {
+        return new ContainerProtectionImpl(blocks, signFinder);
     }
 
     /**
@@ -37,18 +39,19 @@ class ContainerProtectionImpl implements ContainerProtection {
      * will make for a faster {@link #getOwner()}, as it can simply read the
      * first entry on the main sign.
      *
-     * @param block
-     *            The block that is protected.
+     * @param blocks
+     *            The block that are protected. (Usually one block, multiple for
+     *            double chests.)
      * @param signFinder
      *            The sign finder.
      * @param mainSign
      *            The main sign, used for {@link #getOwner()}.
      * @return The protection.
      */
-    static Protection fromBlockWithMainSign(Block block, SignFinder signFinder,
-            Sign mainSign) {
-        ContainerProtectionImpl protection = new ContainerProtectionImpl(block,
-                signFinder);
+    static Protection fromBlocksWithMainSign(List<Block> blocks,
+            SignFinder signFinder, Sign mainSign) {
+        ContainerProtectionImpl protection = new ContainerProtectionImpl(
+                blocks, signFinder);
         protection.mainSign = Optional.of(mainSign);
         return protection;
     }
@@ -57,31 +60,33 @@ class ContainerProtectionImpl implements ContainerProtection {
      * Creates a new protection for the protection block. Calling this method
      * will make for a faster {@link #getAllowed()} and {@link #getOwner()}
      *
-     * @param block
-     *            The block that is protected.
+     * @param blocks
+     *            The blocks that are protected. (Usually one block, multiple
+     *            for double chests.)
      * @param signFinder
      *            The sign finder.
      * @param signs
      *            All signs in the protection.
      * @return The protection.
      */
-    static Protection fromBlockWithSigns(Block block, SignFinder signFinder,
-            Collection<Sign> signs) {
-        ContainerProtectionImpl protection = new ContainerProtectionImpl(block,
-                signFinder);
+    static Protection fromBlocksWithSigns(List<Block> blocks,
+            SignFinder signFinder, Collection<Sign> signs) {
+        ContainerProtectionImpl protection = new ContainerProtectionImpl(
+                blocks, signFinder);
         protection.fetchMainSignAndAllowed(signs);
         return protection;
     }
 
     private Optional<Collection<Profile>> allAllowed = Optional.absent();
-    private final Block block;
+    private final List<Block> blocks;
 
     private Optional<Sign> mainSign = Optional.absent();
     private Optional<Profile> owner = Optional.absent();
     private final SignFinder signFinder;
 
-    private ContainerProtectionImpl(Block block, SignFinder signFinder) {
-        this.block = block;
+    private ContainerProtectionImpl(List<Block> blocks, SignFinder signFinder) {
+        Validate.notEmpty(blocks);
+        this.blocks = blocks;
         this.signFinder = signFinder;
     }
 
@@ -125,7 +130,7 @@ class ContainerProtectionImpl implements ContainerProtection {
     }
 
     private Collection<Sign> fetchSigns() {
-        return signFinder.findAttachedSigns(block);
+        return signFinder.findAttachedSigns(blocks);
     }
 
     @Override

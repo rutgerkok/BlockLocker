@@ -1,6 +1,7 @@
 package nl.rutgerkok.chestsignprotect.impl;
 
 import java.util.Collection;
+import java.util.List;
 
 import nl.rutgerkok.chestsignprotect.ChestSettings;
 import nl.rutgerkok.chestsignprotect.ChestSettings.ProtectionType;
@@ -31,11 +32,12 @@ class ProtectionFinderImpl implements ProtectionFinder {
         if (!settings.canProtect(ProtectionType.CONTAINER, blockMaterial)) {
             return Optional.absent();
         }
-        Collection<Sign> signs = signFinder.findAttachedSigns(block);
+        List<Block> blocks = signFinder.findContainerNeighbors(block);
+        Collection<Sign> signs = signFinder.findAttachedSigns(blocks);
         if (signs.isEmpty()) {
             return Optional.absent();
         }
-        return Optional.of(ContainerProtectionImpl.fromBlockWithSigns(block,
+        return Optional.of(ContainerProtectionImpl.fromBlocksWithSigns(blocks,
                 signFinder, signs));
     }
 
@@ -98,12 +100,12 @@ class ProtectionFinderImpl implements ProtectionFinder {
      */
     private Protection newContainerProtection(Block containerBlock, Sign sign,
             boolean isMainSign) {
+        List<Block> blocks = signFinder.findContainerNeighbors(containerBlock);
         if (isMainSign) {
-            return ContainerProtectionImpl.fromBlockWithMainSign(
-                    containerBlock, signFinder, sign);
+            return ContainerProtectionImpl.fromBlocksWithMainSign(blocks,
+                    signFinder, sign);
         } else {
-            return ContainerProtectionImpl
-                    .fromBlock(containerBlock, signFinder);
+            return ContainerProtectionImpl.fromBlocks(blocks, signFinder);
         }
     }
 
