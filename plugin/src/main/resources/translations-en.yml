@@ -3,3 +3,4 @@ tag:
   everyone: "[Everyone]"
   private: "[Private]"
   more_users: "[More Users]"
+  player_not_found: "~~Not found~~"

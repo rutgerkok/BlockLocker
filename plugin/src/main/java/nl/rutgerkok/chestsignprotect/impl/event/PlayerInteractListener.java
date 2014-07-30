@@ -29,6 +29,12 @@ public class PlayerInteractListener implements Listener {
             return;
         }
 
+        // Check if protection needs update
+        if (protection.get().isMissingUniqueIds()) {
+            plugin.fixMissingUniqueIds(protection.get());
+        }
+
+        // Check if player is allowed
         Player player = event.getPlayer();
         Profile playerProfile = plugin.getProfileFactory().fromPlayer(player);
         if (protection.get().isAllowed(playerProfile)) {

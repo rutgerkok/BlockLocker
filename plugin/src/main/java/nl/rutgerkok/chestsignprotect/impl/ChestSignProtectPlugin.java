@@ -12,9 +12,11 @@ import nl.rutgerkok.chestsignprotect.ProfileFactory;
 import nl.rutgerkok.chestsignprotect.ProtectionFinder;
 import nl.rutgerkok.chestsignprotect.SignParser;
 import nl.rutgerkok.chestsignprotect.Translator;
+import nl.rutgerkok.chestsignprotect.impl.converter.SignConverter;
 import nl.rutgerkok.chestsignprotect.impl.event.BlockDestroyListener;
 import nl.rutgerkok.chestsignprotect.impl.event.PlayerInteractListener;
 import nl.rutgerkok.chestsignprotect.impl.profile.ProfileFactoryImpl;
+import nl.rutgerkok.chestsignprotect.protection.Protection;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.Configuration;
@@ -29,6 +31,13 @@ public class ChestSignProtectPlugin extends JavaPlugin implements
     private NMSAccessor nms;
     private ProfileFactoryImpl profileFactory;
     private ProtectionFinderImpl protectionFinder;
+    private SignConverter signConverter;
+    private Translator translator;
+
+    @Override
+    public void fixMissingUniqueIds(Protection protection) {
+        signConverter.fixMissingUniqueIds(protection);
+    }
 
     /**
      * Gets a configuration file from the jar file. Unlike
@@ -65,6 +74,11 @@ public class ChestSignProtectPlugin extends JavaPlugin implements
         return protectionFinder;
     }
 
+    @Override
+    public Translator getTranslator() {
+        return translator;
+    }
+
     private Translator loadTranslations(String fileName) {
         File file = new File(getDataFolder(), fileName);
         Configuration config = YamlConfiguration.loadConfiguration(file);
@@ -99,7 +113,7 @@ public class ChestSignProtectPlugin extends JavaPlugin implements
         Config config = new Config(getConfig());
 
         // Translation
-        Translator translator = loadTranslations(config.getLanguageFileName());
+        translator = loadTranslations(config.getLanguageFileName());
 
         // Parsers and finders
         profileFactory = new ProfileFactoryImpl(translator);
@@ -108,6 +122,7 @@ public class ChestSignProtectPlugin extends JavaPlugin implements
                 profileFactory);
         SignFinder signFinder = new SignFinder(signParser);
         protectionFinder = new ProtectionFinderImpl(signFinder, chestSettings);
+        signConverter = new SignConverter(this, signParser, nms);
 
         // Events
         registerEvents();
@@ -122,15 +137,8 @@ public class ChestSignProtectPlugin extends JavaPlugin implements
         plugins.registerEvents(new PlayerInteractListener(this), this);
     }
 
-    /**
-     * Logs a message with severe importance, along with a stack trace.
-     *
-     * @param message
-     *            The message to log.
-     * @param t
-     *            The exception that provides the stack trace.
-     */
-    private void severe(String message, Throwable t) {
+    @Override
+    public void severe(String message, Throwable t) {
         getLogger().log(Level.SEVERE, message, t);
     }
 

@@ -2,6 +2,8 @@ package nl.rutgerkok.chestsignprotect.profile;
 
 import nl.rutgerkok.chestsignprotect.protection.Protection;
 
+import org.json.simple.JSONObject;
+
 /**
  * Represents a profile. A profile is something that owns or is allowed access
  * to a {@link Protection}.
@@ -17,11 +19,11 @@ public interface Profile {
     String getDisplayName();
 
     /**
-     * Gets the name as it should be saved. May not contain spaces.
+     * Gets the object as it should be saved.
      *
-     * @return The name as it should be saved.
+     * @return The object as it should be saved.
      */
-    String getSaveName();
+    JSONObject getSaveObject();
 
     /**
      * Gets whether this profile includes another profile. For example,

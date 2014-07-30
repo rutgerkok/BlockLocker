@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import nl.rutgerkok.chestsignprotect.ChestSettings.SignType;
+import nl.rutgerkok.chestsignprotect.profile.PlayerProfile;
 import nl.rutgerkok.chestsignprotect.profile.Profile;
 import nl.rutgerkok.chestsignprotect.protection.ContainerProtection;
 import nl.rutgerkok.chestsignprotect.protection.Protection;
@@ -57,9 +58,12 @@ class ContainerProtectionImpl implements ContainerProtection {
      * will make for a faster {@link #getAllowed()} and {@link #getOwner()}
      *
      * @param block
+     *            The block that is protected.
      * @param signFinder
+     *            The sign finder.
      * @param signs
-     * @return
+     *            All signs in the protection.
+     * @return The protection.
      */
     static Protection fromBlockWithSigns(Block block, SignFinder signFinder,
             Collection<Sign> signs) {
@@ -144,11 +148,33 @@ class ContainerProtectionImpl implements ContainerProtection {
     }
 
     @Override
+    public Collection<Sign> getSigns() {
+        // Sign objects cannot be cached
+        return fetchSigns();
+    }
+
+    @Override
     public boolean isAllowed(Profile profile) {
         for (Profile allowed : getAllowed()) {
             if (allowed.includes(profile)) {
                 return true;
             }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isMissingUniqueIds() {
+        for (Profile profile : getAllowed()) {
+            if (!(profile instanceof PlayerProfile)) {
+                continue;
+            }
+            if (((PlayerProfile) profile).getUniqueId().isPresent()) {
+                continue;
+            }
+
+            // Found missing id
+            return true;
         }
         return false;
     }

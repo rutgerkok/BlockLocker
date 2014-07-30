@@ -1,6 +1,7 @@
 package nl.rutgerkok.chestsignprotect.impl;
 
 import java.util.Collection;
+import java.util.List;
 
 import nl.rutgerkok.chestsignprotect.ChestSettings;
 import nl.rutgerkok.chestsignprotect.ChestSettings.SignType;
@@ -10,6 +11,8 @@ import nl.rutgerkok.chestsignprotect.profile.Profile;
 
 import org.bukkit.ChatColor;
 import org.bukkit.block.Sign;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import com.google.common.base.Optional;
 
@@ -58,15 +61,17 @@ class SignParserImpl implements SignParser {
     /**
      * Used for signs where the hidden text was found.
      *
-     * @param text
+     * @param jsonArray
      *            The hidden text.
      * @param addTo
      *            The profile collection to add all profiles to.
      */
-    private void parseAdvancedSign(String text, Collection<Profile> addTo) {
-        String[] lines = text.split(" ");
-        for (String line : lines) {
-            Optional<Profile> profile = profileFactory.fromSavedText(line);
+    private void parseAdvancedSign(JSONArray jsonArray,
+            Collection<Profile> addTo) {
+        @SuppressWarnings("unchecked")
+        List<JSONObject> list = jsonArray;
+        for (JSONObject object : list) {
+            Optional<Profile> profile = profileFactory.fromSavedObject(object);
             if (profile.isPresent()) {
                 addTo.add(profile.get());
             }
@@ -83,10 +88,12 @@ class SignParserImpl implements SignParser {
      */
     @Override
     public void parseSign(Sign sign, Collection<Profile> addTo) {
-        Optional<String> foundTextData = nms.getTextData(sign);
+        Optional<JSONArray> foundTextData = nms.getJsonData(sign);
         if (foundTextData.isPresent()) {
+            System.out.println("Found extra data");
             parseAdvancedSign(foundTextData.get(), addTo);
         } else {
+            System.out.println("Found simple sign");
             parseSimpleSign(sign.getLines(), addTo);
         }
     }

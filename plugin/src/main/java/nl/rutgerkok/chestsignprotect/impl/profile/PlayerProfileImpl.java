@@ -2,16 +2,21 @@ package nl.rutgerkok.chestsignprotect.impl.profile;
 
 import java.util.UUID;
 
+import nl.rutgerkok.chestsignprotect.profile.PlayerProfile;
 import nl.rutgerkok.chestsignprotect.profile.Profile;
+
+import org.json.simple.JSONObject;
 
 import com.google.common.base.Optional;
 
-class PlayerProfile implements Profile {
+class PlayerProfileImpl implements PlayerProfile {
 
+    static final String NAME_KEY = "n";
+    static final String UUID_KEY = "u";
     private final String displayName;
     private final Optional<UUID> uuid;
 
-    PlayerProfile(String displayName, Optional<UUID> uuid) {
+    PlayerProfileImpl(String displayName, Optional<UUID> uuid) {
         this.displayName = displayName;
         this.uuid = uuid;
     }
@@ -33,7 +38,7 @@ class PlayerProfile implements Profile {
             return false;
         }
 
-        PlayerProfile otherProfile = (PlayerProfile) other;
+        PlayerProfileImpl otherProfile = (PlayerProfileImpl) other;
         if (uuid.isPresent() != otherProfile.uuid.isPresent()) {
             return false;
         }
@@ -50,12 +55,20 @@ class PlayerProfile implements Profile {
         return displayName;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public String getSaveName() {
+    public JSONObject getSaveObject() {
+        JSONObject object = new JSONObject();
+        object.put(NAME_KEY, displayName);
         if (uuid.isPresent()) {
-            return uuid.get() + "|" + displayName;
+            object.put(UUID_KEY, uuid.get().toString());
         }
-        return displayName;
+        return object;
+    }
+
+    @Override
+    public Optional<UUID> getUniqueId() {
+        return uuid;
     }
 
     @Override
@@ -68,12 +81,12 @@ class PlayerProfile implements Profile {
 
     @Override
     public boolean includes(Profile other) {
-        if (!(other instanceof PlayerProfile)) {
+        if (!(other instanceof PlayerProfileImpl)) {
             return false;
         }
 
-        PlayerProfile otherProfile = (PlayerProfile) other;
-        if (uuid.isPresent() && otherProfile.uuid.isPresent()) {
+        PlayerProfileImpl otherProfile = (PlayerProfileImpl) other;
+        if (uuid.isPresent()) {
             return uuid.equals(otherProfile.uuid);
         }
         return displayName.equalsIgnoreCase(otherProfile.displayName);

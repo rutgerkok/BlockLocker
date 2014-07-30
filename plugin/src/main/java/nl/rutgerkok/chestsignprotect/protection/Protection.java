@@ -4,6 +4,8 @@ import java.util.Collection;
 
 import nl.rutgerkok.chestsignprotect.profile.Profile;
 
+import org.bukkit.block.Sign;
+
 import com.google.common.base.Optional;
 
 /**
@@ -33,6 +35,15 @@ public interface Protection {
     Optional<Profile> getOwner();
 
     /**
+     * Gets all signs used in this protection. Low-level method,
+     * {@link #getAllowed()} is preferred. Example usage is changing the
+     * contents on the sign.
+     *
+     * @return All signs used by this protection.
+     */
+    Collection<Sign> getSigns();
+
+    /**
      * Checks if the given profile has been allowed to this protection.
      *
      * @param profile
@@ -41,6 +52,14 @@ public interface Protection {
      * @see #getAllowed()
      */
     boolean isAllowed(Profile profile);
+
+    /**
+     * Gets whether this sign is missing unique ids, and has to rely on player
+     * names.
+     *
+     * @return True if this sign is missing unique ids, false otherwise.
+     */
+    boolean isMissingUniqueIds();
 
     /**
      * Checks if the given profile is the owner of this chest.

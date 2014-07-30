@@ -3,8 +3,11 @@ package nl.rutgerkok.chestsignprotect.impl.profile;
 import nl.rutgerkok.chestsignprotect.profile.Profile;
 
 import org.apache.commons.lang.Validate;
+import org.json.simple.JSONObject;
 
 class EveryoneProfile implements Profile {
+
+    static final String EVERYONE_KEY = "e";
 
     private final String tag;
 
@@ -37,9 +40,12 @@ class EveryoneProfile implements Profile {
         return tag;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public String getSaveName() {
-        return tag;
+    public JSONObject getSaveObject() {
+        JSONObject object = new JSONObject();
+        object.put(EVERYONE_KEY, true);
+        return object;
     }
 
     /**

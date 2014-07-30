@@ -31,7 +31,11 @@ public class ProtectedTileEntitySign extends TileEntitySign {
         }
     }
 
-    public String getExtraText() {
-        return extraText.or("");
+    public Optional<String> getExtraText() {
+        return extraText;
+    }
+
+    public void setExtraText(String data) {
+        extraText = Optional.of(data);
     }
 }
