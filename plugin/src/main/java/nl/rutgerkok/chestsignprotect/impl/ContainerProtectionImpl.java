@@ -78,11 +78,11 @@ class ContainerProtectionImpl implements ContainerProtection {
     }
 
     private Optional<Collection<Profile>> allAllowed = Optional.absent();
-    private final List<Block> blocks;
+    private final BlockFinder blockFinder;
 
+    private final List<Block> blocks;
     private Optional<Sign> mainSign = Optional.absent();
     private Optional<Profile> owner = Optional.absent();
-    private final BlockFinder blockFinder;
 
     private ContainerProtectionImpl(List<Block> blocks, BlockFinder blockFinder) {
         Validate.notEmpty(blocks);

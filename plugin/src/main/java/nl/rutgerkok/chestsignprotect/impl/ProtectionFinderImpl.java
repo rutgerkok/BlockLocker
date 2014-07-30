@@ -19,8 +19,8 @@ import org.bukkit.material.Attachable;
 import com.google.common.base.Optional;
 
 class ProtectionFinderImpl implements ProtectionFinder {
-    private final ChestSettings settings;
     private final BlockFinder blockFinder;
+    private final ChestSettings settings;
 
     ProtectionFinderImpl(BlockFinder lookup, ChestSettings settings) {
         blockFinder = lookup;
