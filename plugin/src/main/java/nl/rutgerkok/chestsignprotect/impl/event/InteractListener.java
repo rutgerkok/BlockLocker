@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
 import com.google.common.base.Optional;
@@ -18,6 +17,24 @@ public class InteractListener extends EventListener {
 
     public InteractListener(ChestSignProtect plugin) {
         super(plugin);
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onInventoryMoveItemEvent(InventoryMoveItemEvent event) {
+        InventoryHolder from = event.getInitiator().getHolder();
+        InventoryHolder to = event.getDestination().getHolder();
+        if (from instanceof BlockState) {
+            if (isProtected(((BlockState) from).getBlock())) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+        if (to instanceof BlockState) {
+            if (isProtected(((BlockState) to).getBlock())) {
+                event.setCancelled(true);
+                return;
+            }
+        }
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -42,4 +59,5 @@ public class InteractListener extends EventListener {
 
         event.setCancelled(true);
     }
+
 }

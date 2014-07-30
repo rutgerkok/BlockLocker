@@ -31,8 +31,6 @@ public class BlockDestroyListener extends EventListener {
         super(plugin);
     }
 
-
-
     @EventHandler(ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
         Optional<Protection> protection = plugin.getProtectionFinder()
