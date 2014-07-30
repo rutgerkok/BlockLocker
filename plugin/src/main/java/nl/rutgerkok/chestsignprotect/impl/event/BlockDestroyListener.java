@@ -1,6 +1,5 @@
 package nl.rutgerkok.chestsignprotect.impl.event;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -8,13 +7,11 @@ import nl.rutgerkok.chestsignprotect.ChestSignProtect;
 import nl.rutgerkok.chestsignprotect.profile.Profile;
 import nl.rutgerkok.chestsignprotect.protection.Protection;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockDamageEvent;
@@ -28,27 +25,13 @@ import org.bukkit.event.world.StructureGrowEvent;
 
 import com.google.common.base.Optional;
 
-public class BlockDestroyListener implements Listener {
-
-    private final ChestSignProtect plugin;
+public class BlockDestroyListener extends EventListener {
 
     public BlockDestroyListener(ChestSignProtect plugin) {
-        Validate.notNull(plugin);
-        this.plugin = plugin;
+        super(plugin);
     }
 
-    private boolean anyProtected(Collection<Block> blocks) {
-        for (Block block : blocks) {
-            if (isProtected(block)) {
-                return true;
-            }
-        }
-        return false;
-    }
 
-    private boolean isProtected(Block block) {
-        return plugin.getProtectionFinder().findProtection(block).isPresent();
-    }
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
