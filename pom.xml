@@ -5,13 +5,14 @@
 	<groupId>nl.rutgerkok</groupId>
 	<artifactId>chestsignprotect-base</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
+	<packaging>pom</packaging>
 
-	<name>chestsignprotect</name>
+	<name>ChestSignProtect-Base</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<chestsignprotect.version>${project.version}</chestsignprotect.version>
 	</properties>
 
 	<repositories>
@@ -24,5 +25,6 @@
 	<modules>
 		<module>plugin</module>
 		<module>v1_7_R3</module>
-	</module>
+		<module>v1_7_R4</module>
+	</modules>
 </project>

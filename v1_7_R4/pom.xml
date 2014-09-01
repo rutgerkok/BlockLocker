@@ -3,11 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>nl.rutgerkok</groupId>
-	<artifactId>chestsignprotect-v1_7_R3</artifactId>
-	<version>v1_7_R3</version>
+	<artifactId>chestsignprotect-v1_7_R4</artifactId>
+	<version>v1_7_R4</version>
 	<packaging>jar</packaging>
 
-	<name>ChestSignProtect v1_7_R3</name>
+	<name>ChestSignProtect v1_7_R4</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
@@ -25,7 +25,7 @@
 		<dependency>
 			<groupId>org.bukkit</groupId>
 			<artifactId>craftbukkit</artifactId>
-			<version>1.7.9-R0.2</version>
+			<version>1.7.10-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
