@@ -1,6 +1,8 @@
 # Translations file for the English language
+protection:
+  claimed_container: "&6Claimed this container. Nobody else can access it."
 tag:
   everyone: "[Everyone]"
-  private: "[Private]"
-  more_users: "[More Users]"
+  private: "&9[Private]"
+  more_users: "&9[More Users]"
   player_not_found: "~~Not found~~"

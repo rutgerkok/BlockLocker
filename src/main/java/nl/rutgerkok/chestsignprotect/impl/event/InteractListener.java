@@ -1,15 +1,29 @@
 package nl.rutgerkok.chestsignprotect.impl.event;
 
+import nl.rutgerkok.chestsignprotect.ChestSettings.ProtectionType;
 import nl.rutgerkok.chestsignprotect.ChestSignProtect;
+import nl.rutgerkok.chestsignprotect.Permissions;
+import nl.rutgerkok.chestsignprotect.ProtectionSign;
+import nl.rutgerkok.chestsignprotect.SignType;
+import nl.rutgerkok.chestsignprotect.Translator.Translation;
+import nl.rutgerkok.chestsignprotect.profile.PlayerProfile;
 import nl.rutgerkok.chestsignprotect.profile.Profile;
 import nl.rutgerkok.chestsignprotect.protection.Protection;
 
+import org.bukkit.GameMode;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.MaterialData;
 
 import com.google.common.base.Optional;
 
@@ -37,11 +51,27 @@ public class InteractListener extends EventListener {
         }
     }
 
+    /**
+     * Prevents access to containers.
+     *
+     * @param event
+     *            The event object.
+     */
     @EventHandler(ignoreCancelled = true)
     public void onPlayerInteract(PlayerInteractEvent event) {
-        Optional<Protection> protection = plugin.getProtectionFinder()
-                .findProtection(event.getClickedBlock());
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) {
+            return;
+        }
+
+        Player player = event.getPlayer();
+        Block block = event.getClickedBlock();
+        Optional<Protection> protection = plugin.getProtectionFinder().findProtection(block);
+
         if (!protection.isPresent()) {
+            if (tryPlaceSign(event.getPlayer(), block, event.getBlockFace())) {
+                plugin.getTranslator().sendMessage(player, Translation.PROTECTION_CLAIMED_CONTAINER);
+                event.setCancelled(true);
+            }
             return;
         }
 
@@ -51,7 +81,6 @@ public class InteractListener extends EventListener {
         }
 
         // Check if player is allowed
-        Player player = event.getPlayer();
         Profile playerProfile = plugin.getProfileFactory().fromPlayer(player);
         if (protection.get().isAllowed(playerProfile)) {
             return;
@@ -59,5 +88,73 @@ public class InteractListener extends EventListener {
 
         event.setCancelled(true);
     }
+
+    private boolean hasSignInHand(Player player) {
+        ItemStack itemInHand = player.getItemInHand();
+        if (itemInHand == null || itemInHand.getAmount() == 0 || itemInHand.getType() != Material.SIGN) {
+            return false;
+        }
+        return true;
+    }
+
+    private void removeSingleItemFromHand(Player player) {
+        if (player.getGameMode() == GameMode.CREATIVE) {
+            return;
+        }
+
+        ItemStack itemInHand = player.getItemInHand();
+        if (itemInHand == null) {
+            return;
+        }
+
+        if (itemInHand.getAmount() > 1) {
+            itemInHand.setAmount(itemInHand.getAmount() - 1);
+            player.setItemInHand(itemInHand);
+        } else {
+            player.setItemInHand(null);
+        }
+    }
+
+    private boolean tryPlaceSign(Player player, Block block, BlockFace clickedSide) {
+        if (player.isSneaking()) {
+            return false;
+        }
+        if (!plugin.getChestSettings().canProtect(ProtectionType.CONTAINER, block.getType())) {
+            return false;
+        }
+        if (!player.hasPermission(Permissions.CAN_PROTECT)) {
+            return false;
+        }
+        if (!hasSignInHand(player)) {
+            return false;
+        }
+
+        Block signBlock = block.getRelative(clickedSide);
+        if (signBlock.getType() != Material.AIR) {
+            return false;
+        }
+
+        // Create empty sign
+        org.bukkit.material.Sign signMaterial = new org.bukkit.material.Sign(Material.WALL_SIGN);
+        signMaterial.setFacingDirection(clickedSide);
+        // Set base material so that .getState() will be of the correct type
+        setBlockMaterialData(signBlock, signMaterial);
+        Sign sign = (Sign) signBlock.getState();
+
+        // Place text on it
+        PlayerProfile profile = plugin.getProfileFactory().fromPlayer(player);
+        ProtectionSign protectionSign = plugin.getProtectionFinder().newProtectionSign(sign, SignType.PRIVATE, profile);
+        plugin.getSignParser().saveSign(protectionSign);
+
+        // Remove the sign from the player's hand
+        removeSingleItemFromHand(player);
+        return true;
+    }
+
+    @SuppressWarnings("deprecation")
+    private void setBlockMaterialData(Block block, MaterialData materialData) {
+        block.setTypeIdAndData(materialData.getItemTypeId(), materialData.getData(), false);
+    }
+
 
 }

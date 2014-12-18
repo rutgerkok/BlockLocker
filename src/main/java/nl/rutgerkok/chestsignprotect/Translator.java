@@ -1,6 +1,7 @@
 package nl.rutgerkok.chestsignprotect;
 
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 
 /**
  * Collection of translations.
@@ -9,7 +10,11 @@ import org.bukkit.ChatColor;
 public interface Translator {
 
     public enum Translation {
-        TAG_EVERYONE, TAG_MORE_USERS, TAG_PLAYER_NOT_FOUND, TAG_PRIVATE;
+        PROTECTION_CLAIMED_CONTAINER,
+        TAG_EVERYONE,
+        TAG_MORE_USERS,
+        TAG_PLAYER_NOT_FOUND,
+        TAG_PRIVATE;
 
         /**
          * Gets the key used in configuration files.
@@ -39,4 +44,14 @@ public interface Translator {
      * @return The translation, or the key if not found.
      */
     String getWithoutColor(Translation key);
+
+    /**
+     * Sends the specified message translated to the given player.
+     * 
+     * @param player
+     *            The player (or console) to the send the message to.
+     * @param translation
+     *            The message to send.
+     */
+    void sendMessage(CommandSender player, Translation translation);
 }
