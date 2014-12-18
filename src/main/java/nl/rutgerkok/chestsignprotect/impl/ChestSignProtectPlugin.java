@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.logging.Level;
 
+import nl.rutgerkok.chestsignprotect.ChestSettings;
 import nl.rutgerkok.chestsignprotect.ChestSignProtect;
 import nl.rutgerkok.chestsignprotect.ProfileFactory;
 import nl.rutgerkok.chestsignprotect.ProtectionFinder;
@@ -29,11 +30,12 @@ import com.google.common.base.Charsets;
 
 public class ChestSignProtectPlugin extends JavaPlugin implements
         ChestSignProtect {
-    private NMSAccessor nms;
     private ProfileFactoryImpl profileFactory;
     private ProtectionFinderImpl protectionFinder;
     private SignConverter signConverter;
     private Translator translator;
+    private ChestSettings chestSettings;
+    private SignParser signParser;
 
     @Override
     public void fixMissingUniqueIds(Protection protection) {
@@ -100,6 +102,7 @@ public class ChestSignProtectPlugin extends JavaPlugin implements
     @Override
     public void onEnable() {
         // NMS checks
+        NMSAccessor nms;
         try {
             nms = new NMSAccessor();
         } catch (Throwable t) {
@@ -117,12 +120,11 @@ public class ChestSignProtectPlugin extends JavaPlugin implements
 
         // Parsers and finders
         profileFactory = new ProfileFactoryImpl(translator);
-        ChestSettingsImpl chestSettings = new ChestSettingsImpl(translator);
-        SignParser signParser = new SignParserImpl(chestSettings, nms,
-                profileFactory);
+        chestSettings = new ChestSettingsImpl(translator);
+        signParser = new SignParserImpl(chestSettings, nms, profileFactory);
         BlockFinder blockFinder = new BlockFinder(signParser);
         protectionFinder = new ProtectionFinderImpl(blockFinder, chestSettings);
-        signConverter = new SignConverter(this, signParser, nms);
+        signConverter = new SignConverter(this, signParser);
 
         // Events
         registerEvents();
@@ -140,6 +142,16 @@ public class ChestSignProtectPlugin extends JavaPlugin implements
     @Override
     public void severe(String message, Throwable t) {
         getLogger().log(Level.SEVERE, message, t);
+    }
+
+    @Override
+    public ChestSettings getChestSettings() {
+        return chestSettings;
+    }
+
+    @Override
+    public SignParser getSignParser() {
+        return signParser;
     }
 
 }

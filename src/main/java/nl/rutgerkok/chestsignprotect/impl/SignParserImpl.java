@@ -1,17 +1,24 @@
 package nl.rutgerkok.chestsignprotect.impl;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import nl.rutgerkok.chestsignprotect.ChestSettings;
-import nl.rutgerkok.chestsignprotect.ChestSettings.SignType;
+import nl.rutgerkok.chestsignprotect.ProtectionSign;
 import nl.rutgerkok.chestsignprotect.SignParser;
+import nl.rutgerkok.chestsignprotect.SignType;
 import nl.rutgerkok.chestsignprotect.impl.nms.NMSAccessor;
 import nl.rutgerkok.chestsignprotect.impl.profile.ProfileFactoryImpl;
 import nl.rutgerkok.chestsignprotect.profile.Profile;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import com.google.common.base.Optional;
@@ -37,13 +44,18 @@ class SignParserImpl implements SignParser {
     @Override
     public Optional<SignType> getSignType(Sign sign) {
         String header = sign.getLine(0);
+        return Optional.fromNullable(getSignTypeUnsafe(header));
+    }
+
+    @Nullable
+    private SignType getSignTypeUnsafe(String header) {
         header = ChatColor.stripColor(header).trim();
         for (SignType type : SignType.values()) {
             if (header.equalsIgnoreCase(chestSettings.getLocalizedHeader(type))) {
-                return Optional.of(type);
+                return type;
             }
         }
-        return Optional.absent();
+        return null;
     }
 
     @Override
@@ -58,35 +70,23 @@ class SignParserImpl implements SignParser {
      *            The hidden text.
      * @param addTo
      *            The profile collection to add all profiles to.
+     * @return
      */
-    private void parseAdvancedSign(List<JSONObject> list,
-            Collection<Profile> addTo) {
+    private Optional<ProtectionSign> parseAdvancedSign(Location location, String header, List<JSONObject> list) {
+        SignType signType = getSignTypeUnsafe(header);
+        if (signType == null) {
+            return Optional.absent();
+        }
+
+        List<Profile> profiles = new ArrayList<Profile>();
         for (JSONObject object : list) {
             Optional<Profile> profile = profileFactory.fromSavedObject(object);
             if (profile.isPresent()) {
-                addTo.add(profile.get());
+                profiles.add(profile.get());
             }
         }
-    }
 
-    /**
-     * Parses the given sign for all names on it.
-     *
-     * @param sign
-     *            The sign to parse.
-     * @param addTo
-     *            The collection to add the profiles to.
-     */
-    @Override
-    public void parseSign(Sign sign, Collection<Profile> addTo) {
-        Optional<List<JSONObject>> foundTextData = nms.getJsonData(sign);
-        if (foundTextData.isPresent()) {
-            System.out.println("Found extra data");
-            parseAdvancedSign(foundTextData.get(), addTo);
-        } else {
-            System.out.println("Found simple sign");
-            parseSimpleSign(sign.getLines(), addTo);
-        }
+        return Optional.<ProtectionSign> of(new ProtectionSignImpl(location, signType, profiles));
     }
 
     /**
@@ -95,16 +95,63 @@ class SignParserImpl implements SignParser {
      *
      * @param lines
      *            The lines on the sign.
-     * @param addTo
-     *            The profile collection to add all profiles to.
+     * @return The protection sign, if the header format is correct.
      */
-    private void parseSimpleSign(String[] lines, Collection<Profile> addTo) {
-        // First line is not parsed, as it contains the header
+    private Optional<ProtectionSign> parseSimpleSign(Location location, String[] lines) {
+        SignType signType = getSignTypeUnsafe(lines[0]);
+        if (signType == null) {
+            return Optional.absent();
+        }
+
+        List<Profile> profiles = new ArrayList<Profile>();
         for (int i = 1; i < lines.length; i++) {
             String name = lines[i].trim();
             if (!name.isEmpty()) {
-                addTo.add(profileFactory.fromDisplayText(name));
+                profiles.add(profileFactory.fromDisplayText(name));
             }
         }
+
+        return Optional.<ProtectionSign> of(new ProtectionSignImpl(location, signType, profiles));
+    }
+
+    @Override
+    public Optional<ProtectionSign> parseSign(Sign sign) {
+        Optional<List<JSONObject>> foundTextData = nms.getJsonData(sign);
+        if (foundTextData.isPresent()) {
+            System.out.println("Found extra data");
+            return parseAdvancedSign(sign.getLocation(), sign.getLine(0), foundTextData.get());
+        } else {
+            System.out.println("Found simple sign");
+            return parseSimpleSign(sign.getLocation(), sign.getLines());
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void saveSign(ProtectionSign sign) {
+        // Find sign
+        Location signLocation = sign.getLocation();
+        Block block = signLocation.getWorld().getBlockAt(signLocation);
+        BlockState blockState = block.getState();
+        if (!(blockState instanceof Sign)) {
+            return;
+        }
+
+        // Update sign, both visual and using raw JSON
+        Sign signState = (Sign) blockState;
+        signState.setLine(0, chestSettings.getLocalizedHeader(sign.getType()));
+
+        JSONArray jsonArray = new JSONArray();
+        int i = 1; // Start at 1 to avoid overwriting the header
+        for (Profile profile : sign.getProfiles()) {
+            signState.setLine(i, profile.getDisplayName());
+            jsonArray.add(profile.getSaveObject());
+            i++;
+        }
+
+        // Save the text and JSON
+        // (JSON after text, to avoid text overwriting the JSON)
+        signState.update();
+        nms.setJsonData(signState, jsonArray);
     }
 }

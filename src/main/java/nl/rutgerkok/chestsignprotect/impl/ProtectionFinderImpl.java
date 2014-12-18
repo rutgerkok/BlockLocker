@@ -1,12 +1,17 @@
 package nl.rutgerkok.chestsignprotect.impl;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import nl.rutgerkok.chestsignprotect.ChestSettings;
 import nl.rutgerkok.chestsignprotect.ChestSettings.ProtectionType;
-import nl.rutgerkok.chestsignprotect.ChestSettings.SignType;
 import nl.rutgerkok.chestsignprotect.ProtectionFinder;
+import nl.rutgerkok.chestsignprotect.ProtectionSign;
+import nl.rutgerkok.chestsignprotect.SignType;
+import nl.rutgerkok.chestsignprotect.impl.protection.ContainerProtectionImpl;
+import nl.rutgerkok.chestsignprotect.profile.PlayerProfile;
+import nl.rutgerkok.chestsignprotect.profile.Profile;
 import nl.rutgerkok.chestsignprotect.protection.Protection;
 
 import org.apache.commons.lang.Validate;
@@ -33,7 +38,7 @@ class ProtectionFinderImpl implements ProtectionFinder {
             return Optional.absent();
         }
         List<Block> blocks = blockFinder.findContainerNeighbors(block);
-        Collection<Sign> signs = blockFinder.findAttachedSigns(blocks);
+        Collection<ProtectionSign> signs = blockFinder.findAttachedSigns(blocks);
         if (signs.isEmpty()) {
             return Optional.absent();
         }
@@ -43,11 +48,10 @@ class ProtectionFinderImpl implements ProtectionFinder {
 
     private Optional<Protection> findForSign(Sign sign) {
         // Get type of sign
-        Optional<SignType> signType = blockFinder.getSignParser().getSignType(sign);
-        if (!signType.isPresent()) {
+        Optional<ProtectionSign> parsed = blockFinder.getSignParser().parseSign(sign);
+        if (!parsed.isPresent()) {
             return Optional.absent();
         }
-        boolean isMainSign = signType.get().isMainSign();
 
         Attachable attachable = (Attachable) sign.getData();
         Block attachedBlock = sign.getBlock().getRelative(
@@ -56,8 +60,7 @@ class ProtectionFinderImpl implements ProtectionFinder {
         // Check if attached block is a container
         if (settings.canProtect(ProtectionType.CONTAINER,
                 attachedBlock.getType())) {
-            return Optional.of(newContainerProtection(attachedBlock, sign,
-                    isMainSign));
+            return Optional.of(newContainerProtection(attachedBlock, parsed.get()));
         }
 
         // Check if block above or below is a door
@@ -97,15 +100,19 @@ class ProtectionFinderImpl implements ProtectionFinder {
      *            Users] signs.
      * @return The created protection.
      */
-    private Protection newContainerProtection(Block containerBlock, Sign sign,
-            boolean isMainSign) {
+    private Protection newContainerProtection(Block containerBlock, ProtectionSign sign) {
         List<Block> blocks = blockFinder.findContainerNeighbors(containerBlock);
-        if (isMainSign) {
+        if (sign.getType().isMainSign()) {
             return ContainerProtectionImpl.fromBlocksWithMainSign(blocks,
                     blockFinder, sign);
         } else {
             return ContainerProtectionImpl.fromBlocks(blocks, blockFinder);
         }
+    }
+
+    @Override
+    public ProtectionSign newProtectionSign(Sign sign, SignType signType, PlayerProfile owner) {
+        return new ProtectionSignImpl(sign.getLocation(), signType, Collections.<Profile> singletonList(owner));
     }
 
 }

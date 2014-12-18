@@ -1,6 +1,7 @@
 package nl.rutgerkok.chestsignprotect.impl;
 
 import nl.rutgerkok.chestsignprotect.ChestSettings;
+import nl.rutgerkok.chestsignprotect.SignType;
 import nl.rutgerkok.chestsignprotect.Translator;
 import nl.rutgerkok.chestsignprotect.Translator.Translation;
 

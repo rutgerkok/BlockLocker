@@ -1,9 +1,11 @@
 package nl.rutgerkok.chestsignprotect;
 
+import nl.rutgerkok.chestsignprotect.profile.PlayerProfile;
 import nl.rutgerkok.chestsignprotect.protection.Protection;
 
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.Sign;
 
 import com.google.common.base.Optional;
 
@@ -37,4 +39,21 @@ public interface ProtectionFinder {
      *
      */
     Optional<Protection> findProtection(World world, int x, int y, int z);
+
+    /**
+     * Creates a new protection sign, ignoring the content already on the sign.
+     * 
+     * <p>
+     * To inspect the contents of existing signs, use
+     * {@link #findProtection(Block)}.
+     * 
+     * @param sign
+     *            The sign.
+     * @param signType
+     *            Type to set the sign to.
+     * @param owner
+     *            Owner for the sign.
+     * @return The new protection sign.
+     */
+    ProtectionSign newProtectionSign(Sign sign, SignType signType, PlayerProfile owner);
 }

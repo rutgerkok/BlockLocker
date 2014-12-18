@@ -39,6 +39,21 @@ public interface ChestSignProtect {
     Translator getTranslator();
 
     /**
+     * Gets the {@link ChestSettings} object, containing all customizable
+     * aspects of the plugin.
+     * 
+     * @return The settings object.
+     */
+    ChestSettings getChestSettings();
+
+    /**
+     * Gets the {@link SignParser} object.
+     * 
+     * @return The sign parser.
+     */
+    SignParser getSignParser();
+
+    /**
      * Logs a message with severe importance, along with a stack trace.
      *
      * @param string

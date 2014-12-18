@@ -1,11 +1,11 @@
-package nl.rutgerkok.chestsignprotect.impl;
+package nl.rutgerkok.chestsignprotect.impl.protection;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
-import nl.rutgerkok.chestsignprotect.ChestSettings.SignType;
+import nl.rutgerkok.chestsignprotect.ProtectionSign;
+import nl.rutgerkok.chestsignprotect.SignType;
+import nl.rutgerkok.chestsignprotect.impl.BlockFinder;
 import nl.rutgerkok.chestsignprotect.profile.PlayerProfile;
 import nl.rutgerkok.chestsignprotect.profile.Profile;
 import nl.rutgerkok.chestsignprotect.protection.ContainerProtection;
@@ -13,12 +13,11 @@ import nl.rutgerkok.chestsignprotect.protection.Protection;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.block.Block;
-import org.bukkit.block.Sign;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 
-class ContainerProtectionImpl implements ContainerProtection {
+public final class ContainerProtectionImpl implements ContainerProtection {
 
     /**
      * Creates a new protection for the protected block.
@@ -30,7 +29,7 @@ class ContainerProtectionImpl implements ContainerProtection {
      *            The sign finder.
      * @return The protection.
      */
-    static Protection fromBlocks(List<Block> blocks, BlockFinder blockFinder) {
+    public static Protection fromBlocks(List<Block> blocks, BlockFinder blockFinder) {
         return new ContainerProtectionImpl(blocks, blockFinder);
     }
 
@@ -48,8 +47,8 @@ class ContainerProtectionImpl implements ContainerProtection {
      *            The main sign, used for {@link #getOwner()}.
      * @return The protection.
      */
-    static Protection fromBlocksWithMainSign(List<Block> blocks,
-            BlockFinder blockFinder, Sign mainSign) {
+    public static Protection fromBlocksWithMainSign(List<Block> blocks,
+            BlockFinder blockFinder, ProtectionSign mainSign) {
         ContainerProtectionImpl protection = new ContainerProtectionImpl(
                 blocks, blockFinder);
         protection.mainSign = Optional.of(mainSign);
@@ -69,8 +68,8 @@ class ContainerProtectionImpl implements ContainerProtection {
      *            All signs in the protection.
      * @return The protection.
      */
-    static Protection fromBlocksWithSigns(List<Block> blocks,
-            BlockFinder blockFinder, Collection<Sign> signs) {
+    public static Protection fromBlocksWithSigns(List<Block> blocks,
+            BlockFinder blockFinder, Collection<ProtectionSign> signs) {
         ContainerProtectionImpl protection = new ContainerProtectionImpl(
                 blocks, blockFinder);
         protection.fetchMainSignAndAllowed(signs);
@@ -81,7 +80,7 @@ class ContainerProtectionImpl implements ContainerProtection {
     private final BlockFinder blockFinder;
 
     private final List<Block> blocks;
-    private Optional<Sign> mainSign = Optional.absent();
+    private Optional<ProtectionSign> mainSign = Optional.absent();
     private Optional<Profile> owner = Optional.absent();
 
     private ContainerProtectionImpl(List<Block> blocks, BlockFinder blockFinder) {
@@ -90,17 +89,17 @@ class ContainerProtectionImpl implements ContainerProtection {
         this.blockFinder = blockFinder;
     }
 
-    private void fetchMainSignAndAllowed(Collection<Sign> signs) {
+    private void fetchMainSignAndAllowed(Collection<ProtectionSign> signs) {
         Collection<Profile> allAllowed = Lists.newArrayList();
-        for (Sign sign : signs) {
+        for (ProtectionSign sign : signs) {
             // Check for main sign
-            Optional<SignType> type = blockFinder.getSignParser().getSignType(sign);
-            if (type.isPresent() && type.get().isMainSign()) {
+            SignType type = sign.getType();
+            if (type.isMainSign()) {
                 mainSign = Optional.of(sign);
             }
 
             // Parse it
-            blockFinder.getSignParser().parseSign(sign, allAllowed);
+            allAllowed.addAll(sign.getProfiles());
         }
         this.allAllowed = Optional.of(allAllowed);
     }
@@ -117,18 +116,12 @@ class ContainerProtectionImpl implements ContainerProtection {
         }
 
         // We have a hint, grab the first name on it
-        Sign mainSign = this.mainSign.get();
-        Collection<Profile> profiles = new ArrayList<Profile>(4);
-        blockFinder.getSignParser().parseSign(mainSign, profiles);
-
-        Iterator<Profile> iterator = profiles.iterator();
-        if (iterator.hasNext()) {
-            owner = Optional.of(iterator.next());
-        }
-
+        ProtectionSign mainSign = this.mainSign.get();
+        List<Profile> profiles = mainSign.getProfiles();
+        owner = Optional.of(profiles.get(0));
     }
 
-    private Collection<Sign> fetchSigns() {
+    private Collection<ProtectionSign> fetchSigns() {
         return blockFinder.findAttachedSigns(blocks);
     }
 
@@ -152,7 +145,7 @@ class ContainerProtectionImpl implements ContainerProtection {
     }
 
     @Override
-    public Collection<Sign> getSigns() {
+    public Collection<ProtectionSign> getSigns() {
         // Sign objects cannot be cached
         return fetchSigns();
     }

@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import nl.rutgerkok.chestsignprotect.ProtectionSign;
 import nl.rutgerkok.chestsignprotect.SignParser;
 
 import org.bukkit.Material;
@@ -16,10 +17,11 @@ import org.bukkit.material.Chest;
 import org.bukkit.material.Directional;
 import org.bukkit.material.MaterialData;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
-class BlockFinder {
+public final class BlockFinder {
     private static BlockFace[] MAIN_FACES = { BlockFace.NORTH, BlockFace.EAST,
             BlockFace.SOUTH, BlockFace.WEST };
 
@@ -36,8 +38,8 @@ class BlockFinder {
      *            The block to check attached signs on.
      * @return The signs.
      */
-    private Collection<Sign> findAttachedSigns(Block block) {
-        Collection<Sign> signs = new ArrayList<Sign>();
+    private Collection<ProtectionSign> findAttachedSigns(Block block) {
+        Collection<ProtectionSign> signs = new ArrayList<ProtectionSign>();
         for (BlockFace face : MAIN_FACES) {
             Block atPosition = block.getRelative(face);
             Material material = atPosition.getType();
@@ -45,21 +47,24 @@ class BlockFinder {
                 continue;
             }
             Sign sign = (Sign) atPosition.getState();
-            if (!isValidSign(sign, atPosition, block)) {
+            if (!isAttachedSign(sign, atPosition, block)) {
                 continue;
             }
-            signs.add(sign);
+            Optional<ProtectionSign> parsedSign = parser.parseSign(sign);
+            if (parsedSign.isPresent()) {
+                signs.add(parsedSign.get());
+            }
         }
         return signs;
     }
 
-    Collection<Sign> findAttachedSigns(List<Block> blocks) {
+    public Collection<ProtectionSign> findAttachedSigns(List<Block> blocks) {
         if (blocks.size() == 1) {
             // Avoid creating a builder, iterator and extra set
             return findAttachedSigns(blocks.get(0));
         }
 
-        ImmutableSet.Builder<Sign> signs = ImmutableSet.builder();
+        ImmutableSet.Builder<ProtectionSign> signs = ImmutableSet.builder();
         for (Block block : blocks) {
             signs.addAll(findAttachedSigns(block));
         }
@@ -73,7 +78,7 @@ class BlockFinder {
      *            The container.
      * @return List of attached containers, including the given container.
      */
-    List<Block> findContainerNeighbors(Block block) {
+    public List<Block> findContainerNeighbors(Block block) {
         // Currently only chests share an inventory
         // Minecraft connects two chests next to each other that have the same
         // direction. We simply check for that condition, taking both normal
@@ -126,13 +131,13 @@ class BlockFinder {
      *
      * @return The parser.
      */
-    SignParser getSignParser() {
+    public SignParser getSignParser() {
         return parser;
     }
 
     /**
-     * Checks if the sign at the given position is a valid sign for the
-     * container.
+     * Checks if the sign at the given position is attached to the container.
+     * Doens't check the text on the sign.
      *
      * @param sign
      *            The sign to check.
@@ -145,12 +150,9 @@ class BlockFinder {
      * @return True if the direction and header of the sign are valid, false
      *         otherwise.
      */
-    private boolean isValidSign(Sign sign, Block signBlock, Block attachedTo) {
+    private boolean isAttachedSign(Sign sign, Block signBlock, Block attachedTo) {
         BlockFace requiredFace = signBlock.getFace(attachedTo);
         BlockFace actualFace = ((Attachable) sign.getData()).getAttachedFace();
-        if (actualFace != requiredFace) {
-            return false;
-        }
-        return parser.hasValidHeader(sign);
+        return (actualFace == requiredFace);
     }
 }

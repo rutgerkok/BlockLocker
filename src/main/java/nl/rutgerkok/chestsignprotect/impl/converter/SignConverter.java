@@ -11,30 +11,29 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import nl.rutgerkok.chestsignprotect.ChestSignProtect;
 import nl.rutgerkok.chestsignprotect.NameAndId;
+import nl.rutgerkok.chestsignprotect.ProtectionSign;
 import nl.rutgerkok.chestsignprotect.SignParser;
 import nl.rutgerkok.chestsignprotect.Translator.Translation;
-import nl.rutgerkok.chestsignprotect.impl.nms.NMSAccessor;
 import nl.rutgerkok.chestsignprotect.profile.PlayerProfile;
 import nl.rutgerkok.chestsignprotect.profile.Profile;
 import nl.rutgerkok.chestsignprotect.protection.Protection;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
-import org.bukkit.block.Sign;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.json.simple.JSONArray;
 
+/**
+ * Converts signs without UUIDs to signs with UUIDs.
+ *
+ */
 public class SignConverter {
     private final Queue<ProtectionMissingIds> missingUniqueIds;
-    private final NMSAccessor nms;
     private final ChestSignProtect plugin;
     private final SignParser signParser;
 
-    public SignConverter(ChestSignProtect plugin, SignParser signParser,
-            NMSAccessor nms) {
+    public SignConverter(ChestSignProtect plugin, SignParser signParser) {
         this.plugin = plugin;
         this.signParser = signParser;
-        this.nms = nms;
         missingUniqueIds = new ConcurrentLinkedQueue<ProtectionMissingIds>();
 
         Bukkit.getScheduler().runTaskTimerAsynchronously(
@@ -57,31 +56,16 @@ public class SignConverter {
     private void finishFix(Protection protection,
             Map<String, NameAndId> nameCache) {
 
-        for (Sign sign : protection.getSigns()) {
+        for (ProtectionSign sign : protection.getSigns()) {
             System.out.println("Fixing a sign at " + sign.getLocation());
-            Collection<Profile> oldProfileCollection = new ArrayList<Profile>(3);
+            Collection<Profile> oldProfileCollection = sign.getProfiles();
             Collection<Profile> newProfileCollection = new ArrayList<Profile>(3);
-            signParser.parseSign(sign, oldProfileCollection);
-            int line = 1; // Skip header
             for (Profile profile : oldProfileCollection) {
                 profile = replaceProfile(profile, nameCache);
-                sign.setLine(line, profile.getDisplayName());
                 newProfileCollection.add(profile);
-                line++;
             }
-            sign.update();
-
-            setProfilesOnSign(sign, newProfileCollection);
+            signParser.saveSign(sign);
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    private void setProfilesOnSign(Sign sign, Collection<Profile> profiles) {
-        JSONArray jsonArray = new JSONArray();
-        for (Profile profile : profiles) {
-            jsonArray.add(profile.getSaveObject());
-        }
-        nms.setJsonData(sign, jsonArray);
     }
 
     /**

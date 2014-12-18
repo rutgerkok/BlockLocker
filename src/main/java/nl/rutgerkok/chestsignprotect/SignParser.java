@@ -1,17 +1,12 @@
 package nl.rutgerkok.chestsignprotect;
 
-import java.util.Collection;
-
-import nl.rutgerkok.chestsignprotect.ChestSettings.SignType;
-import nl.rutgerkok.chestsignprotect.profile.Profile;
-
 import org.bukkit.block.Sign;
 
 import com.google.common.base.Optional;
 
 /**
- * Parses a single sign. It can find the type of the header and get a collection
- * of profiles stored on the sign.
+ * Parses a single sign. It essentially converts between {@link Sign} and
+ * {@link ProtectionSign}.
  *
  */
 public interface SignParser {
@@ -41,9 +36,18 @@ public interface SignParser {
      *
      * @param sign
      *            The sign to parse.
-     * @param addTo
-     *            The collection to add the profiles to.
+     * @return The parsed sign.
      */
-    void parseSign(Sign sign, Collection<Profile> addTo);
+    Optional<ProtectionSign> parseSign(Sign sign);
+
+    /**
+     * Saves the contents of the given sign to the world.
+     *
+     * @param sign
+     *            The sign to save.
+     * @param saveInformation
+     *            Data on the sign to save.
+     */
+    void saveSign(ProtectionSign sign);
 
 }

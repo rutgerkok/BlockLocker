@@ -6,6 +6,7 @@ import nl.rutgerkok.chestsignprotect.NameAndId;
 import nl.rutgerkok.chestsignprotect.ProfileFactory;
 import nl.rutgerkok.chestsignprotect.Translator;
 import nl.rutgerkok.chestsignprotect.Translator.Translation;
+import nl.rutgerkok.chestsignprotect.profile.PlayerProfile;
 import nl.rutgerkok.chestsignprotect.profile.Profile;
 
 import org.apache.commons.lang.Validate;
@@ -46,14 +47,14 @@ public class ProfileFactoryImpl implements ProfileFactory {
     }
 
     @Override
-    public Profile fromNameAndUniqueId(NameAndId nameAndId) {
+    public PlayerProfile fromNameAndUniqueId(NameAndId nameAndId) {
         Validate.notNull(nameAndId);
         Optional<UUID> uuid = Optional.of(nameAndId.getUniqueId());
         return new PlayerProfileImpl(nameAndId.getName(), uuid);
     }
 
     @Override
-    public Profile fromPlayer(Player player) {
+    public PlayerProfile fromPlayer(Player player) {
         Validate.notNull(player);
         Optional<UUID> uuid = Optional.of(player.getUniqueId());
         return new PlayerProfileImpl(player.getName(), uuid);

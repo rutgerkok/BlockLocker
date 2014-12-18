@@ -2,9 +2,8 @@ package nl.rutgerkok.chestsignprotect.protection;
 
 import java.util.Collection;
 
+import nl.rutgerkok.chestsignprotect.ProtectionSign;
 import nl.rutgerkok.chestsignprotect.profile.Profile;
-
-import org.bukkit.block.Sign;
 
 import com.google.common.base.Optional;
 
@@ -41,7 +40,7 @@ public interface Protection {
      *
      * @return All signs used by this protection.
      */
-    Collection<Sign> getSigns();
+    Collection<ProtectionSign> getSigns();
 
     /**
      * Checks if the given profile has been allowed to this protection.

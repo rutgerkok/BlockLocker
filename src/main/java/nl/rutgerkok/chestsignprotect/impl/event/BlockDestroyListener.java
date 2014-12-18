@@ -66,14 +66,6 @@ public class BlockDestroyListener extends EventListener {
         }
     }
 
-    // When does this event actually fire?
-//    @EventHandler(ignoreCancelled = true)
-//    public void onBlockPhysics(BlockPhysicsEvent event) {
-//        if (isProtected(event.getBlock())) {
-//            event.setCancelled(true);
-//        }
-//    }
-
     @EventHandler(ignoreCancelled = true)
     public void onBlockPistonExtend(BlockPistonExtendEvent event) {
         if (anyProtected(event.getBlocks())) {

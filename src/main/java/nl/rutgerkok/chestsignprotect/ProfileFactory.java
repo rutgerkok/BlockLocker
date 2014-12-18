@@ -1,6 +1,6 @@
 package nl.rutgerkok.chestsignprotect;
 
-import nl.rutgerkok.chestsignprotect.profile.Profile;
+import nl.rutgerkok.chestsignprotect.profile.PlayerProfile;
 
 import org.bukkit.entity.Player;
 
@@ -13,7 +13,7 @@ public interface ProfileFactory {
      *            The name and id.
      * @return The profile.
      */
-    Profile fromNameAndUniqueId(NameAndId nameAndId);
+    PlayerProfile fromNameAndUniqueId(NameAndId nameAndId);
 
     /**
      * Creates a new profile representing the online player.
@@ -22,5 +22,5 @@ public interface ProfileFactory {
      *            The online player.
      * @return The profile.
      */
-    Profile fromPlayer(Player player);
+    PlayerProfile fromPlayer(Player player);
 }
