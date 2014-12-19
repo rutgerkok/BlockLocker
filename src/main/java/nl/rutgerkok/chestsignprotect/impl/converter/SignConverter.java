@@ -3,6 +3,7 @@ package nl.rutgerkok.chestsignprotect.impl.converter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -58,13 +59,13 @@ public class SignConverter {
 
         for (ProtectionSign sign : protection.getSigns()) {
             System.out.println("Fixing a sign at " + sign.getLocation());
-            Collection<Profile> oldProfileCollection = sign.getProfiles();
-            Collection<Profile> newProfileCollection = new ArrayList<Profile>(3);
+            List<Profile> oldProfileCollection = sign.getProfiles();
+            List<Profile> newProfileCollection = new ArrayList<Profile>(3);
             for (Profile profile : oldProfileCollection) {
                 profile = replaceProfile(profile, nameCache);
                 newProfileCollection.add(profile);
             }
-            signParser.saveSign(sign);
+            signParser.saveSign(sign.withProfiles(newProfileCollection));
         }
     }
 
