@@ -6,7 +6,7 @@ protection:
   claimed_manually: "&6Created a claim. Only the people listed on the sign can access it."
   cannot_change_sign: "&4You cannot change a sign nearby a claimed container."
   no_permission_for_claim: "&4You don't have permission to claim a container, sorry."
-  not_nearby: "&4There is no protection nearby."
+  not_nearby: "&4There is no protection nearby. (Shift-)right-click a container with a sign in your hand to protect it."
 tag:
   everyone: "[Everyone]"
   private: "&9[Private]"
