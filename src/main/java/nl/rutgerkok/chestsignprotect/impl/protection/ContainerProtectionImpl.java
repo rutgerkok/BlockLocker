@@ -35,23 +35,25 @@ public final class ContainerProtectionImpl implements ContainerProtection {
 
     /**
      * Creates a new protection for the protection block. Calling this method
-     * will make for a faster {@link #getOwner()}, as it can simply read the
-     * first entry on the main sign.
+     * might make for a faster {@link #getOwner()}, as it can read the owner
+     * from the sign if it is a main sign.
      *
      * @param blocks
      *            The block that are protected. (Usually one block, multiple for
      *            double chests.)
      * @param blockFinder
      *            The sign finder.
-     * @param mainSign
-     *            The main sign, used for {@link #getOwner()}.
+     * @param sign
+     *            The sign. If it is a main sign it is used for
+     *            {@link #getOwner()}.
      * @return The protection.
      */
-    public static Protection fromBlocksWithMainSign(List<Block> blocks,
-            BlockFinder blockFinder, ProtectionSign mainSign) {
-        ContainerProtectionImpl protection = new ContainerProtectionImpl(
-                blocks, blockFinder);
-        protection.mainSign = Optional.of(mainSign);
+    public static Protection fromBlocksWithSign(List<Block> blocks,
+            BlockFinder blockFinder, ProtectionSign sign) {
+        ContainerProtectionImpl protection = new ContainerProtectionImpl(blocks, blockFinder);
+        if (sign.getType().isMainSign()) {
+            protection.mainSign = Optional.of(sign);
+        }
         return protection;
     }
 

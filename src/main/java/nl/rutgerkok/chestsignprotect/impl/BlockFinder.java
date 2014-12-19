@@ -23,7 +23,7 @@ import com.google.common.collect.ImmutableSet;
 
 public final class BlockFinder {
     private static BlockFace[] MAIN_FACES = { BlockFace.NORTH, BlockFace.EAST,
-            BlockFace.SOUTH, BlockFace.WEST };
+            BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP };
 
     private SignParser parser;
 
@@ -69,6 +69,24 @@ public final class BlockFinder {
             signs.addAll(findAttachedSigns(block));
         }
         return signs.build();
+    }
+
+    /**
+     * Gets the block the sign is attached on.
+     * 
+     * @param sign
+     *            The sign.
+     * @return The block the sign is attached on.
+     */
+    public Block findAttachedTo(Sign sign) {
+        MaterialData materialData = sign.getData();
+        // Wall sign
+        if (materialData.getItemType() == Material.WALL_SIGN && materialData instanceof Attachable) {
+            Attachable attachable = (Attachable) sign.getData();
+            return sign.getBlock().getRelative(attachable.getAttachedFace());
+        }
+        // Sign post
+        return sign.getBlock().getRelative(BlockFace.DOWN);
     }
 
     /**
@@ -152,7 +170,16 @@ public final class BlockFinder {
      */
     private boolean isAttachedSign(Sign sign, Block signBlock, Block attachedTo) {
         BlockFace requiredFace = signBlock.getFace(attachedTo);
-        BlockFace actualFace = ((Attachable) sign.getData()).getAttachedFace();
+        MaterialData materialData = sign.getData();
+        BlockFace actualFace;
+        if (materialData.getItemType() == Material.WALL_SIGN) {
+            // Wall sign
+            actualFace = ((Attachable) sign.getData()).getAttachedFace();
+        } else {
+            // Sign post
+            actualFace = BlockFace.DOWN;
+        }
         return (actualFace == requiredFace);
+
     }
 }

@@ -109,8 +109,7 @@ public class SignConverter {
         final Map<String, NameAndId> nameCache;
         try {
             nameCache = new UUIDFetcher(names).call();
-            Bukkit.getScheduler().runTask(
-                    JavaPlugin.getProvidingPlugin(getClass()), new Runnable() {
+            plugin.runLater(new Runnable() {
                         @Override
                         public void run() {
                             // Notify the protections

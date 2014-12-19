@@ -18,6 +18,7 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
+import org.bukkit.event.block.SignChangeEvent;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -51,7 +52,7 @@ class SignParserImpl implements SignParser {
     private SignType getSignTypeUnsafe(String header) {
         header = ChatColor.stripColor(header).trim();
         for (SignType type : SignType.values()) {
-            if (header.equalsIgnoreCase(chestSettings.getLocalizedHeader(type))) {
+            if (header.equalsIgnoreCase(chestSettings.getSimpleLocalizedHeader(type))) {
                 return type;
             }
         }
@@ -139,7 +140,7 @@ class SignParserImpl implements SignParser {
 
         // Update sign, both visual and using raw JSON
         Sign signState = (Sign) blockState;
-        signState.setLine(0, chestSettings.getLocalizedHeader(sign.getType()));
+        signState.setLine(0, chestSettings.getFancyLocalizedHeader(sign.getType()));
 
         JSONArray jsonArray = new JSONArray();
         int i = 1; // Start at 1 to avoid overwriting the header
@@ -154,4 +155,10 @@ class SignParserImpl implements SignParser {
         signState.update();
         nms.setJsonData(signState, jsonArray);
     }
+
+    @Override
+    public Optional<SignType> getSignType(SignChangeEvent event) {
+        return Optional.fromNullable(getSignTypeUnsafe(event.getLine(0)));
+    }
+
 }

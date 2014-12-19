@@ -20,10 +20,28 @@ import org.bukkit.configuration.file.YamlConfiguration;
 class ConfigTranslator implements Translator {
 
     private boolean needsSave = false;
-    private final Map<Translation, String> translations;
+    private final Map<Translation, TranslationValue> translations;
+
+    /**
+     * Little class to hold the different representations of the translated
+     * values. The original ({@code &1foo}), the colored ({@code §1foo}) and
+     * uncolored ({@code foo}).
+     *
+     */
+    private static class TranslationValue {
+        private final String original;
+        private final String uncolored;
+        private final String colored;
+
+        private TranslationValue(String original) {
+            this.original = original.trim();
+            this.colored = ChatColor.translateAlternateColorCodes('&', original);
+            this.uncolored = ChatColor.stripColor(colored);
+        }
+    }
 
     ConfigTranslator(ConfigurationSection config) {
-        translations = new EnumMap<Translation, String>(Translation.class);
+        translations = new EnumMap<Translation, TranslationValue>(Translation.class);
         for (Translation translation : Translation.values()) {
             String key = translation.toString();
 
@@ -35,11 +53,10 @@ class ConfigTranslator implements Translator {
             String value = config.getString(key);
             if (value == null) {
                 // No default value was specified, strange
-                value = "~~TODO translate~~";
+                value = "~~TODO translate " + key + "~~";
             }
 
-            value = ChatColor.translateAlternateColorCodes('&', value.trim());
-            translations.put(translation, value);
+            translations.put(translation, new TranslationValue(value));
         }
     }
 
@@ -66,12 +83,12 @@ class ConfigTranslator implements Translator {
         // This is not the case, as *all* possible Translation keys have an
         // entry in the map: if a value is missing in the config file, the
         // constructor assigns the default value
-        return translations.get(key);
+        return translations.get(key).colored;
     }
 
     @Override
     public String getWithoutColor(Translation key) {
-        return ChatColor.stripColor(get(key));
+        return translations.get(key).uncolored;
     }
 
     boolean needsSave() {
@@ -88,10 +105,8 @@ class ConfigTranslator implements Translator {
      */
     void save(File file) throws IOException {
         YamlConfiguration config = new YamlConfiguration();
-        for (Entry<Translation, String> translationEntry : translations
-                .entrySet()) {
-            config.set(translationEntry.getKey().toString(),
-                    translationEntry.getValue());
+        for (Entry<Translation, TranslationValue> translationEntry : translations.entrySet()) {
+            config.set(translationEntry.getKey().toString(), translationEntry.getValue().original);
         }
         config.save(file);
         needsSave = false;

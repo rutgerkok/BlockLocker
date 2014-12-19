@@ -3,6 +3,7 @@ package nl.rutgerkok.chestsignprotect.impl;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import nl.rutgerkok.chestsignprotect.ChestSettings;
 import nl.rutgerkok.chestsignprotect.ChestSettings.ProtectionType;
@@ -14,14 +15,13 @@ import nl.rutgerkok.chestsignprotect.profile.PlayerProfile;
 import nl.rutgerkok.chestsignprotect.profile.Profile;
 import nl.rutgerkok.chestsignprotect.protection.Protection;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
-import org.bukkit.material.Attachable;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 
 class ProtectionFinderImpl implements ProtectionFinder {
     private final BlockFinder blockFinder;
@@ -32,81 +32,133 @@ class ProtectionFinderImpl implements ProtectionFinder {
         this.settings = settings;
     }
 
-    private Optional<Protection> findForContainer(Block block) {
+    private Optional<Protection> findExistingProtectionForBlock(Block block) {
         Material blockMaterial = block.getType();
-        if (!settings.canProtect(ProtectionType.CONTAINER, blockMaterial)) {
+        Optional<ProtectionType> protectionType = settings.getProtectionType(blockMaterial);
+        if (!protectionType.isPresent()) {
             return Optional.absent();
         }
-        List<Block> blocks = blockFinder.findContainerNeighbors(block);
-        Collection<ProtectionSign> signs = blockFinder.findAttachedSigns(blocks);
-        if (signs.isEmpty()) {
-            return Optional.absent();
+        switch (protectionType.get()) {
+            case CONTAINER:
+                List<Block> blocks = blockFinder.findContainerNeighbors(block);
+                Collection<ProtectionSign> signs = blockFinder.findAttachedSigns(blocks);
+                if (signs.isEmpty()) {
+                    return Optional.absent();
+                }
+                return Optional.of(ContainerProtectionImpl.fromBlocksWithSigns(
+                        blocks, blockFinder, signs));
+            default:
+                throw new UnsupportedOperationException("Don't know how to handle protection type " + protectionType.get());
         }
-        return Optional.of(ContainerProtectionImpl.fromBlocksWithSigns(blocks,
-                blockFinder, signs));
+
     }
 
-    private Optional<Protection> findForSign(Sign sign) {
+    private Optional<Protection> findExistingProtectionForExistingSign(Sign sign) {
         // Get type of sign
         Optional<ProtectionSign> parsed = blockFinder.getSignParser().parseSign(sign);
         if (!parsed.isPresent()) {
+            // Not actually a protection sign, so no protection
             return Optional.absent();
         }
 
-        Attachable attachable = (Attachable) sign.getData();
-        Block attachedBlock = sign.getBlock().getRelative(
-                attachable.getAttachedFace());
-
-        // Check if attached block is a container
-        if (settings.canProtect(ProtectionType.CONTAINER,
-                attachedBlock.getType())) {
-            return Optional.of(newContainerProtection(attachedBlock, parsed.get()));
+        Optional<Block> protectionBlock = getProtectionBlockForSign(sign);
+        if (protectionBlock.isPresent()) {
+            return findExistingProtectionForBlock(protectionBlock.get(), parsed.get());
         }
 
-        // Check if block above or below is a door
-        // TODO
-
         return Optional.absent();
+    }
+
+    @Override
+    public Optional<Protection> findExistingProtectionForNewSign(Block signBlock) {
+        BlockState blockState = signBlock.getState();
+        if (!(blockState instanceof Sign)) {
+            return Optional.absent();
+        }
+
+        Sign sign = (Sign) blockState;
+        Optional<Block> attachedTo = this.getProtectionBlockForSign(sign);
+        if (!attachedTo.isPresent()) {
+            return Optional.absent();
+        }
+
+        return findExistingProtectionForBlock(attachedTo.get());
     }
 
     @Override
     public Optional<Protection> findProtection(Block block) {
-        Validate.notNull(block);
+        Preconditions.checkNotNull(block);
         Material blockMaterial = block.getType();
-        if (blockMaterial == Material.WALL_SIGN) {
+
+        // Check for sign
+        if (blockMaterial == Material.WALL_SIGN || blockMaterial == Material.SIGN_POST) {
             Sign sign = (Sign) block.getState();
-            return findForSign(sign);
+            return findExistingProtectionForExistingSign(sign);
         }
-        if (settings.canProtect(ProtectionType.CONTAINER, blockMaterial)) {
-            return findForContainer(block);
+
+        // Check for other blocks
+        return findExistingProtectionForBlock(block);
+    }
+
+    /**
+     * Gets the block the sign protects. The block will be of a type that can be
+     * protected. If the sign is a valid protection sign, this means that the
+     * blocks is protected. If the sign is not yet a valid protection sign, keep
+     * in mind that the block may still be protected by another sign.
+     *
+     * @param sign
+     *            The sign, whether properly formatted or not.
+     * @return A block that can be protected, and may or may not be protected
+     *         currently.
+     */
+    private Optional<Block> getProtectionBlockForSign(Sign sign) {
+        Block attachedBlock = blockFinder.findAttachedTo(sign);
+        if (settings.canProtect(ProtectionType.CONTAINER, attachedBlock.getType())) {
+            return Optional.of(attachedBlock);
         }
+
+        // TODO find door
+
         return Optional.absent();
     }
 
     @Override
-    public Optional<Protection> findProtection(World world, int x, int y, int z) {
-        return findProtection(world.getBlockAt(x, y, z));
+    public boolean isSignNearbyProtectionBlock(Block signBlock) {
+        BlockState blockState = signBlock.getState();
+        if (blockState instanceof Sign) {
+            return getProtectionBlockForSign((Sign) blockState).isPresent();
+        }
+        return false;
     }
 
     /**
-     * Direct method to call the constructor of {@link ContainerProtectionImpl}.
+     * Gets the {@link Protection} for the given block, which is already part of
+     * a protection and is not a sign. A sign is given as a hint to this method,
+     * so that the
      *
      * @param containerBlock
-     *            The block that represents the container.
+     *            The block that represents the protection (is a door or
+     *            container block).
      * @param sign
      *            The sign used for finding the block.
-     * @param isMainSign
-     *            Type of the sign: true if [Private] signs, false for [More
-     *            Users] signs.
      * @return The created protection.
+     * @throws NoSuchElementException
+     *             If the protectionBlock is not actually a block that can be
+     *             protected
      */
-    private Protection newContainerProtection(Block containerBlock, ProtectionSign sign) {
-        List<Block> blocks = blockFinder.findContainerNeighbors(containerBlock);
-        if (sign.getType().isMainSign()) {
-            return ContainerProtectionImpl.fromBlocksWithMainSign(blocks,
-                    blockFinder, sign);
-        } else {
-            return ContainerProtectionImpl.fromBlocks(blocks, blockFinder);
+    private Optional<Protection> findExistingProtectionForBlock(Block protectionBlock, ProtectionSign sign) {
+        Optional<ProtectionType> protectionType = settings.getProtectionType(protectionBlock.getType());
+        if (!protectionType.isPresent()) {
+            return Optional.absent();
+        }
+
+        switch (protectionType.get()) {
+            case CONTAINER:
+                List<Block> blocks = blockFinder.findContainerNeighbors(protectionBlock);
+                return Optional.of(ContainerProtectionImpl.fromBlocksWithSign(
+                        blocks, blockFinder, sign));
+            default:
+                throw new UnsupportedOperationException("Don't know how to handle protection type " + protectionType.get());
         }
     }
 

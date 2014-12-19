@@ -3,7 +3,6 @@ package nl.rutgerkok.chestsignprotect;
 import nl.rutgerkok.chestsignprotect.profile.PlayerProfile;
 import nl.rutgerkok.chestsignprotect.protection.Protection;
 
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 
@@ -16,7 +15,8 @@ import com.google.common.base.Optional;
 public interface ProtectionFinder {
 
     /**
-     * Returns the protection at the given block, if any.
+     * Gets the protection the given block is part of. If the block is a sign,
+     * the sign must already be filled in.
      *
      * @param block
      *            The block to search at.
@@ -25,20 +25,16 @@ public interface ProtectionFinder {
     Optional<Protection> findProtection(Block block);
 
     /**
-     * Returns the protection at the given block, if any.
+     * Gets the protection the sign is placed against. The contents of the sign
+     * is not checked; in other words: the sign doesn't have to be part of the
+     * protection (yet).
      *
-     * @param world
-     *            The world the protection is in.
-     * @param x
-     *            X coordinate of the block.
-     * @param y
-     *            (Vertical) Y coordinate of the block.
-     * @param z
-     *            Z coordinate of the block.
-     * @return The protection, if any.
-     *
+     * @param signBlock
+     *            The sign.
+     * @return The protection, or empty if the block is not a sign or not placed
+     *         against a protection.
      */
-    Optional<Protection> findProtection(World world, int x, int y, int z);
+    Optional<Protection> findExistingProtectionForNewSign(Block signBlock);
 
     /**
      * Creates a new protection sign, ignoring the content already on the sign.
@@ -56,4 +52,19 @@ public interface ProtectionFinder {
      * @return The new protection sign.
      */
     ProtectionSign newProtectionSign(Sign sign, SignType signType, PlayerProfile owner);
+
+    /**
+     * Gets whether the given sign is near a block that can be protected. In
+     * other words, this method returns true if the sign is attached to a chest,
+     * furnace etc. or placed above a door.
+     *
+     * <p>
+     * This method doesn't care whether the block that can be protected is
+     * actually protected.
+     * 
+     * @param signBlock
+     *            The sign block.
+     * @return True if the sign is placed near a block that can be protected.
+     */
+    boolean isSignNearbyProtectionBlock(Block signBlock);
 }

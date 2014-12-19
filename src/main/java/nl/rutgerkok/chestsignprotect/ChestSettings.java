@@ -27,13 +27,23 @@ public interface ChestSettings {
     boolean canProtect(ProtectionType type, Material material);
 
     /**
-     * Gets the localized header for the given sign type, includes brackets.
+     * Gets the localized header for the given sign type, includes brackets and
+     * colors.
      *
      * @param signType
      *            The type of the sign.
      * @return The header.
      */
-    String getLocalizedHeader(SignType signType);
+    String getFancyLocalizedHeader(SignType signType);
+
+    /**
+     * Gets the localized header for the given sign type, without colors.
+     * 
+     * @param signType
+     *            The type of the sign.
+     * @return The header.
+     */
+    String getSimpleLocalizedHeader(SignType signType);
 
     /**
      * Gets the type of the protection.

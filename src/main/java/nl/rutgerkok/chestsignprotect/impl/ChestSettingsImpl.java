@@ -26,15 +26,19 @@ class ChestSettingsImpl implements ChestSettings {
         return protectionType.get().equals(type);
     }
 
-    @Override
-    public String getLocalizedHeader(SignType signType) {
+    private Translation getTranslationKey(SignType signType) {
         switch (signType) {
             case MORE_USERS:
-                return translator.get(Translation.TAG_MORE_USERS);
+                return Translation.TAG_MORE_USERS;
             case PRIVATE:
-                return translator.get(Translation.TAG_PRIVATE);
+                return Translation.TAG_PRIVATE;
         }
         throw new AssertionError("Unknown type: " + signType);
+    }
+
+    @Override
+    public String getFancyLocalizedHeader(SignType signType) {
+        return translator.get(getTranslationKey(signType));
     }
 
     @Override
@@ -57,6 +61,11 @@ class ChestSettingsImpl implements ChestSettings {
             default:
                 return Optional.absent();
         }
+    }
+
+    @Override
+    public String getSimpleLocalizedHeader(SignType signType) {
+        return translator.getWithoutColor(getTranslationKey(signType));
     }
 
 }

@@ -16,6 +16,7 @@ import nl.rutgerkok.chestsignprotect.Translator;
 import nl.rutgerkok.chestsignprotect.impl.converter.SignConverter;
 import nl.rutgerkok.chestsignprotect.impl.event.BlockDestroyListener;
 import nl.rutgerkok.chestsignprotect.impl.event.InteractListener;
+import nl.rutgerkok.chestsignprotect.impl.event.SignChangeListener;
 import nl.rutgerkok.chestsignprotect.impl.nms.NMSAccessor;
 import nl.rutgerkok.chestsignprotect.impl.profile.ProfileFactoryImpl;
 import nl.rutgerkok.chestsignprotect.protection.Protection;
@@ -137,6 +138,7 @@ public class ChestSignProtectPlugin extends JavaPlugin implements
         PluginManager plugins = Bukkit.getPluginManager();
         plugins.registerEvents(new BlockDestroyListener(this), this);
         plugins.registerEvents(new InteractListener(this), this);
+        plugins.registerEvents(new SignChangeListener(this), this);
     }
 
     @Override
@@ -152,6 +154,11 @@ public class ChestSignProtectPlugin extends JavaPlugin implements
     @Override
     public SignParser getSignParser() {
         return signParser;
+    }
+
+    @Override
+    public void runLater(Runnable runnable) {
+        getServer().getScheduler().runTask(this, runnable);
     }
 
 }

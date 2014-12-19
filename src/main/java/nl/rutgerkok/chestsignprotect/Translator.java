@@ -10,7 +10,13 @@ import org.bukkit.command.CommandSender;
 public interface Translator {
 
     public enum Translation {
+        PROTECTION_ADD_MORE_USERS_SIGN_INSTEAD,
+        PROTECTION_CAN_ONLY_ADD_PROTECTION_SIGN,
+        PROTECTION_CANNOT_CHANGE_SIGN,
         PROTECTION_CLAIMED_CONTAINER,
+        PROTECTION_CLAIMED_MANUALLY,
+        PROTECTION_NO_PERMISSION_FOR_CLAIM,
+        PROTECTION_NOT_NEARBY,
         TAG_EVERYONE,
         TAG_MORE_USERS,
         TAG_PLAYER_NOT_FOUND,

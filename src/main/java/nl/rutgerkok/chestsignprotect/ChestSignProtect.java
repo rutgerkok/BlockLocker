@@ -62,4 +62,12 @@ public interface ChestSignProtect {
      *            The exception that provides a stacktrace.
      */
     void severe(String string, Throwable t);
+
+    /**
+     * Runs a task the next tick on the server thread.
+     *
+     * @param runnable
+     *            The task.
+     */
+    void runLater(Runnable runnable);
 }
