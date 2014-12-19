@@ -76,20 +76,20 @@ class PlayerProfileImpl implements PlayerProfile {
         if (uuid.isPresent()) {
             return uuid.hashCode();
         }
-        return displayName.hashCode();
+        return displayName.toLowerCase().hashCode();
     }
 
     @Override
     public boolean includes(Profile other) {
-        if (!(other instanceof PlayerProfileImpl)) {
+        if (!(other instanceof PlayerProfile)) {
             return false;
         }
 
-        PlayerProfileImpl otherProfile = (PlayerProfileImpl) other;
+        PlayerProfile otherProfile = (PlayerProfile) other;
         if (uuid.isPresent()) {
-            return uuid.equals(otherProfile.uuid);
+            return uuid.equals(otherProfile.getUniqueId());
         }
-        return displayName.equalsIgnoreCase(otherProfile.displayName);
+        return displayName.equalsIgnoreCase(otherProfile.getDisplayName());
     }
 
     @Override

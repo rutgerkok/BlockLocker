@@ -41,7 +41,9 @@ public class ProfileFactoryImpl implements ProfileFactory {
         if (text.equalsIgnoreCase(everyoneTagWithoutColor)) {
             return new EveryoneProfile(translator.get(Translation.TAG_EVERYONE));
         }
-        // Group support will come later
+        if (text.startsWith("[") && text.endsWith("]") && text.length() >= 3) {
+            return new GroupProfileImpl(text.substring(1, text.length() - 1));
+        }
 
         return new PlayerProfileImpl(text, Optional.<UUID> absent());
     }
@@ -80,6 +82,13 @@ public class ProfileFactoryImpl implements ProfileFactory {
         Optional<String> value = getString(json, EveryoneProfile.EVERYONE_KEY);
         if (value.isPresent()) {
             Profile profile = new EveryoneProfile(value.get());
+            return Optional.of(profile);
+        }
+
+        // Groups
+        Optional<String> groupName = getString(json, GroupProfileImpl.GROUP_KEY);
+        if (groupName.isPresent()) {
+            Profile profile = new GroupProfileImpl(groupName.get());
             return Optional.of(profile);
         }
 
