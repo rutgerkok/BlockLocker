@@ -92,6 +92,7 @@ public class InteractListener extends EventListener {
             return;
         }
 
+        plugin.getTranslator().sendMessage(player, Translation.PROTECTION_NO_ACCESS);
         event.setCancelled(true);
     }
 
