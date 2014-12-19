@@ -1,5 +1,7 @@
 package nl.rutgerkok.chestsignprotect.impl.event;
 
+import java.util.Set;
+
 import nl.rutgerkok.chestsignprotect.ChestSettings.ProtectionType;
 import nl.rutgerkok.chestsignprotect.ChestSignProtect;
 import nl.rutgerkok.chestsignprotect.Permissions;
@@ -26,8 +28,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableSet;
 
 public class InteractListener extends EventListener {
+
+    private static Set<BlockFace> AUTOPLACE_BLOCK_FACES = ImmutableSet.of(
+            BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP);
 
     public InteractListener(ChestSignProtect plugin) {
         super(plugin);
@@ -128,6 +134,9 @@ public class InteractListener extends EventListener {
         if (!hasSignInHand(player)) {
             return false;
         }
+        if (!AUTOPLACE_BLOCK_FACES.contains(clickedSide)) {
+            return false;
+        }
 
         Block signBlock = block.getRelative(clickedSide);
         if (signBlock.getType() != Material.AIR) {
@@ -135,10 +144,9 @@ public class InteractListener extends EventListener {
         }
 
         // Create empty sign
-        org.bukkit.material.Sign signMaterial = new org.bukkit.material.Sign(Material.WALL_SIGN);
-        signMaterial.setFacingDirection(clickedSide);
+
         // Set base material so that .getState() will be of the correct type
-        setBlockMaterialData(signBlock, signMaterial);
+        setBlockMaterialData(signBlock, getSignMaterial(clickedSide));
         Sign sign = (Sign) signBlock.getState();
 
         // Place text on it
@@ -149,6 +157,15 @@ public class InteractListener extends EventListener {
         // Remove the sign from the player's hand
         removeSingleItemFromHand(player);
         return true;
+    }
+
+    private MaterialData getSignMaterial(BlockFace blockFace) {
+        if (blockFace == BlockFace.UP) {
+            return new MaterialData(Material.SIGN_POST);
+        }
+        org.bukkit.material.Sign signMaterial = new org.bukkit.material.Sign(Material.WALL_SIGN);
+        signMaterial.setFacingDirection(blockFace);
+        return signMaterial;
     }
 
     @SuppressWarnings("deprecation")

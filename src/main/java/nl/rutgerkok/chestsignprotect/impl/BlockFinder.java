@@ -43,7 +43,7 @@ public final class BlockFinder {
         for (BlockFace face : MAIN_FACES) {
             Block atPosition = block.getRelative(face);
             Material material = atPosition.getType();
-            if (material != Material.WALL_SIGN) {
+            if (material != Material.WALL_SIGN && material != Material.SIGN_POST) {
                 continue;
             }
             Sign sign = (Sign) atPosition.getState();
