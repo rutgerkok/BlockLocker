@@ -58,6 +58,14 @@ class ChestSettingsImpl implements ChestSettings {
             case TRAP_DOOR:
             case WORKBENCH:
                 return Optional.of(ProtectionType.CONTAINER);
+            case WOODEN_DOOR:
+            case IRON_DOOR_BLOCK:
+            case SPRUCE_DOOR:
+            case BIRCH_DOOR:
+            case JUNGLE_DOOR:
+            case ACACIA_DOOR:
+            case DARK_OAK_DOOR:
+                return Optional.of(ProtectionType.DOOR);
             default:
                 return Optional.absent();
         }

@@ -22,8 +22,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 public final class BlockFinder {
-    private static BlockFace[] MAIN_FACES = { BlockFace.NORTH, BlockFace.EAST,
+    private static BlockFace[] SIGN_ATTACHEMENT_FACES = { BlockFace.NORTH, BlockFace.EAST,
             BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP };
+    private static BlockFace[] UP_DOWN = { BlockFace.UP, BlockFace.DOWN };
 
     private SignParser parser;
 
@@ -40,7 +41,7 @@ public final class BlockFinder {
      */
     private Collection<ProtectionSign> findAttachedSigns(Block block) {
         Collection<ProtectionSign> signs = new ArrayList<ProtectionSign>();
-        for (BlockFace face : MAIN_FACES) {
+        for (BlockFace face : SIGN_ATTACHEMENT_FACES) {
             Block atPosition = block.getRelative(face);
             Material material = atPosition.getType();
             if (material != Material.WALL_SIGN && material != Material.SIGN_POST) {
@@ -58,10 +59,10 @@ public final class BlockFinder {
         return signs;
     }
 
-    public Collection<ProtectionSign> findAttachedSigns(List<Block> blocks) {
+    public Collection<ProtectionSign> findAttachedSigns(Collection<Block> blocks) {
         if (blocks.size() == 1) {
             // Avoid creating a builder, iterator and extra set
-            return findAttachedSigns(blocks.get(0));
+            return findAttachedSigns(blocks.iterator().next());
         }
 
         ImmutableSet.Builder<ProtectionSign> signs = ImmutableSet.builder();
@@ -108,7 +109,7 @@ public final class BlockFinder {
         Material chestMaterial = block.getType(); // CHEST or TRAPPED_CHEST
         BlockFace chestFacing = ((Directional) getData(block)).getFacing();
 
-        for (BlockFace face : MAIN_FACES) {
+        for (BlockFace face : SIGN_ATTACHEMENT_FACES) {
             Block atPosition = block.getRelative(face);
             if (atPosition.getType() != chestMaterial) {
                 continue;
@@ -181,5 +182,20 @@ public final class BlockFinder {
         }
         return (actualFace == requiredFace);
 
+    }
+
+    /**
+     * Gets the blocks above and below the given block.
+     * 
+     * @param block
+     *            The block.
+     * @return The blocks above and below the given block.
+     */
+    Collection<Block> getAboveAndBelow(Block block) {
+        ImmutableList.Builder<Block> builder = ImmutableList.builder();
+        for (BlockFace blockFace : UP_DOWN) {
+            builder.add(block.getRelative(blockFace));
+        }
+        return builder.build();
     }
 }

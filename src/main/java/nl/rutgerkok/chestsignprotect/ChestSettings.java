@@ -11,7 +11,8 @@ public interface ChestSettings {
      *
      */
     public enum ProtectionType {
-        CONTAINER;
+        CONTAINER,
+        DOOR;
     }
 
     /**

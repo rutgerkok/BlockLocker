@@ -3,7 +3,6 @@ package nl.rutgerkok.chestsignprotect.impl;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import nl.rutgerkok.chestsignprotect.ChestSettings;
 import nl.rutgerkok.chestsignprotect.ChestSettings.ProtectionType;
@@ -11,6 +10,7 @@ import nl.rutgerkok.chestsignprotect.ProtectionFinder;
 import nl.rutgerkok.chestsignprotect.ProtectionSign;
 import nl.rutgerkok.chestsignprotect.SignType;
 import nl.rutgerkok.chestsignprotect.impl.protection.ContainerProtectionImpl;
+import nl.rutgerkok.chestsignprotect.impl.protection.DoorProtectionImpl;
 import nl.rutgerkok.chestsignprotect.profile.PlayerProfile;
 import nl.rutgerkok.chestsignprotect.profile.Profile;
 import nl.rutgerkok.chestsignprotect.protection.Protection;
@@ -38,6 +38,10 @@ class ProtectionFinderImpl implements ProtectionFinder {
         if (!protectionType.isPresent()) {
             return Optional.absent();
         }
+
+        // We don't know yet if signs are attached, so we have to check for that
+        // in each case of the switch statement
+
         switch (protectionType.get()) {
             case CONTAINER:
                 List<Block> blocks = blockFinder.findContainerNeighbors(block);
@@ -46,7 +50,15 @@ class ProtectionFinderImpl implements ProtectionFinder {
                     return Optional.absent();
                 }
                 return Optional.of(ContainerProtectionImpl.fromBlocksWithSigns(
-                        blocks, blockFinder, signs));
+                        signs, blocks, blockFinder));
+            case DOOR:
+                Door door = new Door(block);
+                Collection<ProtectionSign> doorSigns = blockFinder.findAttachedSigns(door.getBlocksForSigns());
+                if (doorSigns.isEmpty()) {
+                    return Optional.absent();
+                }
+                return Optional.of(DoorProtectionImpl.fromDoorWithSigns(
+                        doorSigns, blockFinder, door));
             default:
                 throw new UnsupportedOperationException("Don't know how to handle protection type " + protectionType.get());
         }
@@ -117,7 +129,12 @@ class ProtectionFinderImpl implements ProtectionFinder {
             return Optional.of(attachedBlock);
         }
 
-        // TODO find door
+        // Search above and below that block for doors
+        for (Block maybeDoor : blockFinder.getAboveAndBelow(attachedBlock)) {
+            if (settings.canProtect(ProtectionType.DOOR, maybeDoor.getType())) {
+                return Optional.of(maybeDoor);
+            }
+        }
 
         return Optional.absent();
     }
@@ -128,13 +145,15 @@ class ProtectionFinderImpl implements ProtectionFinder {
         if (blockState instanceof Sign) {
             return getProtectionBlockForSign((Sign) blockState).isPresent();
         }
+        // Not a sign, so definitely not a sign nearby a protection block
         return false;
     }
 
     /**
      * Gets the {@link Protection} for the given block, which is already part of
      * a protection and is not a sign. A sign is given as a hint to this method,
-     * so that the
+     * so that the {@link Protection#getOwner()} method executes a little
+     * faster.
      *
      * @param containerBlock
      *            The block that represents the protection (is a door or
@@ -142,9 +161,6 @@ class ProtectionFinderImpl implements ProtectionFinder {
      * @param sign
      *            The sign used for finding the block.
      * @return The created protection.
-     * @throws NoSuchElementException
-     *             If the protectionBlock is not actually a block that can be
-     *             protected
      */
     private Optional<Protection> findExistingProtectionForBlock(Block protectionBlock, ProtectionSign sign) {
         Optional<ProtectionType> protectionType = settings.getProtectionType(protectionBlock.getType());
@@ -154,9 +170,12 @@ class ProtectionFinderImpl implements ProtectionFinder {
 
         switch (protectionType.get()) {
             case CONTAINER:
-                List<Block> blocks = blockFinder.findContainerNeighbors(protectionBlock);
+                Collection<Block> blocks = blockFinder.findContainerNeighbors(protectionBlock);
                 return Optional.of(ContainerProtectionImpl.fromBlocksWithSign(
-                        blocks, blockFinder, sign));
+                        sign, blocks, blockFinder));
+            case DOOR:
+                Door door = new Door(protectionBlock);
+                return Optional.of(DoorProtectionImpl.fromDoorWithSign(sign, blockFinder, door));
             default:
                 throw new UnsupportedOperationException("Don't know how to handle protection type " + protectionType.get());
         }
