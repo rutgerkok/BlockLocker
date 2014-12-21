@@ -1,13 +1,21 @@
 # Translations file for the English language
+command:
+  cannot_be_used_by_console: "This command cannot be used by the console. Sorry!"
+  cannot_edit_owner: "&4You cannot change the owner of the protection. Destroy the sign instead."
+  no_sign_selected: "&4You must select a sign on one of your protected blocks first by right-clicking it."
+  line_number_out_of_bounds: "&4Please enter a line number between 2 and 4, inclusive."
+  sign_no_longer_part_of_protection: "&4The selected sign no longer belongs to a protected block."
+  updated_sign: "&6Updated the sign!"
 protection:
   add_more_users_sign_instead: "&4There can only be one [Private] sign on a protection. Add a [More Users] sign instead."
   can_only_add_protection_sign: "&4There can only be one [Private] and zero or more [More Users] signs on a protection. Other signs are not allowed."
+  cannot_change_sign: "&4You cannot change a sign nearby a claimed container."
   claimed_container: "&6Claimed this container. Nobody else can access it."
   claimed_manually: "&6Created a claim. Only the people listed on the sign can access it."
-  cannot_change_sign: "&4You cannot change a sign nearby a claimed container."
   no_access: "&4This block is protected, you cannot use it."
   no_permission_for_claim: "&4You don't have permission to claim a container, sorry."
   not_nearby: "&4There is no protection nearby. (Shift-)right-click a container with a sign in your hand to protect it."
+  selected_sign: "&6Selected a sign. Type \"/blocklocker <line number> <name>\" to edit this sign."
 tag:
   everyone: "[Everyone]"
   private: "&9[Private]"

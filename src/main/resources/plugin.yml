@@ -7,3 +7,8 @@ permissions:
   blocklocker.protect:
     description: "Allows the user to protect containers and doors."
     default: true
+commands:
+  blocklocker:
+    description: "Edit a sign on your protection."
+    permission: "blocklocker.protect"
+    usage: "/<command> <lineNumber> <value>"

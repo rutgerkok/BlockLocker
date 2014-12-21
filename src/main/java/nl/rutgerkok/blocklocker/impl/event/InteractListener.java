@@ -3,13 +3,12 @@ package nl.rutgerkok.blocklocker.impl.event;
 import java.util.Set;
 
 import nl.rutgerkok.blocklocker.BlockLockerPlugin;
+import nl.rutgerkok.blocklocker.ChestSettings.ProtectionType;
 import nl.rutgerkok.blocklocker.Permissions;
 import nl.rutgerkok.blocklocker.ProtectionSign;
 import nl.rutgerkok.blocklocker.SignType;
-import nl.rutgerkok.blocklocker.ChestSettings.ProtectionType;
 import nl.rutgerkok.blocklocker.Translator.Translation;
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;
-import nl.rutgerkok.blocklocker.profile.Profile;
 import nl.rutgerkok.blocklocker.protection.DoorProtection;
 import nl.rutgerkok.blocklocker.protection.Protection;
 
@@ -31,7 +30,7 @@ import org.bukkit.material.MaterialData;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
-public class InteractListener extends EventListener {
+public final class InteractListener extends EventListener {
 
     private static Set<BlockFace> AUTOPLACE_BLOCK_FACES = ImmutableSet.of(
             BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP);
@@ -64,9 +63,22 @@ public class InteractListener extends EventListener {
         }
     }
 
-    private void handleAllowed(PlayerInteractEvent event, Protection protection) {
+    private void handleAllowed(PlayerInteractEvent event, PlayerProfile playerProfile, Protection protection) {
+        Block clickedBlock = event.getClickedBlock();
+
+        // Select signs
+        if (clickedBlock.getType() == Material.WALL_SIGN || clickedBlock.getType() == Material.SIGN_POST) {
+            if (protection.isOwner(playerProfile)) {
+                Sign sign = (Sign) clickedBlock.getState();
+                Player player = event.getPlayer();
+                plugin.getSignSelector().setSelectedSign(player, sign);
+                plugin.getTranslator().sendMessage(player, Translation.PROTECTION_SELECTED_SIGN);
+            }
+            return;
+        }
+
+        // Open (double) doors manually
         if (protection instanceof DoorProtection) {
-            // Open (double) doors manually
             event.setCancelled(true);
             ((DoorProtection) protection).toggleOpen();
         }
@@ -132,13 +144,14 @@ public class InteractListener extends EventListener {
         }
 
         // Check if player is allowed
-        Profile playerProfile = plugin.getProfileFactory().fromPlayer(player);
+        PlayerProfile playerProfile = plugin.getProfileFactory().fromPlayer(player);
         if (protection.get().isAllowed(playerProfile)) {
-            handleAllowed(event, protection.get());
+            handleAllowed(event, playerProfile, protection.get());
         } else {
             handleDisallowed(player);
             event.setCancelled(true);
         }
+
     }
 
     private void removeSingleItemFromHand(Player player) {

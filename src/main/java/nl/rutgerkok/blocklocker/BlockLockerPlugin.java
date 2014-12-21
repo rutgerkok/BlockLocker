@@ -18,6 +18,14 @@ public interface BlockLockerPlugin {
     void fixMissingUniqueIds(Protection protection);
 
     /**
+     * Gets the {@link ChestSettings} object, containing all customizable
+     * aspects of the plugin.
+     * 
+     * @return The settings object.
+     */
+    ChestSettings getChestSettings();
+
+    /**
      * Gets the profile factory, used to create profiles.
      *
      * @return The profile factory.
@@ -32,6 +40,21 @@ public interface BlockLockerPlugin {
     ProtectionFinder getProtectionFinder();
 
     /**
+     * Gets the {@link SignParser} object.
+     * 
+     * @return The sign parser.
+     */
+    SignParser getSignParser();
+
+    /**
+     * Gets the sign selector, that holds the currently selected signs of all
+     * players.
+     * 
+     * @return The sign selector.
+     */
+    SignSelector getSignSelector();
+
+    /**
      * Gets the translator, used to translate messages.
      *
      * @return The translator.
@@ -39,19 +62,12 @@ public interface BlockLockerPlugin {
     Translator getTranslator();
 
     /**
-     * Gets the {@link ChestSettings} object, containing all customizable
-     * aspects of the plugin.
-     * 
-     * @return The settings object.
+     * Runs a task the next tick on the server thread.
+     *
+     * @param runnable
+     *            The task.
      */
-    ChestSettings getChestSettings();
-
-    /**
-     * Gets the {@link SignParser} object.
-     * 
-     * @return The sign parser.
-     */
-    SignParser getSignParser();
+    void runLater(Runnable runnable);
 
     /**
      * Logs a message with severe importance, along with a stack trace.
@@ -62,12 +78,4 @@ public interface BlockLockerPlugin {
      *            The exception that provides a stacktrace.
      */
     void severe(String string, Throwable t);
-
-    /**
-     * Runs a task the next tick on the server thread.
-     *
-     * @param runnable
-     *            The task.
-     */
-    void runLater(Runnable runnable);
 }

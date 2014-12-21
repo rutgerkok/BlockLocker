@@ -12,9 +12,11 @@ import nl.rutgerkok.blocklocker.ChestSettings;
 import nl.rutgerkok.blocklocker.ProfileFactory;
 import nl.rutgerkok.blocklocker.ProtectionFinder;
 import nl.rutgerkok.blocklocker.SignParser;
+import nl.rutgerkok.blocklocker.SignSelector;
 import nl.rutgerkok.blocklocker.Translator;
 import nl.rutgerkok.blocklocker.impl.converter.SignConverter;
 import nl.rutgerkok.blocklocker.impl.event.BlockDestroyListener;
+import nl.rutgerkok.blocklocker.impl.event.BlockLockerCommand;
 import nl.rutgerkok.blocklocker.impl.event.InteractListener;
 import nl.rutgerkok.blocklocker.impl.event.SignChangeListener;
 import nl.rutgerkok.blocklocker.impl.nms.NMSAccessor;
@@ -37,6 +39,7 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
     private Translator translator;
     private ChestSettings chestSettings;
     private SignParser signParser;
+    private SignSelector signSelector;
 
     @Override
     public void fixMissingUniqueIds(Protection protection) {
@@ -126,6 +129,7 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
         BlockFinder blockFinder = new BlockFinder(signParser);
         protectionFinder = new ProtectionFinderImpl(blockFinder, chestSettings);
         signConverter = new SignConverter(this, signParser);
+        signSelector = new SignSelectorImpl(this);
 
         // Events
         registerEvents();
@@ -139,6 +143,7 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
         plugins.registerEvents(new BlockDestroyListener(this), this);
         plugins.registerEvents(new InteractListener(this), this);
         plugins.registerEvents(new SignChangeListener(this), this);
+        getCommand(getName().toLowerCase()).setExecutor(new BlockLockerCommand(this));
     }
 
     @Override
@@ -159,6 +164,11 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
     @Override
     public void runLater(Runnable runnable) {
         getServer().getScheduler().runTask(this, runnable);
+    }
+
+    @Override
+    public SignSelector getSignSelector() {
+        return signSelector;
     }
 
 }
