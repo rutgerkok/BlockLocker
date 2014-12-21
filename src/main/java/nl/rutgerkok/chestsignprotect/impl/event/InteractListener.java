@@ -10,6 +10,7 @@ import nl.rutgerkok.chestsignprotect.SignType;
 import nl.rutgerkok.chestsignprotect.Translator.Translation;
 import nl.rutgerkok.chestsignprotect.profile.PlayerProfile;
 import nl.rutgerkok.chestsignprotect.profile.Profile;
+import nl.rutgerkok.chestsignprotect.protection.DoorProtection;
 import nl.rutgerkok.chestsignprotect.protection.Protection;
 
 import org.bukkit.GameMode;
@@ -37,6 +38,50 @@ public class InteractListener extends EventListener {
 
     public InteractListener(ChestSignProtect plugin) {
         super(plugin);
+    }
+
+    private MaterialData getRotatedSignPost(Player player) {
+        float rotation = player.getLocation().getYaw();
+        if (rotation < 0) {
+            rotation += 360.0f;
+        }
+        int intRotation = Math.round((rotation / 360.0f) * 16.0f);
+        byte dataValue = (byte) ((intRotation + 8) % 16);
+        System.out.println("dataValue " + dataValue + ", yaw " + rotation);
+        @SuppressWarnings("deprecation")
+        MaterialData materialData = new org.bukkit.material.Sign(Material.SIGN_POST, dataValue);
+        return materialData;
+    }
+
+    private MaterialData getSignMaterial(BlockFace blockFace, Player player) {
+        if (blockFace == BlockFace.UP) {
+            // Place standing sign in direction of player
+            return getRotatedSignPost(player);
+        } else {
+            // Place attached sign
+            org.bukkit.material.Sign signMaterial = new org.bukkit.material.Sign(Material.WALL_SIGN);
+            signMaterial.setFacingDirection(blockFace);
+            return signMaterial;
+        }
+    }
+
+    private void handleAllowed(PlayerInteractEvent event, Protection protection) {
+        if (protection instanceof DoorProtection) {
+            event.setCancelled(true);
+            ((DoorProtection) protection).toggleOpen();
+        }
+    }
+
+    private void handleDisallowed(Player player) {
+        plugin.getTranslator().sendMessage(player, Translation.PROTECTION_NO_ACCESS);
+    }
+
+    private boolean hasSignInHand(Player player) {
+        ItemStack itemInHand = player.getItemInHand();
+        if (itemInHand == null || itemInHand.getAmount() == 0 || itemInHand.getType() != Material.SIGN) {
+            return false;
+        }
+        return true;
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -89,19 +134,11 @@ public class InteractListener extends EventListener {
         // Check if player is allowed
         Profile playerProfile = plugin.getProfileFactory().fromPlayer(player);
         if (protection.get().isAllowed(playerProfile)) {
-            return;
+            handleAllowed(event, protection.get());
+        } else {
+            handleDisallowed(player);
+            event.setCancelled(true);
         }
-
-        plugin.getTranslator().sendMessage(player, Translation.PROTECTION_NO_ACCESS);
-        event.setCancelled(true);
-    }
-
-    private boolean hasSignInHand(Player player) {
-        ItemStack itemInHand = player.getItemInHand();
-        if (itemInHand == null || itemInHand.getAmount() == 0 || itemInHand.getType() != Material.SIGN) {
-            return false;
-        }
-        return true;
     }
 
     private void removeSingleItemFromHand(Player player) {
@@ -120,6 +157,11 @@ public class InteractListener extends EventListener {
         } else {
             player.setItemInHand(null);
         }
+    }
+
+    @SuppressWarnings("deprecation")
+    private void setBlockMaterialData(Block block, MaterialData materialData) {
+        block.setTypeIdAndData(materialData.getItemTypeId(), materialData.getData(), false);
     }
 
     private boolean tryPlaceSign(Player player, Block block, BlockFace clickedSide) {
@@ -147,7 +189,7 @@ public class InteractListener extends EventListener {
         // Create empty sign
 
         // Set base material so that .getState() will be of the correct type
-        setBlockMaterialData(signBlock, getSignMaterial(clickedSide));
+        setBlockMaterialData(signBlock, getSignMaterial(clickedSide, player));
         Sign sign = (Sign) signBlock.getState();
 
         // Place text on it
@@ -159,20 +201,5 @@ public class InteractListener extends EventListener {
         removeSingleItemFromHand(player);
         return true;
     }
-
-    private MaterialData getSignMaterial(BlockFace blockFace) {
-        if (blockFace == BlockFace.UP) {
-            return new MaterialData(Material.SIGN_POST);
-        }
-        org.bukkit.material.Sign signMaterial = new org.bukkit.material.Sign(Material.WALL_SIGN);
-        signMaterial.setFacingDirection(blockFace);
-        return signMaterial;
-    }
-
-    @SuppressWarnings("deprecation")
-    private void setBlockMaterialData(Block block, MaterialData materialData) {
-        block.setTypeIdAndData(materialData.getItemTypeId(), materialData.getData(), false);
-    }
-
 
 }

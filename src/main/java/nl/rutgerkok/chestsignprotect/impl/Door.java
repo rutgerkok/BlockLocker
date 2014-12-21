@@ -113,8 +113,9 @@ public final class Door {
      *            Whether the door must be opened (true) or closed (false).
      */
     @SuppressWarnings("deprecation")
-    public void setOpen(boolean open) {
+    private void setOpen(boolean open) {
         if (open) {
+            // Open door
             if (bottomLeftBlock != null) {
                 bottomLeftBlock.setData((byte) (bottomLeftBlock.getData() | 0x4));
             }
@@ -122,11 +123,12 @@ public final class Door {
                 bottomRightBlock.setData((byte) (bottomRightBlock.getData() | 0x4));
             }
         } else {
+            // Close door
             if (bottomLeftBlock != null) {
-                bottomLeftBlock.setData((byte) (bottomLeftBlock.getData() & 0x4));
+                bottomLeftBlock.setData((byte) (bottomLeftBlock.getData() & ~0x4));
             }
             if (bottomRightBlock != null) {
-                bottomRightBlock.setData((byte) (bottomRightBlock.getData() & 0x4));
+                bottomRightBlock.setData((byte) (bottomRightBlock.getData() & ~0x4));
             }
         }
     }
@@ -156,6 +158,27 @@ public final class Door {
             blocks.add(topRightBlock.getRelative(BlockFace.UP));
         }
         return blocks.build();
+    }
+
+    /**
+     * Closes the door if the door is open, opens the door if the door is
+     * closed. If parts of the door is opened, parts is closed then the whole
+     * door will be in one state after calling this method, but it is unknown in
+     * which state.
+     */
+    public void toggleOpen() {
+        setOpen(!isOpen());
+    }
+
+    @SuppressWarnings("deprecation")
+    private boolean isOpen() {
+        if (bottomRightBlock != null) {
+            return (bottomRightBlock.getData() & 0x4) != 0;
+        }
+        if (bottomLeftBlock != null) {
+            return (bottomLeftBlock.getData() & 0x4) != 0;
+        }
+        return false;
     }
 
 }

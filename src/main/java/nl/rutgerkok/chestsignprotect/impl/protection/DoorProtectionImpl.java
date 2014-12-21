@@ -63,8 +63,8 @@ public final class DoorProtectionImpl extends AbstractProtection implements Door
     }
 
     @Override
-    public void setOpen(boolean open) {
-        door.setOpen(open);
+    public void toggleOpen() {
+        door.toggleOpen();
     }
 
 }

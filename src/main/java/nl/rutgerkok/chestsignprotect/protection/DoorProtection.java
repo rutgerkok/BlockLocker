@@ -7,10 +7,9 @@ package nl.rutgerkok.chestsignprotect.protection;
 public interface DoorProtection extends Protection {
 
     /**
-     * Opens or closes the door.
-     * 
-     * @param open
-     *            True to open the door, false to close the door.
+     * Opens or closes the door. If the door is open, the door is closed and
+     * vice versa.
+     *
      */
-    public void setOpen(boolean open);
+    public void toggleOpen();
 }
