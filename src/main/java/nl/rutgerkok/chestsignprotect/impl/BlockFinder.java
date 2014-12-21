@@ -80,14 +80,8 @@ public final class BlockFinder {
      * @return The block the sign is attached on.
      */
     public Block findAttachedTo(Sign sign) {
-        MaterialData materialData = sign.getData();
-        // Wall sign
-        if (materialData.getItemType() == Material.WALL_SIGN && materialData instanceof Attachable) {
-            Attachable attachable = (Attachable) sign.getData();
-            return sign.getBlock().getRelative(attachable.getAttachedFace());
-        }
-        // Sign post
-        return sign.getBlock().getRelative(BlockFace.DOWN);
+        Attachable attachable = (Attachable) sign.getData();
+        return sign.getBlock().getRelative(attachable.getAttachedFace());
     }
 
     /**
@@ -172,16 +166,8 @@ public final class BlockFinder {
     private boolean isAttachedSign(Sign sign, Block signBlock, Block attachedTo) {
         BlockFace requiredFace = signBlock.getFace(attachedTo);
         MaterialData materialData = sign.getData();
-        BlockFace actualFace;
-        if (materialData.getItemType() == Material.WALL_SIGN) {
-            // Wall sign
-            actualFace = ((Attachable) sign.getData()).getAttachedFace();
-        } else {
-            // Sign post
-            actualFace = BlockFace.DOWN;
-        }
+        BlockFace actualFace = ((org.bukkit.material.Sign) materialData).getAttachedFace();
         return (actualFace == requiredFace);
-
     }
 
     /**
