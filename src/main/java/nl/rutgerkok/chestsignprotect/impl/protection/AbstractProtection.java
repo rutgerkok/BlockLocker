@@ -52,13 +52,13 @@ abstract class AbstractProtection implements Protection {
         this.allSigns = Optional.of(signs);
     }
 
-    private void fetchMainSignAndAllowed(Collection<ProtectionSign> signs) {
+    private Collection<Profile> fetchAllowed(Collection<ProtectionSign> signs) {
         Collection<Profile> allAllowed = Lists.newArrayList();
         for (ProtectionSign sign : signs) {
             // Parse it
             allAllowed.addAll(sign.getProfiles());
         }
-        this.allAllowed = Optional.of(allAllowed);
+        return allAllowed;
     }
 
     private Optional<Profile> fetchOwner() {
@@ -75,7 +75,9 @@ abstract class AbstractProtection implements Protection {
     }
 
     /**
-     * Finds all signs attached to this protection.
+     * Finds all signs attached to this protection. This method must always do a
+     * lookup, results may not be cached: {@link AbstractProtection} already
+     * does that.
      *
      * @return All signs.
      */
@@ -83,10 +85,9 @@ abstract class AbstractProtection implements Protection {
 
     @Override
     public final Collection<Profile> getAllowed() {
-        if (allAllowed.isPresent()) {
-            return allAllowed.get();
+        if (!allAllowed.isPresent()) {
+            allAllowed = Optional.of(fetchAllowed(getSigns()));
         }
-        fetchMainSignAndAllowed(fetchSigns());
         return allAllowed.get();
     }
 
