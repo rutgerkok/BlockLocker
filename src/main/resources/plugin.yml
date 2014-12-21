@@ -1,9 +1,9 @@
 name: ${project.name}
 version: ${project.version}
-main: nl.rutgerkok.chestsignprotect.impl.ChestSignProtectPlugin
+main: nl.rutgerkok.blocklocker.impl.BlockLockerPluginImpl
 author: Rutger Kok
 load: startup
 permissions:
-  chestsignprotect.protect:
+  blocklocker.protect:
     description: "Allows the user to protect containers and doors."
     default: true
