@@ -47,7 +47,6 @@ public class InteractListener extends EventListener {
         }
         int intRotation = Math.round((rotation / 360.0f) * 16.0f);
         byte dataValue = (byte) ((intRotation + 8) % 16);
-        System.out.println("dataValue " + dataValue + ", yaw " + rotation);
         @SuppressWarnings("deprecation")
         MaterialData materialData = new org.bukkit.material.Sign(Material.SIGN_POST, dataValue);
         return materialData;
@@ -67,6 +66,7 @@ public class InteractListener extends EventListener {
 
     private void handleAllowed(PlayerInteractEvent event, Protection protection) {
         if (protection instanceof DoorProtection) {
+            // Open (double) doors manually
             event.setCancelled(true);
             ((DoorProtection) protection).toggleOpen();
         }
