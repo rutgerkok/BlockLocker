@@ -3,3 +3,7 @@ version: ${project.version}
 main: nl.rutgerkok.chestsignprotect.impl.ChestSignProtectPlugin
 author: Rutger Kok
 load: startup
+permissions:
+  chestsignprotect.protect:
+    description: "Allows the user to protect containers and doors."
+    default: true
