@@ -10,6 +10,9 @@ import org.bukkit.Location;
  * Represents the information on a protection sign in the world. Instances of
  * this interface must be immutable.
  *
+ * <p>
+ * Two protection signs are considered equal when they are placed on the same
+ * block in the same world and are of the same implementation.
  */
 public interface ProtectionSign {
 
