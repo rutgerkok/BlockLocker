@@ -2,6 +2,8 @@ package nl.rutgerkok.blocklocker.impl.event;
 
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
 import nl.rutgerkok.blocklocker.BlockLockerPlugin;
 import nl.rutgerkok.blocklocker.ChestSettings.ProtectionType;
 import nl.rutgerkok.blocklocker.Permissions;
@@ -17,12 +19,14 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.DoubleChest;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
@@ -51,6 +55,29 @@ public final class InteractListener extends EventListener {
         }
 
         return allowed;
+    }
+
+    /**
+     * Gets the block the inventory is stored in, or null if the inventory is
+     * not stored in a block.
+     *
+     * @param inventory
+     *            The inventory.
+     * @return The block, or null.
+     */
+    @Nullable
+    private Block getInventoryBlock(Inventory inventory) {
+        InventoryHolder holder = inventory.getHolder();
+        if (holder instanceof BlockState) {
+            return ((BlockState) holder).getBlock();
+        }
+        if (holder instanceof DoubleChest) {
+            InventoryHolder leftHolder = ((DoubleChest) holder).getLeftSide();
+            if (leftHolder instanceof BlockState) {
+                return ((BlockState) leftHolder).getBlock();
+            }
+        }
+        return null;
     }
 
     private MaterialData getRotatedSignPost(Player player) {
@@ -118,16 +145,17 @@ public final class InteractListener extends EventListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onInventoryMoveItemEvent(InventoryMoveItemEvent event) {
-        InventoryHolder from = event.getInitiator().getHolder();
-        InventoryHolder to = event.getDestination().getHolder();
-        if (from instanceof BlockState) {
-            if (isProtected(((BlockState) from).getBlock())) {
+        Block from = getInventoryBlock(event.getSource());
+        Block to = getInventoryBlock(event.getDestination());
+
+        if (from != null) {
+            if (isProtected(from)) {
                 event.setCancelled(true);
                 return;
             }
         }
-        if (to instanceof BlockState) {
-            if (isProtected(((BlockState) to).getBlock())) {
+        if (to != null) {
+            if (isProtected(to)) {
                 event.setCancelled(true);
                 return;
             }
