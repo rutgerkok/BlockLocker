@@ -22,7 +22,6 @@ Not yet implemented, planned for first release:
 * Allow the admin to change which blocks can be protected.
 * Add `/blocklocker reload` command.
 * Ultra-simple API for third-party plugins, this API will be supported forever.
-* Destroying the `[Private]` sign destroys all `[More Users]` signs.
 * Send message to player when a chest is placed that the chest can be protected.
 
 Planned after first release:

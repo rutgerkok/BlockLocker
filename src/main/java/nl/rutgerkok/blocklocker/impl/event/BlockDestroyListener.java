@@ -4,12 +4,14 @@ import java.util.Iterator;
 import java.util.List;
 
 import nl.rutgerkok.blocklocker.BlockLockerPlugin;
+import nl.rutgerkok.blocklocker.ProtectionSign;
 import nl.rutgerkok.blocklocker.profile.Profile;
 import nl.rutgerkok.blocklocker.protection.Protection;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -30,10 +32,35 @@ public class BlockDestroyListener extends EventListener {
         super(plugin);
     }
 
+    private Optional<ProtectionSign> asMainSign(Block block) {
+        if (block.getType() != Material.WALL_SIGN && block.getType() != Material.SIGN_POST) {
+            return Optional.absent();
+        }
+
+        Sign sign = (Sign) block.getState();
+        Optional<ProtectionSign> protectionSign = plugin.getSignParser().parseSign(sign);
+        if (!protectionSign.isPresent()) {
+            return Optional.absent();
+        }
+        if (!protectionSign.get().getType().isMainSign()) {
+            return Optional.absent();
+        }
+        return protectionSign;
+    }
+
+    private void destroyOtherSigns(ProtectionSign protectionSign, Protection protection) {
+        for (ProtectionSign foundSign : protection.getSigns()) {
+            if (!foundSign.equals(protectionSign)) {
+                foundSign.getLocation().getBlock().breakNaturally();
+            }
+        }
+    }
+
     @EventHandler(ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
+        Block block = event.getBlock();
         Optional<Protection> protection = plugin.getProtectionFinder()
-                .findProtection(event.getBlock());
+                .findProtection(block);
         if (!protection.isPresent()) {
             return;
         }
@@ -42,6 +69,12 @@ public class BlockDestroyListener extends EventListener {
         Profile profile = plugin.getProfileFactory().fromPlayer(player);
         if (!protection.get().isOwner(profile)) {
             event.setCancelled(true);
+            return;
+        }
+
+        Optional<ProtectionSign> mainSign = asMainSign(block);
+        if (mainSign.isPresent()) {
+            destroyOtherSigns(mainSign.get(), protection.get());
         }
     }
 
