@@ -174,6 +174,7 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
 
     @Override
     public void reload() {
+        reloadConfig();
         loadServices();
     }
 
