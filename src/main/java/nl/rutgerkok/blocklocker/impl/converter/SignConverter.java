@@ -49,7 +49,6 @@ public class SignConverter {
 
     private void finishFix(Collection<Protection> protections,
             Map<String, NameAndId> nameCache) {
-        System.out.println(protections.size() + " protections to fix");
         for (Protection protection : protections) {
             finishFix(protection, nameCache);
         }
@@ -59,7 +58,6 @@ public class SignConverter {
             Map<String, NameAndId> nameCache) {
 
         for (ProtectionSign sign : protection.getSigns()) {
-            System.out.println("Fixing a sign at " + sign.getLocation());
             List<Profile> oldProfileCollection = sign.getProfiles();
             List<Profile> newProfileCollection = new ArrayList<Profile>(3);
             for (Profile profile : oldProfileCollection) {
@@ -142,7 +140,6 @@ public class SignConverter {
             return plugin.getProfileFactory().fromNameAndUniqueId(invalid);
         } else {
             // Valid profile, replace
-            System.out.println("Replaced " + oldProfile + " with " + nameAndId);
             return plugin.getProfileFactory().fromNameAndUniqueId(nameAndId);
         }
     }

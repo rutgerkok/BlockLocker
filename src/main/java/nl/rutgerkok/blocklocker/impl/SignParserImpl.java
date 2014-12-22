@@ -119,10 +119,8 @@ class SignParserImpl implements SignParser {
     public Optional<ProtectionSign> parseSign(Sign sign) {
         Optional<List<JSONObject>> foundTextData = nms.getJsonData(sign);
         if (foundTextData.isPresent()) {
-            System.out.println("Found extra data");
             return parseAdvancedSign(sign.getLocation(), sign.getLine(0), foundTextData.get());
         } else {
-            System.out.println("Found simple sign");
             return parseSimpleSign(sign.getLocation(), sign.getLines());
         }
     }

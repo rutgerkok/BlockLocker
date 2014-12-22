@@ -109,7 +109,6 @@ public final class NMSAccessor {
     }
 
     private void setSecretData(TileEntitySign nmsSign, String data) {
-        System.out.println("setting " + data);
         IChatBaseComponent line = nmsSign.lines[0];
         ChatModifier modifier = Objects.firstNonNull(line.getChatModifier(), new ChatModifier());
         ChatHoverable hoverable = new ChatHoverable(EnumHoverAction.SHOW_TEXT, new ChatComponentText(data));
