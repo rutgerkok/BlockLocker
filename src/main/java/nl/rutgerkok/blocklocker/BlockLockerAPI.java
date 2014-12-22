@@ -29,9 +29,9 @@ public final class BlockLockerAPI {
      * 
      * @param block
      *            The block.
-     * @return The owner, or empty if the block is not protected or the
-     *         protection has not yet looked up the UUID of the owner.
+     * @return The owner, or empty if the block is not protected.
      */
+    @SuppressWarnings("deprecation")
     public static Optional<OfflinePlayer> getOwner(Block block) {
         Optional<Protection> protection = getPlugin().getProtectionFinder().findProtection(block);
         if (!protection.isPresent()) {
@@ -44,6 +44,10 @@ public final class BlockLockerAPI {
             if (uuid.isPresent()) {
                 return Optional.of(Bukkit.getOfflinePlayer(uuid.get()));
             }
+
+            // No uuid looked up yet
+            getPlugin().fixMissingUniqueIds(protection.get());
+            return Optional.fromNullable(Bukkit.getOfflinePlayer(owner.getDisplayName()));
         }
 
         return Optional.absent();
