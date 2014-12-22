@@ -83,13 +83,4 @@ public interface BlockLockerPlugin {
      */
     void runLater(Runnable runnable);
 
-    /**
-     * Logs a message with severe importance, along with a stack trace.
-     *
-     * @param string
-     *            The message to log.
-     * @param t
-     *            The exception that provides a stacktrace.
-     */
-    void severe(String string, Throwable t);
 }

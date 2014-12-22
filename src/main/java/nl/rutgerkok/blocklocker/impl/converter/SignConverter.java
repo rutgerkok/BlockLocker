@@ -9,6 +9,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.logging.Level;
 
 import nl.rutgerkok.blocklocker.BlockLockerPlugin;
 import nl.rutgerkok.blocklocker.NameAndId;
@@ -118,7 +119,7 @@ public class SignConverter {
                         }
                     });
         } catch (Exception e) {
-            plugin.severe("Failed to fetch UUIDs", e);
+            plugin.getLogger().log(Level.SEVERE, "Failed to fetch UUIDs", e);
         }
     }
 

@@ -68,7 +68,7 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
         try {
             resource.close();
         } catch (IOException e) {
-            severe("Failed to close stream", e);
+            getLogger().log(Level.SEVERE, "Failed to close stream", e);
         }
         return config;
     }
@@ -99,7 +99,7 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
             try {
                 translator.save(file);
             } catch (IOException e) {
-                severe("Failed to save translation file", e);
+                getLogger().log(Level.SEVERE, "Failed to save translation file", e);
             }
         }
         return translator;
@@ -111,7 +111,7 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
         try {
             nms = new NMSAccessor();
         } catch (Throwable t) {
-            severe("This Minecraft version is not supported. Find another version of the plugin, if available.", t);
+            getLogger().log(Level.SEVERE, "This Minecraft version is not supported. Find another version of the plugin, if available.", t);
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
@@ -150,11 +150,6 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
         plugins.registerEvents(new InteractListener(this), this);
         plugins.registerEvents(new SignChangeListener(this), this);
         getCommand(getName().toLowerCase()).setExecutor(new BlockLockerCommand(this));
-    }
-
-    @Override
-    public void severe(String message, Throwable t) {
-        getLogger().log(Level.SEVERE, message, t);
     }
 
     @Override
