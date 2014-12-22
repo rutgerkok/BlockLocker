@@ -21,7 +21,6 @@ Not yet implemented, planned for first release:
 
 * Automatically closing doors.
 * Ultra-simple API for third-party plugins, this API will be supported forever.
-* Send message to player when a chest is placed that the chest can be protected.
 
 Planned after first release:
 

@@ -14,6 +14,7 @@ protection:
   bypassed: "&6You have just bypassed a protection of {0}."
   can_only_add_protection_sign: "&4There can only be one [Private] and zero or more [More Users] signs on a protection. Other signs are not allowed."
   cannot_change_sign: "&4You cannot change a sign nearby a claimed container."
+  chest_hint: "&6Place a sign on this chest to protect it."
   claimed_container: "&6Claimed this container. Nobody else can access it."
   claimed_manually: "&6Created a claim. Only the people listed on the sign can access it."
   is_claimed_by: "&6This block has been claimed by {0}."

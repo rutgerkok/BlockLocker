@@ -17,6 +17,7 @@ import nl.rutgerkok.blocklocker.Translator;
 import nl.rutgerkok.blocklocker.impl.converter.SignConverter;
 import nl.rutgerkok.blocklocker.impl.event.BlockDestroyListener;
 import nl.rutgerkok.blocklocker.impl.event.BlockLockerCommand;
+import nl.rutgerkok.blocklocker.impl.event.BlockPlaceListener;
 import nl.rutgerkok.blocklocker.impl.event.InteractListener;
 import nl.rutgerkok.blocklocker.impl.event.SignChangeListener;
 import nl.rutgerkok.blocklocker.impl.nms.NMSAccessor;
@@ -145,6 +146,7 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
     private void registerEvents() {
         PluginManager plugins = Bukkit.getPluginManager();
         plugins.registerEvents(new BlockDestroyListener(this), this);
+        plugins.registerEvents(new BlockPlaceListener(this), this);
         plugins.registerEvents(new InteractListener(this), this);
         plugins.registerEvents(new SignChangeListener(this), this);
         getCommand(getName().toLowerCase()).setExecutor(new BlockLockerCommand(this));

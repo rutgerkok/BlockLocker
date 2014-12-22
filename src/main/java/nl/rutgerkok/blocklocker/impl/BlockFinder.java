@@ -24,6 +24,8 @@ import com.google.common.collect.ImmutableSet;
 public final class BlockFinder {
     private static BlockFace[] SIGN_ATTACHEMENT_FACES = { BlockFace.NORTH, BlockFace.EAST,
             BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP };
+    public static BlockFace[] CHEST_LINKING_FACES = { BlockFace.NORTH, BlockFace.EAST,
+            BlockFace.SOUTH, BlockFace.WEST };
     private static BlockFace[] UP_DOWN = { BlockFace.UP, BlockFace.DOWN };
 
     private SignParser parser;
@@ -103,7 +105,7 @@ public final class BlockFinder {
         Material chestMaterial = block.getType(); // CHEST or TRAPPED_CHEST
         BlockFace chestFacing = ((Directional) getData(block)).getFacing();
 
-        for (BlockFace face : SIGN_ATTACHEMENT_FACES) {
+        for (BlockFace face : CHEST_LINKING_FACES) {
             Block atPosition = block.getRelative(face);
             if (atPosition.getType() != chestMaterial) {
                 continue;
