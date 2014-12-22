@@ -18,7 +18,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
-import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
@@ -87,13 +86,6 @@ public class BlockDestroyListener extends EventListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockBurnEvent(BlockBurnEvent event) {
-        if (isProtected(event.getBlock())) {
-            event.setCancelled(true);
-        }
-    }
-
-    @EventHandler(ignoreCancelled = true)
-    public void onBlockDamageEvent(BlockDamageEvent event) {
         if (isProtected(event.getBlock())) {
             event.setCancelled(true);
         }
