@@ -70,4 +70,12 @@ public interface Protection {
      */
     boolean isOwner(Profile profile);
 
+    /**
+     * Gets the display name of the owner of the protection. If
+     * {@link #getOwner()} is absent, "?" is returned.
+     *
+     * @return The display name.
+     */
+    String getOwnerDisplayName();
+
 }

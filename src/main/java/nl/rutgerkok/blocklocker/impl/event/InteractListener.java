@@ -39,6 +39,20 @@ public final class InteractListener extends EventListener {
         super(plugin);
     }
 
+    private boolean checkAllowed(Player player, Protection protection, boolean clickedSign) {
+        PlayerProfile playerProfile = plugin.getProfileFactory().fromPlayer(player);
+        boolean allowed = protection.isAllowed(playerProfile);
+
+        // When not clicking a sign, allow admins to bypass the protection
+        if (!allowed && !clickedSign && player.hasPermission(Permissions.CAN_BYPASS)) {
+            allowed = true;
+            String ownerName = protection.getOwnerDisplayName();
+            plugin.getTranslator().sendMessage(player, Translation.PROTECTION_BYPASSED, ownerName);
+        }
+
+        return allowed;
+    }
+
     private MaterialData getRotatedSignPost(Player player) {
         float rotation = player.getLocation().getYaw();
         if (rotation < 0) {
@@ -63,14 +77,15 @@ public final class InteractListener extends EventListener {
         }
     }
 
-    private void handleAllowed(PlayerInteractEvent event, PlayerProfile playerProfile, Protection protection) {
+    private void handleAllowed(PlayerInteractEvent event, Protection protection, boolean clickedSign) {
         Block clickedBlock = event.getClickedBlock();
+        Player player = event.getPlayer();
+        PlayerProfile playerProfile = plugin.getProfileFactory().fromPlayer(player);
 
         // Select signs
-        if (clickedBlock.getType() == Material.WALL_SIGN || clickedBlock.getType() == Material.SIGN_POST) {
+        if (clickedSign) {
             if (protection.isOwner(playerProfile)) {
                 Sign sign = (Sign) clickedBlock.getState();
-                Player player = event.getPlayer();
                 plugin.getSignSelector().setSelectedSign(player, sign);
                 plugin.getTranslator().sendMessage(player, Translation.PROTECTION_SELECTED_SIGN);
             }
@@ -84,8 +99,13 @@ public final class InteractListener extends EventListener {
         }
     }
 
-    private void handleDisallowed(Player player) {
-        plugin.getTranslator().sendMessage(player, Translation.PROTECTION_NO_ACCESS);
+    private void handleDisallowed(Player player, Protection protection, boolean clickedSign) {
+        if (clickedSign) {
+            plugin.getTranslator().sendMessage(player, Translation.PROTECTION_IS_CLAIMED_BY,
+                    protection.getOwnerDisplayName());
+        } else {
+            plugin.getTranslator().sendMessage(player, Translation.PROTECTION_NO_ACCESS);
+        }
     }
 
     private boolean hasSignInHand(Player player) {
@@ -128,6 +148,7 @@ public final class InteractListener extends EventListener {
 
         Player player = event.getPlayer();
         Block block = event.getClickedBlock();
+        boolean clickedSign = block.getType() == Material.SIGN_POST || block.getType() == Material.WALL_SIGN;
         Optional<Protection> protection = plugin.getProtectionFinder().findProtection(block);
 
         if (!protection.isPresent()) {
@@ -144,11 +165,11 @@ public final class InteractListener extends EventListener {
         }
 
         // Check if player is allowed
-        PlayerProfile playerProfile = plugin.getProfileFactory().fromPlayer(player);
-        if (protection.get().isAllowed(playerProfile)) {
-            handleAllowed(event, playerProfile, protection.get());
+
+        if (checkAllowed(player, protection.get(), clickedSign)) {
+            handleAllowed(event, protection.get(), clickedSign);
         } else {
-            handleDisallowed(player);
+            handleDisallowed(player, protection.get(), clickedSign);
             event.setCancelled(true);
         }
 

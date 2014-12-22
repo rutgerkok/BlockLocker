@@ -7,7 +7,7 @@ import org.bukkit.command.CommandSender;
  * Collection of translations.
  *
  */
-public interface Translator {
+public abstract class Translator {
 
     public enum Translation {
         COMMAND_CANNOT_BE_USED_BY_CONSOLE,
@@ -18,10 +18,12 @@ public interface Translator {
         COMMAND_SIGN_NO_LONGER_PART_OF_PROTECTION,
         COMMAND_UPDATED_SIGN,
         PROTECTION_ADD_MORE_USERS_SIGN_INSTEAD,
+        PROTECTION_BYPASSED,
         PROTECTION_CAN_ONLY_ADD_PROTECTION_SIGN,
         PROTECTION_CANNOT_CHANGE_SIGN,
         PROTECTION_CLAIMED_CONTAINER,
         PROTECTION_CLAIMED_MANUALLY,
+        PROTECTION_IS_CLAIMED_BY,
         PROTECTION_NO_ACCESS,
         PROTECTION_NO_PERMISSION_FOR_CLAIM,
         PROTECTION_NOT_NEARBY,
@@ -48,7 +50,7 @@ public interface Translator {
      *            The key of the translation.
      * @return The translation, or the key if not found.
      */
-    String get(Translation key);
+    public abstract String get(Translation key);
 
     /**
      * Same as {@link #get(Translation)}, but with
@@ -58,7 +60,7 @@ public interface Translator {
      *            The key of the translation.
      * @return The translation, or the key if not found.
      */
-    String getWithoutColor(Translation key);
+    public abstract String getWithoutColor(Translation key);
 
     /**
      * Sends the specified message translated to the given player.
@@ -68,5 +70,24 @@ public interface Translator {
      * @param translation
      *            The message to send.
      */
-    void sendMessage(CommandSender player, Translation translation);
+    public abstract void sendMessage(CommandSender player, Translation translation);
+
+    /**
+     * Sends the specified message translated to the given player.
+     *
+     * @param player
+     *            The player (or console) to the send the message to.
+     * @param translation
+     *            The message to send.
+     * @param parameters
+     *            Replacements for the message. {0} will be replaced by the
+     *            first parameter, etc.
+     */
+    public final void sendMessage(CommandSender player, Translation translation, String... parameters) {
+        String translated = get(translation);
+        for (int i = 0; i < parameters.length; i++) {
+            translated = translated.replace("{" + i + "}", parameters[i]);
+        }
+        player.sendMessage(translated);
+    }
 }

@@ -17,7 +17,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
  * Provides translations from a configuration file.
  *
  */
-class ConfigTranslator implements Translator {
+class ConfigTranslator extends Translator {
 
     private boolean needsSave = false;
     private final Map<Translation, TranslationValue> translations;

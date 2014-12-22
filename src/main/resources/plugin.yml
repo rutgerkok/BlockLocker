@@ -7,6 +7,9 @@ permissions:
   blocklocker.protect:
     description: "Allows the user to protect containers and doors."
     default: true
+  blocklocker.bypass:
+    description: "Allows the user to bypass someone else's protection."
+    default: op
 commands:
   blocklocker:
     description: "Edit a sign on your protection."

@@ -14,10 +14,10 @@ Current features:
 * The owner of a protection can change the signs after creating them using the `/blocklocker <line number> <name>` command.
 * Only the owner of a protection can destroy a protection.
 * Signs placed against a container are automatically filled with `[Private]` and the name of the player.
+* Admins can still open protected doors and containers.
 
 Not yet implemented, planned for first release:
 
-* Admin bypass.
 * Automatically closing doors.
 * Allow the admin to change which blocks can be protected.
 * Add `/blocklocker reload` command.

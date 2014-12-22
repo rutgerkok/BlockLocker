@@ -8,7 +8,7 @@ import org.bukkit.command.CommandSender;
  * Simply returns the key.
  *
  */
-public class NullTranslator implements Translator {
+public class NullTranslator extends Translator {
 
     @Override
     public String get(Translation key) {

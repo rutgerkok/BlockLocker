@@ -4,7 +4,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import nl.rutgerkok.blocklocker.BlockLockerPlugin;
+import nl.rutgerkok.blocklocker.Permissions;
 import nl.rutgerkok.blocklocker.ProtectionSign;
+import nl.rutgerkok.blocklocker.Translator.Translation;
 import nl.rutgerkok.blocklocker.profile.Profile;
 import nl.rutgerkok.blocklocker.protection.Protection;
 
@@ -68,8 +70,13 @@ public class BlockDestroyListener extends EventListener {
         Player player = event.getPlayer();
         Profile profile = plugin.getProfileFactory().fromPlayer(player);
         if (!protection.get().isOwner(profile)) {
-            event.setCancelled(true);
-            return;
+            if (player.hasPermission(Permissions.CAN_BYPASS)) {
+                String ownerName = protection.get().getOwnerDisplayName();
+                plugin.getTranslator().sendMessage(player, Translation.PROTECTION_BYPASSED, ownerName);
+            } else {
+                event.setCancelled(true);
+                return;
+            }
         }
 
         Optional<ProtectionSign> mainSign = asMainSign(block);

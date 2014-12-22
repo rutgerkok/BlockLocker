@@ -101,6 +101,15 @@ abstract class AbstractProtection implements Protection {
     }
 
     @Override
+    public final String getOwnerDisplayName() {
+        Optional<Profile> owner = getOwner();
+        if (owner.isPresent()) {
+            return owner.get().getDisplayName();
+        }
+        return "?";
+    }
+
+    @Override
     public final Collection<ProtectionSign> getSigns() {
         if (!this.allSigns.isPresent()) {
             this.allSigns = Optional.of(fetchSigns());
