@@ -20,7 +20,6 @@ Current features:
 Not yet implemented, planned for first release:
 
 * Automatically closing doors.
-* Ultra-simple API for third-party plugins, this API will be supported forever.
 
 Planned after first release:
 
