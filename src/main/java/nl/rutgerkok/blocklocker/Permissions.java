@@ -4,8 +4,9 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 
 public final class Permissions {
-    public static final String CAN_PROTECT = "blocklocker.protect";
     public static final String CAN_BYPASS = "blocklocker.bypass";
+    public static final String CAN_PROTECT = "blocklocker.protect";
+    public static final String CAN_RELOAD = "blocklocker.reload";
 
     private static final String GROUP_PREFIX = "blocklocker.group.";
 

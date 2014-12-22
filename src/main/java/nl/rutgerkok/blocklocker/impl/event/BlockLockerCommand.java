@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import nl.rutgerkok.blocklocker.BlockLockerPlugin;
+import nl.rutgerkok.blocklocker.Permissions;
 import nl.rutgerkok.blocklocker.SignType;
 import nl.rutgerkok.blocklocker.Translator.Translation;
 import nl.rutgerkok.blocklocker.protection.Protection;
@@ -12,6 +13,7 @@ import nl.rutgerkok.blocklocker.protection.Protection;
 import org.bukkit.block.Sign;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
@@ -39,6 +41,32 @@ public final class BlockLockerCommand implements TabExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (args.length == 0) {
+            return false;
+        }
+
+        if (args[0].equalsIgnoreCase("reload")) {
+            return reloadCommand(sender);
+        }
+        return signChangeCommand(sender, args);
+    }
+
+    private boolean reloadCommand(CommandSender sender) {
+        if (!sender.hasPermission(Permissions.CAN_RELOAD)) {
+            plugin.getTranslator().sendMessage(sender, Translation.COMMAND_NO_PERMISSION);
+            return true;
+        }
+
+        plugin.reload();
+        plugin.getLogger().info(plugin.getTranslator().getWithoutColor(Translation.COMMAND_PLUGIN_RELOADED));
+        if (!(sender instanceof ConsoleCommandSender)) {
+            // Avoid sending message twice to the console
+            plugin.getTranslator().sendMessage(sender, Translation.COMMAND_PLUGIN_RELOADED);
+        }
+        return true;
+    }
+
+    private boolean signChangeCommand(CommandSender sender, String[] args) {
         if (!(sender instanceof Player)) {
             plugin.getTranslator().sendMessage(sender, Translation.COMMAND_CANNOT_BE_USED_BY_CONSOLE);
             return true;
@@ -51,7 +79,7 @@ public final class BlockLockerCommand implements TabExecutor {
             return true;
         }
 
-        if (args.length != 2 && args.length != 1) {
+        if (args.length > 2) {
             return false;
         }
 

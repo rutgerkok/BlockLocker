@@ -5,10 +5,13 @@ author: Rutger Kok
 load: startup
 permissions:
   blocklocker.protect:
-    description: "Allows the user to protect containers and doors."
+    description: "Protect containers and doors."
     default: true
   blocklocker.bypass:
-    description: "Allows the user to bypass someone else's protection."
+    description: "Bypass someone else's protection."
+    default: op
+  blocklocker.reload:
+    description: "Reload the plugin using /blocklocker reload."
     default: op
 commands:
   blocklocker:

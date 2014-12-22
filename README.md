@@ -20,7 +20,6 @@ Current features:
 Not yet implemented, planned for first release:
 
 * Automatically closing doors.
-* Add `/blocklocker reload` command.
 * Ultra-simple API for third-party plugins, this API will be supported forever.
 * Send message to player when a chest is placed that the chest can be protected.
 

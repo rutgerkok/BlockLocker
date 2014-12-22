@@ -2,8 +2,11 @@
 command:
   cannot_be_used_by_console: "This command cannot be used by the console. Sorry!"
   cannot_edit_owner: "&4You cannot change the owner of the protection. Destroy the sign instead."
-  no_sign_selected: "&4You must select a sign on one of your protected blocks first by right-clicking it."
   line_number_out_of_bounds: "&4Please enter a line number between 2 and 4, inclusive."
+  no_sign_selected: "&4You must select a sign on one of your protected blocks first by right-clicking it."
+  no_permission: "&4You don't have permission to execute this command. Sorry!"
+  player_name_too_long: "&4The player name is over 16 characters, which doesn't fit on the sign1 It is also longer than Mojang allows player names to be."
+  plugin_reloaded: "&6Reloaded the configuration files!"
   sign_no_longer_part_of_protection: "&4The selected sign no longer belongs to a protected block."
   updated_sign: "&6Updated the sign!"
 protection:

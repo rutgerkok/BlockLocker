@@ -1,5 +1,7 @@
 package nl.rutgerkok.blocklocker;
 
+import java.util.logging.Logger;
+
 import nl.rutgerkok.blocklocker.protection.Protection;
 
 /**
@@ -24,6 +26,13 @@ public interface BlockLockerPlugin {
      * @return The settings object.
      */
     ChestSettings getChestSettings();
+
+    /**
+     * Gets the logger of the plugin.
+     * 
+     * @return The logger.
+     */
+    Logger getLogger();
 
     /**
      * Gets the profile factory, used to create profiles.
@@ -60,6 +69,11 @@ public interface BlockLockerPlugin {
      * @return The translator.
      */
     Translator getTranslator();
+
+    /**
+     * Reloads the configuration files of the plugin.
+     */
+    void reload();
 
     /**
      * Runs a task the next tick on the server thread.

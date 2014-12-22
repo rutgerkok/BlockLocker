@@ -40,6 +40,7 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
     private ChestSettings chestSettings;
     private SignParser signParser;
     private SignSelector signSelector;
+    private NMSAccessor nms;
 
     @Override
     public void fixMissingUniqueIds(Protection protection) {
@@ -106,7 +107,6 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
     @Override
     public void onEnable() {
         // NMS checks
-        NMSAccessor nms;
         try {
             nms = new NMSAccessor();
         } catch (Throwable t) {
@@ -115,6 +115,13 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
             return;
         }
 
+        loadServices();
+
+        // Events
+        registerEvents();
+    }
+
+    private void loadServices() {
         // Configuration
         saveDefaultConfig();
         Config config = new Config(getLogger(), getConfig());
@@ -130,9 +137,6 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
         protectionFinder = new ProtectionFinderImpl(blockFinder, chestSettings);
         signConverter = new SignConverter(this, signParser);
         signSelector = new SignSelectorImpl(this);
-
-        // Events
-        registerEvents();
     }
 
     /**
@@ -169,6 +173,11 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
     @Override
     public SignSelector getSignSelector() {
         return signSelector;
+    }
+
+    @Override
+    public void reload() {
+        loadServices();
     }
 
 }
