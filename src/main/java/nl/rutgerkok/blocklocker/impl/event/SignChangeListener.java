@@ -7,14 +7,12 @@ import nl.rutgerkok.blocklocker.Translator.Translation;
 import nl.rutgerkok.blocklocker.profile.Profile;
 import nl.rutgerkok.blocklocker.protection.Protection;
 
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.SignChangeEvent;
-import org.bukkit.inventory.ItemStack;
 
 import com.google.common.base.Optional;
 
@@ -24,16 +22,11 @@ public class SignChangeListener extends EventListener {
         super(plugin);
     }
 
-    private void destroySign(Block signBlock) {
-        signBlock.setType(Material.AIR);
-        signBlock.getWorld().dropItemNaturally(signBlock.getLocation(), new ItemStack(Material.SIGN, 1));
-    }
-
     private void destroySignIfNew(Block signBlock) {
         if (isExistingSign(signBlock)) {
             return;
         }
-        destroySign(signBlock);
+        signBlock.breakNaturally();
     }
 
     private void handleSignNearbyProtection(SignChangeEvent event, Protection protection) {
@@ -68,7 +61,7 @@ public class SignChangeListener extends EventListener {
                 }
             } else {
                 plugin.getTranslator().sendMessage(player, Translation.PROTECTION_ADD_MORE_USERS_SIGN_INSTEAD);
-                destroySign(block);
+                block.breakNaturally();
                 event.setCancelled(true);
                 return;
             }
@@ -93,7 +86,7 @@ public class SignChangeListener extends EventListener {
 
         if (!player.hasPermission(Permissions.CAN_PROTECT)) {
             plugin.getTranslator().sendMessage(player, Translation.PROTECTION_NO_PERMISSION_FOR_CLAIM);
-            destroySign(block);
+            block.breakNaturally();
             event.setCancelled(true);
             return;
         }
@@ -101,7 +94,7 @@ public class SignChangeListener extends EventListener {
         // Only the main sign can be used to create new protections
         if (!signType.isMainSign()) {
             plugin.getTranslator().sendMessage(player, Translation.PROTECTION_NOT_NEARBY);
-            destroySign(block);
+            block.breakNaturally();
             event.setCancelled(true);
             return;
         }
@@ -109,7 +102,7 @@ public class SignChangeListener extends EventListener {
         // Sign must be attached to container
         if (!plugin.getProtectionFinder().isSignNearbyProtectionBlock(block)) {
             plugin.getTranslator().sendMessage(player, Translation.PROTECTION_NOT_NEARBY);
-            destroySign(block);
+            block.breakNaturally();
             event.setCancelled(true);
             return;
         }
