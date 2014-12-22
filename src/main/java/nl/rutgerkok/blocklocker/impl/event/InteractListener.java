@@ -146,7 +146,8 @@ public final class InteractListener extends EventListener {
             plugin.getTranslator().sendMessage(player, Translation.PROTECTION_IS_CLAIMED_BY,
                     protection.getOwnerDisplayName());
         } else {
-            plugin.getTranslator().sendMessage(player, Translation.PROTECTION_NO_ACCESS);
+            plugin.getTranslator().sendMessage(player, Translation.PROTECTION_NO_ACCESS,
+                    protection.getOwnerDisplayName());
         }
     }
 
