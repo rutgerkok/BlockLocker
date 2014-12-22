@@ -6,6 +6,7 @@ Lockette/Deadbolt clone that supports UUIDs (and the new doors), written from sc
 Current features:
 
 * Locks chests, furnaces, doors and a few other containers using the familiar `[Private]` and `[More Users]` signs.
+* You can change which block types can be protected.
 * UUIDs are saved to hidden hover text data on the sign, never visible for users.
 * Automatically looks up UUIDs for signs from Lockette and Deadbolt when they are read.
 * All messages can be translated.
@@ -19,7 +20,6 @@ Current features:
 Not yet implemented, planned for first release:
 
 * Automatically closing doors.
-* Allow the admin to change which blocks can be protected.
 * Add `/blocklocker reload` command.
 * Ultra-simple API for third-party plugins, this API will be supported forever.
 * Send message to player when a chest is placed that the chest can be protected.

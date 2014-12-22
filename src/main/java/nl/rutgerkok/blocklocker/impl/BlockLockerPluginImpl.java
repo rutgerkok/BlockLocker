@@ -117,14 +117,14 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
 
         // Configuration
         saveDefaultConfig();
-        Config config = new Config(getConfig());
+        Config config = new Config(getLogger(), getConfig());
 
         // Translation
         translator = loadTranslations(config.getLanguageFileName());
 
         // Parsers and finders
         profileFactory = new ProfileFactoryImpl(translator);
-        chestSettings = new ChestSettingsImpl(translator);
+        chestSettings = new ChestSettingsImpl(translator, config);
         signParser = new SignParserImpl(chestSettings, nms, profileFactory);
         BlockFinder blockFinder = new BlockFinder(signParser);
         protectionFinder = new ProtectionFinderImpl(blockFinder, chestSettings);

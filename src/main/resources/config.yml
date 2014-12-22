@@ -3,3 +3,33 @@
 
 # The language file used by the plugin. Must be placed next to this file.
 languageFile: translations-en.yml
+
+# All types of containers that can be protected.
+# All material names can be found here:
+# https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
+protectableContainers:
+- ANVIL
+- BEACON
+- BREWING_STAND
+- BURNING_FURNACE
+- CHEST
+- DISPENSER
+- DROPPER
+- ENCHANTMENT_TABLE
+- ENDER_CHEST
+- FURNACE
+- TRAPPED_CHEST
+- TRAP_DOOR
+- WORKBENCH
+
+# All types of doors that can be protected. These blocks must follow the data
+# value format as described here:
+# http://minecraft.gamepedia.com/Data_values#Door
+protectableDoors:
+- WOODEN_DOOR
+- IRON_DOOR_BLOCK
+- SPRUCE_DOOR
+- BIRCH_DOOR
+- JUNGLE_DOOR
+- ACACIA_DOOR
+- DARK_OAK_DOOR

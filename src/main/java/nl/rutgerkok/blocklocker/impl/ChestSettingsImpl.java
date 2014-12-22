@@ -11,19 +11,19 @@ import com.google.common.base.Optional;
 
 class ChestSettingsImpl implements ChestSettings {
 
-    private final Translator translator;
+    private static final ProtectionType[] PROTECTION_TYPES = ProtectionType.values();
 
-    ChestSettingsImpl(Translator translator) {
+    private final Translator translator;
+    private final Config config;
+
+    ChestSettingsImpl(Translator translator, Config config) {
         this.translator = translator;
+        this.config = config;
     }
 
     @Override
     public boolean canProtect(ProtectionType type, Material material) {
-        Optional<ProtectionType> protectionType = getProtectionType(material);
-        if (!protectionType.isPresent()) {
-            return false;
-        }
-        return protectionType.get().equals(type);
+        return config.getProtectables(type).contains(material);
     }
 
     private Translation getTranslationKey(SignType signType) {
@@ -43,32 +43,12 @@ class ChestSettingsImpl implements ChestSettings {
 
     @Override
     public Optional<ProtectionType> getProtectionType(Material material) {
-        switch (material) {
-            case ANVIL:
-            case BEACON:
-            case BREWING_STAND:
-            case BURNING_FURNACE:
-            case CHEST:
-            case DISPENSER:
-            case DROPPER:
-            case ENCHANTMENT_TABLE:
-            case ENDER_CHEST:
-            case FURNACE:
-            case TRAPPED_CHEST:
-            case TRAP_DOOR:
-            case WORKBENCH:
-                return Optional.of(ProtectionType.CONTAINER);
-            case WOODEN_DOOR:
-            case IRON_DOOR_BLOCK:
-            case SPRUCE_DOOR:
-            case BIRCH_DOOR:
-            case JUNGLE_DOOR:
-            case ACACIA_DOOR:
-            case DARK_OAK_DOOR:
-                return Optional.of(ProtectionType.DOOR);
-            default:
-                return Optional.absent();
+        for (ProtectionType type : PROTECTION_TYPES) {
+            if (config.getProtectables(type).contains(material)) {
+                return Optional.of(type);
+            }
         }
+        return Optional.absent();
     }
 
     @Override
