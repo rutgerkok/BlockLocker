@@ -17,16 +17,8 @@ import com.google.common.collect.ImmutableList;
  */
 public final class Door {
 
-    private static boolean isTopHalf(Block doorBlock) {
-        @SuppressWarnings("deprecation")
-        byte data = doorBlock.getData();
-        return (data & 0x8) != 0;
-    }
-
-    private static boolean isHingeOnLeftSide(Block topHalfDoorBlock) {
-        @SuppressWarnings("deprecation")
-        byte data = topHalfDoorBlock.getData();
-        return (data & 0x1) == 0;
+    private static BlockFace getFaceToLeftDoor(Block bottomHalfDoorBlock) {
+        return getFaceToRightDoor(bottomHalfDoorBlock).getOppositeFace();
     }
 
     private static BlockFace getFaceToRightDoor(Block bottomHalfDoorBlock) {
@@ -46,17 +38,19 @@ public final class Door {
         }
     }
 
-    private static BlockFace getFaceToLeftDoor(Block bottomHalfDoorBlock) {
-        return getFaceToRightDoor(bottomHalfDoorBlock).getOppositeFace();
+    private static boolean isHingeOnLeftSide(Block topHalfDoorBlock) {
+        @SuppressWarnings("deprecation")
+        byte data = topHalfDoorBlock.getData();
+        return (data & 0x1) == 0;
     }
 
-    @Nullable
-    private static Block ofMaterialOrNull(Material requiredMaterial, Block block) {
-        if (block.getType() == requiredMaterial) {
-            return block;
-        }
-        return null;
+    private static boolean isTopHalf(Block doorBlock) {
+        @SuppressWarnings("deprecation")
+        byte data = doorBlock.getData();
+        return (data & 0x8) != 0;
     }
+
+    private final Material doorMaterial;
 
     @Nullable
     private final Block topLeftBlock;
@@ -74,9 +68,11 @@ public final class Door {
      *            A block that is part of the door.
      */
     public Door(Block doorBlock) {
+        doorMaterial = doorBlock.getType();
+
         Block topBlock;
         Block bottomBlock;
-        Material doorMaterial = doorBlock.getType();
+
         if (isTopHalf(doorBlock)) {
             // Top half
             topBlock = doorBlock;
@@ -93,44 +89,25 @@ public final class Door {
             bottomLeftBlock = bottomBlock;
 
             BlockFace faceToRightDoor = getFaceToRightDoor(bottomBlock);
-            topRightBlock = ofMaterialOrNull(doorMaterial, topLeftBlock.getRelative(faceToRightDoor));
-            bottomRightBlock = ofMaterialOrNull(doorMaterial, bottomLeftBlock.getRelative(faceToRightDoor));
+            topRightBlock = asDoorMaterialOrNull(topLeftBlock.getRelative(faceToRightDoor));
+            bottomRightBlock = asDoorMaterialOrNull(bottomLeftBlock.getRelative(faceToRightDoor));
         } else {
             // Hinge on the right, there may be another door on the left
             topRightBlock = topBlock;
             bottomRightBlock = bottomBlock;
 
             BlockFace faceToLeftDoor = getFaceToLeftDoor(bottomBlock);
-            topLeftBlock = ofMaterialOrNull(doorMaterial, topRightBlock.getRelative(faceToLeftDoor));
-            bottomLeftBlock = ofMaterialOrNull(doorMaterial, bottomRightBlock.getRelative(faceToLeftDoor));
+            topLeftBlock = asDoorMaterialOrNull(topRightBlock.getRelative(faceToLeftDoor));
+            bottomLeftBlock = asDoorMaterialOrNull(bottomRightBlock.getRelative(faceToLeftDoor));
         }
     }
 
-    /**
-     * Opens or closes the door.
-     * 
-     * @param open
-     *            Whether the door must be opened (true) or closed (false).
-     */
-    @SuppressWarnings("deprecation")
-    private void setOpen(boolean open) {
-        if (open) {
-            // Open door
-            if (bottomLeftBlock != null) {
-                bottomLeftBlock.setData((byte) (bottomLeftBlock.getData() | 0x4));
-            }
-            if (bottomRightBlock != null) {
-                bottomRightBlock.setData((byte) (bottomRightBlock.getData() | 0x4));
-            }
-        } else {
-            // Close door
-            if (bottomLeftBlock != null) {
-                bottomLeftBlock.setData((byte) (bottomLeftBlock.getData() & ~0x4));
-            }
-            if (bottomRightBlock != null) {
-                bottomRightBlock.setData((byte) (bottomRightBlock.getData() & ~0x4));
-            }
+    @Nullable
+    private Block asDoorMaterialOrNull(Block block) {
+        if (block.getType() == doorMaterial) {
+            return block;
         }
+        return null;
     }
 
     /**
@@ -161,17 +138,13 @@ public final class Door {
     }
 
     /**
-     * Closes the door if the door is open, opens the door if the door is
-     * closed. If parts of the door is opened, parts is closed then the whole
-     * door will be in one state after calling this method, but it is unknown in
-     * which state.
+     * Gets whether the door is currently open. The result is undefined if the
+     * door is half-open, half-closed.
+     * 
+     * @return True if the door is currently open, false otherwise.
      */
-    public void toggleOpen() {
-        setOpen(!isOpen());
-    }
-
     @SuppressWarnings("deprecation")
-    private boolean isOpen() {
+    public boolean isOpen() {
         if (bottomRightBlock != null) {
             return (bottomRightBlock.getData() & 0x4) != 0;
         }
@@ -179,6 +152,43 @@ public final class Door {
             return (bottomLeftBlock.getData() & 0x4) != 0;
         }
         return false;
+    }
+
+    /**
+     * Opens or closes the door. If the door has been destroyed after creating
+     *
+     * @param open
+     *            Whether the door must be opened (true) or closed (false).
+     */
+    @SuppressWarnings("deprecation")
+    public void setOpen(boolean open) {
+        if (open) {
+            // Open door
+            if (asDoorMaterialOrNull(bottomLeftBlock) != null) {
+                bottomLeftBlock.setData((byte) (bottomLeftBlock.getData() | 0x4));
+            }
+            if (asDoorMaterialOrNull(bottomRightBlock) != null) {
+                bottomRightBlock.setData((byte) (bottomRightBlock.getData() | 0x4));
+            }
+        } else {
+            // Close door
+            if (asDoorMaterialOrNull(bottomLeftBlock) != null) {
+                bottomLeftBlock.setData((byte) (bottomLeftBlock.getData() & ~0x4));
+            }
+            if (asDoorMaterialOrNull(bottomRightBlock) != null) {
+                bottomRightBlock.setData((byte) (bottomRightBlock.getData() & ~0x4));
+            }
+        }
+    }
+
+    /**
+     * Closes the door if the door is open, opens the door if the door is
+     * closed. If parts of the door is opened, parts is closed then the whole
+     * door will be in one state after calling this method, but it is unknown in
+     * which state.
+     */
+    public void toggleOpen() {
+        setOpen(!isOpen());
     }
 
 }

@@ -83,4 +83,13 @@ public interface BlockLockerPlugin {
      */
     void runLater(Runnable runnable);
 
+    /**
+     * Runs a task in the given amount of ticks on the server thread.
+     *
+     * @param runnable
+     *            The task.
+     * @param ticks
+     *            In how many ticks the method needs to run.
+     */
+    void runLater(Runnable runnable, int ticks);
 }

@@ -122,8 +122,23 @@ public final class InteractListener extends EventListener {
         // Open (double) doors manually
         if (protection instanceof DoorProtection) {
             event.setCancelled(true);
-            ((DoorProtection) protection).toggleOpen();
+            DoorProtection doorProtection = (DoorProtection) protection;
+            scheduleClose(doorProtection);
+            doorProtection.toggleOpen();
         }
+    }
+
+    private void scheduleClose(final DoorProtection doorProtection) {
+        int openTicks = doorProtection.getOpenTicks();
+        if (openTicks <= 0) {
+            return;
+        }
+        plugin.runLater(new Runnable() {
+            @Override
+            public void run() {
+                doorProtection.setOpen(false);
+            }
+        }, openTicks);
     }
 
     private void handleDisallowed(Player player, Protection protection, boolean clickedSign) {

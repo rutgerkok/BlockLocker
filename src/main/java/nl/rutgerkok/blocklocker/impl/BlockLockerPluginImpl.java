@@ -177,4 +177,9 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
         loadServices();
     }
 
+    @Override
+    public void runLater(Runnable runnable, int ticks) {
+        getServer().getScheduler().runTaskLater(this, runnable, ticks);
+    }
+
 }
