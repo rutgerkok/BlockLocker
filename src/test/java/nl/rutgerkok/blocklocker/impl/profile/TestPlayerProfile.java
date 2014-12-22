@@ -9,8 +9,6 @@ import java.util.UUID;
 import nl.rutgerkok.blocklocker.NameAndId;
 import nl.rutgerkok.blocklocker.ProfileFactory;
 import nl.rutgerkok.blocklocker.Translator.Translation;
-import nl.rutgerkok.blocklocker.impl.profile.PlayerProfileImpl;
-import nl.rutgerkok.blocklocker.impl.profile.ProfileFactoryImpl;
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;
 import nl.rutgerkok.blocklocker.profile.Profile;
 
@@ -30,14 +28,15 @@ public class TestPlayerProfile {
     public void testIncludes() {
         ProfileFactoryImpl factory = getProfileFactory();
         UUID bobId = UUID.randomUUID();
+        String everyoneTag = "[" + new NullTranslator().getWithoutColor(Translation.TAG_EVERYONE) + "]";
+
         Profile bob = factory.fromNameAndUniqueId(NameAndId.of("Bob", bobId));
         Profile bobRenamed = factory.fromNameAndUniqueId(NameAndId.of("Bob2",
                 bobId));
         Profile jane = factory.fromNameAndUniqueId(NameAndId.of("Jane",
                 UUID.randomUUID()));
         Profile janeWithoutId = factory.fromDisplayText("jane");
-        Profile everyone = factory.fromDisplayText(new NullTranslator()
-                .get(Translation.TAG_EVERYONE));
+        Profile everyone = factory.fromDisplayText(everyoneTag);
 
         assertTrue("Same id", bob.includes(bobRenamed));
         assertTrue("Same id", bobRenamed.includes(bob));
@@ -81,12 +80,16 @@ public class TestPlayerProfile {
     }
 
     @Test
-    public void testRoundtrip() {
+    public void testPlayerProfileRoundtrip() {
         String name = "test";
         UUID uuid = UUID.randomUUID();
         ProfileFactoryImpl factory = getProfileFactory();
         Profile profile = factory.fromNameAndUniqueId(NameAndId.of(name, uuid));
 
+        testRoundtrip(factory, profile);
+    }
+
+    private void testRoundtrip(ProfileFactoryImpl factory, Profile profile) {
         JSONObject object = profile.getSaveObject();
         Profile newProfile = factory.fromSavedObject(object).get();
         assertEquals(profile, newProfile);

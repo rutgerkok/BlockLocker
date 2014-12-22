@@ -23,7 +23,8 @@ protection:
   not_nearby: "&4There is no protection nearby. (Shift-)right-click a container with a sign in your hand to protect it."
   selected_sign: "&6Selected a sign. Type \"/blocklocker <line number> <name>\" to edit this sign."
 tag:
-  everyone: "[Everyone]"
+  everyone: "Everyone"
+  timer: "Timer"
   private: "&9[Private]"
   more_users: "&9[More Users]"
   player_not_found: "~~Not found~~"

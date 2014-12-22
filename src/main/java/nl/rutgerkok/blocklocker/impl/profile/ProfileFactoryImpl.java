@@ -17,14 +17,15 @@ import org.json.simple.JSONObject;
 import com.google.common.base.Optional;
 
 public class ProfileFactoryImpl implements ProfileFactory {
-    private final String everyoneTagWithoutColor;
+    private final String everyoneTag;
+    private final String timerTagStart;
     private final Translator translator;
 
     public ProfileFactoryImpl(Translator translator) {
         Validate.notNull(translator);
         this.translator = translator;
-        everyoneTagWithoutColor = translator
-                .getWithoutColor(Translation.TAG_EVERYONE);
+        everyoneTag = "[" + translator.getWithoutColor(Translation.TAG_EVERYONE) + "]";
+        timerTagStart = "[" + translator.getWithoutColor(Translation.TAG_TIMER) + ":";
     }
 
     /**
@@ -38,14 +39,31 @@ public class ProfileFactoryImpl implements ProfileFactory {
     public Profile fromDisplayText(String text) {
         text = ChatColor.stripColor(text.trim());
 
-        if (text.equalsIgnoreCase(everyoneTagWithoutColor)) {
-            return new EveryoneProfile(translator.get(Translation.TAG_EVERYONE));
+        // [Everyone]
+        if (text.equalsIgnoreCase(everyoneTag)) {
+            return new EveryoneProfile(translator.getWithoutColor(Translation.TAG_EVERYONE));
         }
+
+        // [Timer:X]
+        if (text.startsWith(timerTagStart) && text.endsWith("]")) {
+            int seconds = readDigit(text.charAt(timerTagStart.length()));
+            return new TimerProfileImpl(translator.getWithoutColor(Translation.TAG_TIMER), seconds);
+        }
+
+        // [GroupName]
         if (text.startsWith("[") && text.endsWith("]") && text.length() >= 3) {
             return new GroupProfileImpl(text.substring(1, text.length() - 1));
         }
 
         return new PlayerProfileImpl(text, Optional.<UUID> absent());
+    }
+
+    private int readDigit(char digit) {
+        try {
+            return Integer.parseInt(String.valueOf(digit));
+        } catch (NumberFormatException e) {
+            return -1;
+        }
     }
 
     @Override
@@ -71,7 +89,7 @@ public class ProfileFactoryImpl implements ProfileFactory {
      */
     public Optional<Profile> fromSavedObject(JSONObject json) {
         // Player
-        Optional<String> name = getString(json, PlayerProfileImpl.NAME_KEY);
+        Optional<String> name = getValue(json, PlayerProfileImpl.NAME_KEY, String.class);
         if (name.isPresent()) {
             Optional<UUID> uuid = getUniqueId(json, PlayerProfileImpl.UUID_KEY);
             Profile profile = new PlayerProfileImpl(name.get(), uuid);
@@ -79,14 +97,21 @@ public class ProfileFactoryImpl implements ProfileFactory {
         }
 
         // [Everyone]
-        Optional<String> value = getString(json, EveryoneProfile.EVERYONE_KEY);
+        Optional<Boolean> value = getValue(json, EveryoneProfile.EVERYONE_KEY, Boolean.class);
         if (value.isPresent()) {
-            Profile profile = new EveryoneProfile(value.get());
+            Profile profile = new EveryoneProfile(translator.getWithoutColor(Translation.TAG_EVERYONE));
+            return Optional.of(profile);
+        }
+
+        // Timer
+        Optional<Number> secondsOpen = getValue(json, TimerProfileImpl.TIME_KEY, Number.class);
+        if (secondsOpen.isPresent()) {
+            Profile profile = new TimerProfileImpl(translator.getWithoutColor(Translation.TAG_TIMER), secondsOpen.get().intValue());
             return Optional.of(profile);
         }
 
         // Groups
-        Optional<String> groupName = getString(json, GroupProfileImpl.GROUP_KEY);
+        Optional<String> groupName = getValue(json, GroupProfileImpl.GROUP_KEY, String.class);
         if (groupName.isPresent()) {
             Profile profile = new GroupProfileImpl(groupName.get());
             return Optional.of(profile);
@@ -95,10 +120,10 @@ public class ProfileFactoryImpl implements ProfileFactory {
         return Optional.absent();
     }
 
-    private Optional<String> getString(JSONObject object, String key) {
-        Object stringObject = object.get(key);
-        if (stringObject instanceof String) {
-            return Optional.of((String) stringObject);
+    private <T> Optional<T> getValue(JSONObject object, String key, Class<T> type) {
+        Object value = object.get(key);
+        if (type.isInstance(value)) {
+            return Optional.of(type.cast(value));
         }
         return Optional.absent();
     }

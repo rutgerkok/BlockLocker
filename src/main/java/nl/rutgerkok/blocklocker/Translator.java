@@ -34,7 +34,8 @@ public abstract class Translator {
         TAG_EVERYONE,
         TAG_MORE_USERS,
         TAG_PLAYER_NOT_FOUND,
-        TAG_PRIVATE;
+        TAG_PRIVATE,
+        TAG_TIMER;
 
         /**
          * Gets the key used in configuration files.

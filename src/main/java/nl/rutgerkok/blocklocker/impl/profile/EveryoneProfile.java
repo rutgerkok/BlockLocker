@@ -14,11 +14,11 @@ class EveryoneProfile implements Profile {
     /**
      * Creates a new [Everyone]-profile.
      *
-     * @param tag
-     *            Usually "[Everyone]", may be localized.
+     * @param translation
+     *            Usually "Everyone", may be localized.
      */
-    EveryoneProfile(String tag) {
-        this.tag = tag;
+    EveryoneProfile(String translation) {
+        this.tag = translation;
     }
 
     /**
@@ -37,7 +37,7 @@ class EveryoneProfile implements Profile {
 
     @Override
     public String getDisplayName() {
-        return tag;
+        return '[' + tag + ']';
     }
 
     @SuppressWarnings("unchecked")
