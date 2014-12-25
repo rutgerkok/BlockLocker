@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.UUID;
 
-import nl.rutgerkok.blocklocker.NameAndId;
 import nl.rutgerkok.blocklocker.ProfileFactory;
 import nl.rutgerkok.blocklocker.Translator.Translation;
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;
@@ -16,6 +15,8 @@ import org.json.simple.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import com.google.common.base.Optional;
 
 @RunWith(JUnit4.class)
 public class TestPlayerProfile {
@@ -30,11 +31,9 @@ public class TestPlayerProfile {
         UUID bobId = UUID.randomUUID();
         String everyoneTag = "[" + new NullTranslator().getWithoutColor(Translation.TAG_EVERYONE) + "]";
 
-        Profile bob = factory.fromNameAndUniqueId(NameAndId.of("Bob", bobId));
-        Profile bobRenamed = factory.fromNameAndUniqueId(NameAndId.of("Bob2",
-                bobId));
-        Profile jane = factory.fromNameAndUniqueId(NameAndId.of("Jane",
-                UUID.randomUUID()));
+        Profile bob = factory.fromNameAndUniqueId("Bob", Optional.of(bobId));
+        Profile bobRenamed = factory.fromNameAndUniqueId("Bob2", Optional.of(bobId));
+        Profile jane = factory.fromNameAndUniqueId("Jane", Optional.of(UUID.randomUUID()));
         Profile janeWithoutId = factory.fromDisplayText("jane");
         Profile everyone = factory.fromDisplayText(everyoneTag);
 
@@ -60,7 +59,7 @@ public class TestPlayerProfile {
         String name = "test";
         UUID uuid = UUID.randomUUID();
         ProfileFactory factory = getProfileFactory();
-        Profile profile = factory.fromNameAndUniqueId(NameAndId.of(name, uuid));
+        Profile profile = factory.fromNameAndUniqueId(name, Optional.of(uuid));
 
         // Test object properties
         assertEquals(name, profile.getDisplayName());
@@ -72,7 +71,7 @@ public class TestPlayerProfile {
         String name = "test";
         UUID uuid = UUID.randomUUID();
         ProfileFactory factory = getProfileFactory();
-        Profile profile = factory.fromNameAndUniqueId(NameAndId.of(name, uuid));
+        Profile profile = factory.fromNameAndUniqueId(name, Optional.of(uuid));
         JSONObject object = profile.getSaveObject();
 
         assertEquals(name, object.get(PlayerProfileImpl.NAME_KEY));
@@ -84,7 +83,7 @@ public class TestPlayerProfile {
         String name = "test";
         UUID uuid = UUID.randomUUID();
         ProfileFactoryImpl factory = getProfileFactory();
-        Profile profile = factory.fromNameAndUniqueId(NameAndId.of(name, uuid));
+        Profile profile = factory.fromNameAndUniqueId(name, Optional.of(uuid));
 
         testRoundtrip(factory, profile);
     }

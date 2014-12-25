@@ -4,6 +4,7 @@ import java.util.List;
 
 import nl.rutgerkok.blocklocker.ProtectionSign;
 import nl.rutgerkok.blocklocker.SignType;
+import nl.rutgerkok.blocklocker.profile.PlayerProfile;
 import nl.rutgerkok.blocklocker.profile.Profile;
 
 import org.bukkit.Location;
@@ -18,11 +19,14 @@ final class ProtectionSignImpl implements ProtectionSign {
     private final SignType signType;
     private final List<Profile> profiles;
     private final Location location;
+    private final boolean needsUpdateOverride;
 
-    ProtectionSignImpl(Location location, SignType signType, List<Profile> profiles) {
-        this.location = new Location(location.getWorld(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
+    ProtectionSignImpl(Location location, SignType signType,
+            List<Profile> profiles, boolean needsUpdateOverride) {
+        this.location = location;
         this.signType = Preconditions.checkNotNull(signType);
         this.profiles = ImmutableList.copyOf(profiles);
+        this.needsUpdateOverride = needsUpdateOverride;
         if (profiles.isEmpty() || profiles.size() > MAX_PROFILES) {
             throw new IllegalArgumentException("Invalid size for profiles collection: " + profiles);
         }
@@ -43,7 +47,7 @@ final class ProtectionSignImpl implements ProtectionSign {
 
     @Override
     public ProtectionSign withProfiles(List<Profile> profiles) {
-        return new ProtectionSignImpl(location, signType, profiles);
+        return new ProtectionSignImpl(location, signType, profiles, needsUpdateOverride);
     }
 
     @Override
@@ -87,6 +91,24 @@ final class ProtectionSignImpl implements ProtectionSign {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public boolean needsUpdate(boolean useUniqueIds) {
+        if (needsUpdateOverride) {
+            return true;
+        }
+        if (!useUniqueIds) {
+            return false;
+        }
+        for (Profile profile : profiles) {
+            if (profile instanceof PlayerProfile) {
+                if (!((PlayerProfile) profile).getUniqueId().isPresent()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 }

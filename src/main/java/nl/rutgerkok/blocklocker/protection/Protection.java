@@ -53,12 +53,16 @@ public interface Protection {
     boolean isAllowed(Profile profile);
 
     /**
-     * Gets whether this sign is missing unique ids, and has to rely on player
-     * names.
+     * Gets whether this sign needs an update, for example because UUIDs are
+     * missing, the extra data is not yet stored or the color scheme of the text
+     * doesn't match the current one.
      *
-     * @return True if this sign is missing unique ids, false otherwise.
+     * @param uuidsEnabled
+     *            True if the server is using unique ids, false if not (offline
+     *            mode server).
+     * @return True if this sign needs to be updated, false otherwise.
      */
-    boolean isMissingUniqueIds();
+    boolean needsUpdate(boolean uuidsEnabled);
 
     /**
      * Checks if the given profile is the owner of this chest.

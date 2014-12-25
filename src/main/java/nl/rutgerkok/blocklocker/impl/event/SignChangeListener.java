@@ -2,6 +2,7 @@ package nl.rutgerkok.blocklocker.impl.event;
 
 import nl.rutgerkok.blocklocker.BlockLockerPlugin;
 import nl.rutgerkok.blocklocker.Permissions;
+import nl.rutgerkok.blocklocker.ProtectionUpdater.UpdateMode;
 import nl.rutgerkok.blocklocker.SignType;
 import nl.rutgerkok.blocklocker.Translator.Translation;
 import nl.rutgerkok.blocklocker.profile.Profile;
@@ -151,7 +152,7 @@ public class SignChangeListener extends EventListener {
             public void run() {
                 Optional<Protection> protection = plugin.getProtectionFinder().findProtection(block);
                 if (protection.isPresent()) {
-                    plugin.fixMissingUniqueIds(protection.get());
+                    plugin.getProtectionUpdater().update(protection.get(), UpdateMode.FORCED);
                 }
             }
         });

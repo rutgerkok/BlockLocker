@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.List;
 
 import nl.rutgerkok.blocklocker.ProtectionSign;
-import nl.rutgerkok.blocklocker.profile.PlayerProfile;
 import nl.rutgerkok.blocklocker.profile.Profile;
 import nl.rutgerkok.blocklocker.protection.Protection;
 
@@ -128,17 +127,11 @@ abstract class AbstractProtection implements Protection {
     }
 
     @Override
-    public final boolean isMissingUniqueIds() {
-        for (Profile profile : getAllowed()) {
-            if (!(profile instanceof PlayerProfile)) {
-                continue;
+    public final boolean needsUpdate(boolean onlineMode) {
+        for (ProtectionSign protectionSign : getSigns()) {
+            if (protectionSign.needsUpdate(onlineMode)) {
+                return true;
             }
-            if (((PlayerProfile) profile).getUniqueId().isPresent()) {
-                continue;
-            }
-
-            // Found missing id
-            return true;
         }
         return false;
     }

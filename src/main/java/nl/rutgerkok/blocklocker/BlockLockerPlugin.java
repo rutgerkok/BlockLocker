@@ -2,22 +2,13 @@ package nl.rutgerkok.blocklocker;
 
 import java.util.logging.Logger;
 
-import nl.rutgerkok.blocklocker.protection.Protection;
-
 /**
  * Main entry point of the plugin.
  *
  */
 public interface BlockLockerPlugin {
 
-    /**
-     * Fixes the missing uuids in the given protection, by looking them up
-     * online.
-     *
-     * @param protection
-     *            The protection to fix.
-     */
-    void fixMissingUniqueIds(Protection protection);
+
 
     /**
      * Gets the {@link ChestSettings} object, containing all customizable
@@ -92,4 +83,6 @@ public interface BlockLockerPlugin {
      *            In how many ticks the method needs to run.
      */
     void runLater(Runnable runnable, int ticks);
+
+    ProtectionUpdater getProtectionUpdater();
 }

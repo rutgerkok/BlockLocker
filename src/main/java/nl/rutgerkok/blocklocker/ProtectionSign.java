@@ -62,4 +62,14 @@ public interface ProtectionSign {
      */
     Location getLocation();
 
+    /**
+     * Gets whether this sign needs an update, for example because the colors
+     * are wrong or the UUIDs are missing.
+     *
+     * @param useUniqueIds
+     *            Whether UUIDs are in use on this server.
+     * @return True if the sign needs an update, false otherwise.
+     */
+    boolean needsUpdate(boolean useUniqueIds);
+
 }

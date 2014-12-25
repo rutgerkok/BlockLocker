@@ -11,10 +11,11 @@ import nl.rutgerkok.blocklocker.BlockLockerPlugin;
 import nl.rutgerkok.blocklocker.ChestSettings;
 import nl.rutgerkok.blocklocker.ProfileFactory;
 import nl.rutgerkok.blocklocker.ProtectionFinder;
+import nl.rutgerkok.blocklocker.ProtectionUpdater;
 import nl.rutgerkok.blocklocker.SignParser;
 import nl.rutgerkok.blocklocker.SignSelector;
 import nl.rutgerkok.blocklocker.Translator;
-import nl.rutgerkok.blocklocker.impl.converter.SignConverter;
+import nl.rutgerkok.blocklocker.impl.converter.ProtectionUpdaterImpl;
 import nl.rutgerkok.blocklocker.impl.event.BlockDestroyListener;
 import nl.rutgerkok.blocklocker.impl.event.BlockLockerCommand;
 import nl.rutgerkok.blocklocker.impl.event.BlockPlaceListener;
@@ -22,7 +23,6 @@ import nl.rutgerkok.blocklocker.impl.event.InteractListener;
 import nl.rutgerkok.blocklocker.impl.event.SignChangeListener;
 import nl.rutgerkok.blocklocker.impl.nms.NMSAccessor;
 import nl.rutgerkok.blocklocker.impl.profile.ProfileFactoryImpl;
-import nl.rutgerkok.blocklocker.protection.Protection;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.Configuration;
@@ -36,17 +36,12 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
         BlockLockerPlugin {
     private ProfileFactoryImpl profileFactory;
     private ProtectionFinderImpl protectionFinder;
-    private SignConverter signConverter;
+    private ProtectionUpdater protectionUpdater;
     private Translator translator;
     private ChestSettings chestSettings;
     private SignParser signParser;
     private SignSelector signSelector;
     private NMSAccessor nms;
-
-    @Override
-    public void fixMissingUniqueIds(Protection protection) {
-        signConverter.fixMissingUniqueIds(protection);
-    }
 
     /**
      * Gets a configuration file from the jar file. Unlike
@@ -136,7 +131,7 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
         signParser = new SignParserImpl(chestSettings, nms, profileFactory);
         BlockFinder blockFinder = new BlockFinder(signParser);
         protectionFinder = new ProtectionFinderImpl(blockFinder, chestSettings);
-        signConverter = new SignConverter(this, signParser);
+        protectionUpdater = new ProtectionUpdaterImpl(this);
         signSelector = new SignSelectorImpl(this);
     }
 
@@ -181,6 +176,11 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
     @Override
     public void runLater(Runnable runnable, int ticks) {
         getServer().getScheduler().runTaskLater(this, runnable, ticks);
+    }
+
+    @Override
+    public ProtectionUpdater getProtectionUpdater() {
+        return protectionUpdater;
     }
 
 }

@@ -78,6 +78,11 @@ class SignParserImpl implements SignParser {
         if (signType == null) {
             return Optional.absent();
         }
+        boolean headerNeedsUpdate = false;
+        if (!header.equals(this.chestSettings.getFancyLocalizedHeader(signType))) {
+            // Minor title discrepancy
+            headerNeedsUpdate = true;
+        }
 
         List<Profile> profiles = new ArrayList<Profile>();
         for (JSONObject object : list) {
@@ -87,7 +92,7 @@ class SignParserImpl implements SignParser {
             }
         }
 
-        return Optional.<ProtectionSign> of(new ProtectionSignImpl(location, signType, profiles));
+        return Optional.<ProtectionSign> of(new ProtectionSignImpl(location, signType, profiles, headerNeedsUpdate));
     }
 
     /**
@@ -112,7 +117,9 @@ class SignParserImpl implements SignParser {
             }
         }
 
-        return Optional.<ProtectionSign> of(new ProtectionSignImpl(location, signType, profiles));
+        // Last parameter true -> simple signs always need to be updated to be
+        // advanced signs
+        return Optional.<ProtectionSign> of(new ProtectionSignImpl(location, signType, profiles, true));
     }
 
     @Override

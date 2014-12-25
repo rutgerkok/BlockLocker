@@ -2,7 +2,6 @@ package nl.rutgerkok.blocklocker.impl.profile;
 
 import java.util.UUID;
 
-import nl.rutgerkok.blocklocker.NameAndId;
 import nl.rutgerkok.blocklocker.ProfileFactory;
 import nl.rutgerkok.blocklocker.Translator;
 import nl.rutgerkok.blocklocker.Translator.Translation;
@@ -15,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.json.simple.JSONObject;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 
 public class ProfileFactoryImpl implements ProfileFactory {
     private final String everyoneTag;
@@ -67,10 +67,10 @@ public class ProfileFactoryImpl implements ProfileFactory {
     }
 
     @Override
-    public PlayerProfile fromNameAndUniqueId(NameAndId nameAndId) {
-        Validate.notNull(nameAndId);
-        Optional<UUID> uuid = Optional.of(nameAndId.getUniqueId());
-        return new PlayerProfileImpl(nameAndId.getName(), uuid);
+    public PlayerProfile fromNameAndUniqueId(String name, Optional<UUID> uuid) {
+        Preconditions.checkNotNull(name, "name");
+        Preconditions.checkNotNull(uuid, "uuid");
+        return new PlayerProfileImpl(name, uuid);
     }
 
     @Override

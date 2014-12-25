@@ -5,10 +5,10 @@ import java.util.Collections;
 import java.util.List;
 
 import nl.rutgerkok.blocklocker.ChestSettings;
+import nl.rutgerkok.blocklocker.ChestSettings.ProtectionType;
 import nl.rutgerkok.blocklocker.ProtectionFinder;
 import nl.rutgerkok.blocklocker.ProtectionSign;
 import nl.rutgerkok.blocklocker.SignType;
-import nl.rutgerkok.blocklocker.ChestSettings.ProtectionType;
 import nl.rutgerkok.blocklocker.impl.protection.ContainerProtectionImpl;
 import nl.rutgerkok.blocklocker.impl.protection.DoorProtectionImpl;
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;
@@ -183,7 +183,7 @@ class ProtectionFinderImpl implements ProtectionFinder {
 
     @Override
     public ProtectionSign newProtectionSign(Sign sign, SignType signType, PlayerProfile owner) {
-        return new ProtectionSignImpl(sign.getLocation(), signType, Collections.<Profile> singletonList(owner));
+        return new ProtectionSignImpl(sign.getLocation(), signType, Collections.<Profile> singletonList(owner), true);
     }
 
 }
