@@ -103,8 +103,8 @@ public final class Door {
     }
 
     @Nullable
-    private Block asDoorMaterialOrNull(Block block) {
-        if (block.getType() == doorMaterial) {
+    private Block asDoorMaterialOrNull(@Nullable Block block) {
+        if (block != null && block.getType() == doorMaterial) {
             return block;
         }
         return null;
