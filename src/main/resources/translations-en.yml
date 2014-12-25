@@ -25,6 +25,7 @@ protection:
 tag:
   everyone: "Everyone"
   timer: "Timer"
+  redstone: "Redstone"
   private: "&9[Private]"
   more_users: "&9[More Users]"
   player_not_found: "~~Not found~~"

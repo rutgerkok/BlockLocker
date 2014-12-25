@@ -2,22 +2,23 @@ package nl.rutgerkok.blocklocker.impl.profile;
 
 import nl.rutgerkok.blocklocker.profile.Profile;
 
-import org.apache.commons.lang.Validate;
 import org.json.simple.JSONObject;
 
-class EveryoneProfile implements Profile {
+import com.google.common.base.Preconditions;
 
-    static final String EVERYONE_KEY = "e";
+class RedstoneProfileImpl implements Profile {
+
+    static final String REDSTONE_KEY = "r";
 
     private final String tag;
 
     /**
-     * Creates a new [Everyone]-profile.
+     * Creates a new [Redstone]-profile.
      *
      * @param translation
-     *            Usually "Everyone", may be localized.
+     *            Usually "Redstone", may be localized.
      */
-    EveryoneProfile(String translation) {
+    RedstoneProfileImpl(String translation) {
         this.tag = translation;
     }
 
@@ -44,7 +45,7 @@ class EveryoneProfile implements Profile {
     @Override
     public JSONObject getSaveObject() {
         JSONObject object = new JSONObject();
-        object.put(EVERYONE_KEY, true);
+        object.put(REDSTONE_KEY, true);
         return object;
     }
 
@@ -58,8 +59,8 @@ class EveryoneProfile implements Profile {
 
     @Override
     public boolean includes(Profile other) {
-        Validate.notNull(other);
-        return true;
+        Preconditions.checkNotNull(other);
+        return other instanceof RedstoneProfileImpl;
     }
 
     @Override

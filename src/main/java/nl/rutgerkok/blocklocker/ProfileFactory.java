@@ -3,6 +3,7 @@ package nl.rutgerkok.blocklocker;
 import java.util.UUID;
 
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;
+import nl.rutgerkok.blocklocker.profile.Profile;
 
 import org.bukkit.entity.Player;
 
@@ -31,4 +32,11 @@ public interface ProfileFactory {
      * @return The profile.
      */
     PlayerProfile fromPlayer(Player player);
+
+    /**
+     * Gets the profile for redstone.
+     * 
+     * @return The profile.
+     */
+    Profile fromRedstone();
 }

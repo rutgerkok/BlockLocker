@@ -21,6 +21,7 @@ import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
+import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.world.StructureGrowEvent;
@@ -145,6 +146,17 @@ public class BlockDestroyListener extends EventListener {
             if (isProtected(blockState.getBlock())) {
                 it.remove();
             }
+        }
+    }
+
+    @EventHandler
+    public void onRedstone(BlockRedstoneEvent event) {
+        if (event.getNewCurrent() == event.getOldCurrent()) {
+            return;
+        }
+
+        if (isProtectedForRedstone(event.getBlock())) {
+            event.setNewCurrent(event.getOldCurrent());
         }
     }
 }

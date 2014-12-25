@@ -17,15 +17,21 @@ import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 
 public class ProfileFactoryImpl implements ProfileFactory {
-    private final String everyoneTag;
+    private final String everyoneTagString;
+    private final String redstoneTagString;
     private final String timerTagStart;
     private final Translator translator;
+    private final Profile everyoneProfile;
+    private final Profile redstoneProfile;
 
     public ProfileFactoryImpl(Translator translator) {
         Validate.notNull(translator);
         this.translator = translator;
-        everyoneTag = "[" + translator.getWithoutColor(Translation.TAG_EVERYONE) + "]";
-        timerTagStart = "[" + translator.getWithoutColor(Translation.TAG_TIMER) + ":";
+        this.everyoneTagString = "[" + translator.getWithoutColor(Translation.TAG_EVERYONE) + "]";
+        this.redstoneTagString = "[" + translator.getWithoutColor(Translation.TAG_REDSTONE) + "]";
+        this.timerTagStart = "[" + translator.getWithoutColor(Translation.TAG_TIMER) + ":";
+        this.everyoneProfile = new EveryoneProfileImpl(translator.get(Translation.TAG_EVERYONE));
+        this.redstoneProfile = new RedstoneProfileImpl(translator.get(Translation.TAG_REDSTONE));
     }
 
     /**
@@ -40,8 +46,13 @@ public class ProfileFactoryImpl implements ProfileFactory {
         text = ChatColor.stripColor(text.trim());
 
         // [Everyone]
-        if (text.equalsIgnoreCase(everyoneTag)) {
-            return new EveryoneProfile(translator.getWithoutColor(Translation.TAG_EVERYONE));
+        if (text.equalsIgnoreCase(everyoneTagString)) {
+            return this.everyoneProfile;
+        }
+
+        // [Redstone]
+        if (text.equalsIgnoreCase(redstoneTagString)) {
+            return this.redstoneProfile;
         }
 
         // [Timer:X]
@@ -97,10 +108,15 @@ public class ProfileFactoryImpl implements ProfileFactory {
         }
 
         // [Everyone]
-        Optional<Boolean> value = getValue(json, EveryoneProfile.EVERYONE_KEY, Boolean.class);
-        if (value.isPresent()) {
-            Profile profile = new EveryoneProfile(translator.getWithoutColor(Translation.TAG_EVERYONE));
-            return Optional.of(profile);
+        Optional<Boolean> isEveryone = getValue(json, EveryoneProfileImpl.EVERYONE_KEY, Boolean.class);
+        if (isEveryone.isPresent()) {
+            return Optional.of(this.everyoneProfile);
+        }
+
+        // [Redstone]
+        Optional<Boolean> isRedstone = getValue(json, RedstoneProfileImpl.REDSTONE_KEY, Boolean.class);
+        if (isRedstone.isPresent()) {
+            return Optional.of(this.redstoneProfile);
         }
 
         // Timer
@@ -139,6 +155,11 @@ public class ProfileFactoryImpl implements ProfileFactory {
         } catch (IllegalArgumentException e) {
             return Optional.absent();
         }
+    }
+
+    @Override
+    public Profile fromRedstone() {
+        return this.redstoneProfile;
     }
 
 }

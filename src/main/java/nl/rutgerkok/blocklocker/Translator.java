@@ -35,6 +35,7 @@ public abstract class Translator {
         TAG_MORE_USERS,
         TAG_PLAYER_NOT_FOUND,
         TAG_PRIVATE,
+        TAG_REDSTONE,
         TAG_TIMER;
 
         /**
