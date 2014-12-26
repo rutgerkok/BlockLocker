@@ -121,7 +121,7 @@ public final class InteractListener extends EventListener {
         }
 
         // Open (double) doors manually
-        if (protection instanceof DoorProtection) {
+        if (protection instanceof DoorProtection && !isSneakPlacing(player)) {
             event.setCancelled(true);
             DoorProtection doorProtection = (DoorProtection) protection;
             if (doorProtection.isOpen()) {
@@ -131,26 +131,6 @@ public final class InteractListener extends EventListener {
                 scheduleClose(doorProtection);
             }
         }
-    }
-
-    private void scheduleClose(final DoorProtection doorProtection) {
-        if (!doorProtection.isOpen()) {
-            return;
-        }
-        int openSeconds = doorProtection.getOpenSeconds();
-        if (openSeconds == -1) {
-            // Not specified, use default
-            openSeconds = plugin.getChestSettings().getDefaultDoorOpenSeconds();
-        }
-        if (openSeconds <= 0) {
-            return;
-        }
-        plugin.runLater(new Runnable() {
-            @Override
-            public void run() {
-                doorProtection.setOpen(false);
-            }
-        }, openSeconds * 20);
     }
 
     private void handleDisallowed(Player player, Protection protection, boolean clickedSign) {
@@ -166,6 +146,17 @@ public final class InteractListener extends EventListener {
     private boolean hasSignInHand(Player player) {
         ItemStack itemInHand = player.getItemInHand();
         if (itemInHand == null || itemInHand.getAmount() == 0 || itemInHand.getType() != Material.SIGN) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isSneakPlacing(Player player) {
+        if (!player.isSneaking()) {
+            return false;
+        }
+        ItemStack inHand = player.getItemInHand();
+        if (inHand == null || inHand.getType() == Material.AIR) {
             return false;
         }
         return true;
@@ -245,6 +236,26 @@ public final class InteractListener extends EventListener {
         } else {
             player.setItemInHand(null);
         }
+    }
+
+    private void scheduleClose(final DoorProtection doorProtection) {
+        if (!doorProtection.isOpen()) {
+            return;
+        }
+        int openSeconds = doorProtection.getOpenSeconds();
+        if (openSeconds == -1) {
+            // Not specified, use default
+            openSeconds = plugin.getChestSettings().getDefaultDoorOpenSeconds();
+        }
+        if (openSeconds <= 0) {
+            return;
+        }
+        plugin.runLater(new Runnable() {
+            @Override
+            public void run() {
+                doorProtection.setOpen(false);
+            }
+        }, openSeconds * 20);
     }
 
     @SuppressWarnings("deprecation")
