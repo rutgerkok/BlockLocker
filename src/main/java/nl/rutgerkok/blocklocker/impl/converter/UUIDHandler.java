@@ -13,6 +13,7 @@ import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -63,17 +64,23 @@ final class UUIDHandler {
         };
 
         /**
-         * Converts the name (assumed to be complete) to a {@link Result} that
-         * only contains the name and the zero UUID ({@code new UUID(0, 0)}.
+         * Gets a placeholder result for the given name, will only be used if no
+         * UUID exists for this name. In other words: some feedback is needed
+         * for the player that the name was invalid, and the UUID will need to
+         * set to {@code new UUID(0, 0)} so that the plugin doesn't constantly
+         * tries to look it up.
          */
         private static Function<String, Result> ONLINE_MODE_PLACEHOLDERS = new Function<String, Result>() {
             @Override
             public Result apply(String name) {
+                if (needsPrefixIfInvalidName(name)) {
+                    // Adding a prefix makes the name look invalid to the player
+                    name = invalidNamePrefixes[0] + name;
+                }
                 return new Result(name, new UUID(0, 0));
             }
         };
     }
-
     /**
      * A result value from the {@link UUID} lookup.
      *
@@ -227,9 +234,18 @@ final class UUIDHandler {
     }
 
     /**
+     * Normally, the first entry of this array is added before each line with an
+     * invalid name. When the line already starts with such a character, this
+     * prefix isn't added.
+     */
+    private static final char[] invalidNamePrefixes = { '~', '=', '+', '-', '#', '/', '\\', '{', ':', '.', '<' };
+
+    /**
      * Names that have this length may be cut off versions of longer names.
      */
     private static final int MAX_SIGN_LINE_LENGTH = 15;
+
+    private static final Pattern validUserPattern = Pattern.compile("^[a-zA-Z0-9_]{2,16}$");
 
     private static Player getPlayerFromNameOnSign(String name) {
         if (name.length() == MAX_SIGN_LINE_LENGTH) {
@@ -238,6 +254,23 @@ final class UUIDHandler {
         else {
             return Bukkit.getPlayerExact(name);
         }
+    }
+
+    private static boolean needsPrefixIfInvalidName(String line) {
+        if (line.isEmpty()) {
+            // Prefixing empty lines would be silly
+            return false;
+        }
+        char firstChar = line.charAt(0);
+        for (char possiblePrefix : invalidNamePrefixes) {
+            // Prefixing already prefixed lines would be silly too
+            if (firstChar == possiblePrefix) {
+                return false;
+            }
+        }
+        // But everything else needs a prefix to indicate that the name lookup
+        // failed
+        return true;
     }
 
     /**
@@ -338,7 +371,7 @@ final class UUIDHandler {
      * @param consumer
      *            The consumer that will eventually accept the results.
      */
-    private void fetchUniqueIdsAsync(List<String> names, Map<String, Result> results, ResultConsumer consumer) {
+    private void fetchUniqueIdsAtMojangAsync(List<String> names, Map<String, Result> results, ResultConsumer consumer) {
         UUIDFetcher fetcher = new UUIDFetcher(names);
         try {
             Map<String, UUID> uuidFetcherResults = fetcher.call();
@@ -356,16 +389,27 @@ final class UUIDHandler {
         // something
         final Map<String, Result> results = newPlayerNameMap(namesList, Functions.ONLINE_MODE_PLACEHOLDERS);
 
-        // Get as much results as possible using the online player list
+        // Get as much results as possible without a web request
         for (ListIterator<String> it = namesList.listIterator(); it.hasNext();) {
             String providedName = it.next();
+
+            // Check for name pattern
+            if (!validUserPattern.matcher(providedName).matches()) {
+                // Lookup will fail, so remove it from pending names
+                it.remove();
+                continue;
+            }
+
+            // Get from online players
             Player player = getPlayerFromNameOnSign(providedName);
             if (player != null) {
-                // Success! Player is online, no UUID lookup needed
+                // Success! Player is online, local lookup succeeded, no need
+                // to contact mojang.com for this name
                 // By checking for matching players, we also correct for any
                 // truncated names
                 results.put(providedName.toLowerCase(), new Result(player.getName(), player.getUniqueId()));
                 it.remove();
+                continue;
             }
         }
 
@@ -380,7 +424,7 @@ final class UUIDHandler {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable() {
             @Override
             public void run() {
-                fetchUniqueIdsAsync(namesList, results, consumer);
+                fetchUniqueIdsAtMojangAsync(namesList, results, consumer);
             }
         });
     }

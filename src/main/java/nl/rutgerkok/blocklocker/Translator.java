@@ -33,7 +33,6 @@ public abstract class Translator {
         PROTECTION_SELECTED_SIGN,
         TAG_EVERYONE,
         TAG_MORE_USERS,
-        TAG_PLAYER_NOT_FOUND,
         TAG_PRIVATE,
         TAG_REDSTONE,
         TAG_TIMER;
