@@ -65,13 +65,13 @@ public final class DoorProtectionImpl extends AbstractProtection implements Door
     }
 
     @Override
-    public void setOpen(boolean open) {
-        door.setOpen(open);
-    }
-
-    @Override
-    public void toggleOpen() {
-        door.toggleOpen();
+    public int getOpenSeconds() {
+        for (Profile profile : getAllowed()) {
+            if (profile instanceof TimerProfile) {
+                return ((TimerProfile) profile).getOpenSeconds();
+            }
+        }
+        return -1;
     }
 
     @Override
@@ -80,13 +80,8 @@ public final class DoorProtectionImpl extends AbstractProtection implements Door
     }
 
     @Override
-    public int getOpenTicks() {
-        for (Profile profile : getAllowed()) {
-            if (profile instanceof TimerProfile) {
-                return ((TimerProfile) profile).getOpenTicks();
-            }
-        }
-        return -1;
+    public void setOpen(boolean open) {
+        door.setOpen(open);
     }
 
 }

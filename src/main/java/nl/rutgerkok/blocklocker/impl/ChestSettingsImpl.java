@@ -13,8 +13,8 @@ class ChestSettingsImpl implements ChestSettings {
 
     private static final ProtectionType[] PROTECTION_TYPES = ProtectionType.values();
 
-    private final Translator translator;
     private final Config config;
+    private final Translator translator;
 
     ChestSettingsImpl(Translator translator, Config config) {
         this.translator = translator;
@@ -26,14 +26,9 @@ class ChestSettingsImpl implements ChestSettings {
         return config.getProtectables(type).contains(material);
     }
 
-    private Translation getTranslationKey(SignType signType) {
-        switch (signType) {
-            case MORE_USERS:
-                return Translation.TAG_MORE_USERS;
-            case PRIVATE:
-                return Translation.TAG_PRIVATE;
-        }
-        throw new AssertionError("Unknown type: " + signType);
+    @Override
+    public int getDefaultDoorOpenSeconds() {
+        return config.getDefaultDoorOpenSeconds();
     }
 
     @Override
@@ -54,6 +49,16 @@ class ChestSettingsImpl implements ChestSettings {
     @Override
     public String getSimpleLocalizedHeader(SignType signType) {
         return translator.getWithoutColor(getTranslationKey(signType));
+    }
+
+    private Translation getTranslationKey(SignType signType) {
+        switch (signType) {
+            case MORE_USERS:
+                return Translation.TAG_MORE_USERS;
+            case PRIVATE:
+                return Translation.TAG_PRIVATE;
+        }
+        throw new AssertionError("Unknown type: " + signType);
     }
 
 }

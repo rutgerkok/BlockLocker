@@ -34,3 +34,11 @@ protectableDoors:
 - JUNGLE_DOOR
 - ACACIA_DOOR
 - DARK_OAK_DOOR
+
+# The default amount of seconds a door stays open before closing automatically.
+# Players can override this value by putting a [Timer:X] tag on the sign, where
+# X is a number from 0 to 9.
+# When using 0 or a negative value, the door will never close automatically.
+# When the door was opened using redstone, the door will never close
+# automatically too.
+defaultDoorOpenSeconds: 0

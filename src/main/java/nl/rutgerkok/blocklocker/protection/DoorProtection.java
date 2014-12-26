@@ -16,13 +16,19 @@ public interface DoorProtection extends Protection {
     void setOpen(boolean open);
 
     /**
-     * Opens or closes the door. If the door is open, the door is closed and
-     * vice versa.
-     *
+     * Gets whether the door is currently opened. If only parts of the door are
+     * open, the result of this method is undefined.
+     * 
+     * @return Whether the door is currently opened.
      */
-    void toggleOpen();
-
     boolean isOpen();
 
-    int getOpenTicks();
+    /**
+     * Gets the amount of seconds the door should stay open, before closing
+     * automatically. If no amount of seconds was specified on the door, -1 is
+     * returned.
+     *
+     * @return The amount of ticks, or -1 if unspecified.
+     */
+    int getOpenSeconds();
 }

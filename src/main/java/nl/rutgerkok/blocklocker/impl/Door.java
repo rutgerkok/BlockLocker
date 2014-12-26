@@ -181,14 +181,4 @@ public final class Door {
         }
     }
 
-    /**
-     * Closes the door if the door is open, opens the door if the door is
-     * closed. If parts of the door is opened, parts is closed then the whole
-     * door will be in one state after calling this method, but it is unknown in
-     * which state.
-     */
-    public void toggleOpen() {
-        setOpen(!isOpen());
-    }
-
 }

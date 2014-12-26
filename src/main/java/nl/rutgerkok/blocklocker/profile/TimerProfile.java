@@ -12,5 +12,5 @@ public interface TimerProfile extends Profile {
      * 
      * @return The amount of ticks.
      */
-    int getOpenTicks();
+    int getOpenSeconds();
 }

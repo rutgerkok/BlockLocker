@@ -44,8 +44,8 @@ class TimerProfileImpl implements TimerProfile {
     }
 
     @Override
-    public int getOpenTicks() {
-        return seconds * 20;
+    public int getOpenSeconds() {
+        return seconds;
     }
 
 }

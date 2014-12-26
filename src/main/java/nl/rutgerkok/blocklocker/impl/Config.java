@@ -16,14 +16,15 @@ final class Config {
         private final static String
                 LANGUAGE_FILE = "languageFile",
                 PROTECTABLE_CONTAINERS = "protectableContainers",
-                PROTECTABLE_DOORS = "protectableDoors";
+                PROTECTABLE_DOORS = "protectableDoors",
+                DEFAULT_DOOR_OPEN_SECONDS = "defaultDoorOpenSeconds";
     }
 
     static final String DEFAULT_TRANSLATIONS_FILE = "translations-en.yml";
 
+    private final int defaultDoorOpenSeconds;
     private final String languageFile;
     private final Logger logger;
-
     private final Set<Material> protectableContainers;
     private final Set<Material> protectableDoors;
 
@@ -32,9 +33,21 @@ final class Config {
 
         languageFile = config.getString(Key.LANGUAGE_FILE,
                 DEFAULT_TRANSLATIONS_FILE);
+        defaultDoorOpenSeconds = config.getInt(Key.DEFAULT_DOOR_OPEN_SECONDS, 0);
 
         protectableContainers = toMaterialSet(config.getStringList(Key.PROTECTABLE_CONTAINERS));
         protectableDoors = toMaterialSet(config.getStringList(Key.PROTECTABLE_DOORS));
+    }
+
+    /**
+     * Gets the default amount of ticks a door stays open before automatically
+     * closing. 0 or negative values will make the door never close
+     * automatically.
+     * 
+     * @return The default amount of ticks.
+     */
+    int getDefaultDoorOpenSeconds() {
+        return defaultDoorOpenSeconds;
     }
 
     /**
@@ -42,7 +55,7 @@ final class Config {
      *
      * @return The language.
      */
-    public String getLanguageFileName() {
+    String getLanguageFileName() {
         return languageFile;
     }
 
@@ -52,7 +65,7 @@ final class Config {
      *
      * @return The set.
      */
-    public Set<Material> getProtectables(ProtectionType type) {
+    Set<Material> getProtectables(ProtectionType type) {
         switch (type) {
             case CONTAINER:
                 return protectableContainers;

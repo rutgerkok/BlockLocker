@@ -124,14 +124,25 @@ public final class InteractListener extends EventListener {
         if (protection instanceof DoorProtection) {
             event.setCancelled(true);
             DoorProtection doorProtection = (DoorProtection) protection;
-            scheduleClose(doorProtection);
-            doorProtection.toggleOpen();
+            if (doorProtection.isOpen()) {
+                doorProtection.setOpen(false);
+            } else {
+                doorProtection.setOpen(true);
+                scheduleClose(doorProtection);
+            }
         }
     }
 
     private void scheduleClose(final DoorProtection doorProtection) {
-        int openTicks = doorProtection.getOpenTicks();
-        if (openTicks <= 0) {
+        if (!doorProtection.isOpen()) {
+            return;
+        }
+        int openSeconds = doorProtection.getOpenSeconds();
+        if (openSeconds == -1) {
+            // Not specified, use default
+            openSeconds = plugin.getChestSettings().getDefaultDoorOpenSeconds();
+        }
+        if (openSeconds <= 0) {
             return;
         }
         plugin.runLater(new Runnable() {
@@ -139,7 +150,7 @@ public final class InteractListener extends EventListener {
             public void run() {
                 doorProtection.setOpen(false);
             }
-        }, openTicks);
+        }, openSeconds * 20);
     }
 
     private void handleDisallowed(Player player, Protection protection, boolean clickedSign) {
