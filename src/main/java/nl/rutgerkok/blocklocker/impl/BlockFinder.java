@@ -138,7 +138,16 @@ public final class BlockFinder {
      */
     @SuppressWarnings("deprecation")
     private MaterialData getData(Block block) {
-        return block.getType().getNewData(block.getData());
+        Material material = block.getType();
+        byte data = block.getData();
+
+        // Special-case trapped chest, it should have a Chest MaterialData, but
+        // hasn't for some reason
+        if (material == Material.TRAPPED_CHEST) {
+            return new Chest(Material.TRAPPED_CHEST, data);
+        }
+
+        return material.getNewData(data);
     }
 
     /**
