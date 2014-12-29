@@ -18,3 +18,4 @@ commands:
     description: "Edit a sign on your protection."
     permission: "blocklocker.protect"
     usage: "/<command> <lineNumber> <value>"
+    aliases: "bl"
