@@ -112,9 +112,7 @@ class SignParserImpl implements SignParser {
         List<Profile> profiles = new ArrayList<Profile>();
         for (int i = 1; i < lines.length; i++) {
             String name = lines[i].trim();
-            if (!name.isEmpty()) {
-                profiles.add(profileFactory.fromDisplayText(name));
-            }
+            profiles.add(profileFactory.fromDisplayText(name));
         }
 
         // Last parameter true -> simple signs always need to be updated to be
