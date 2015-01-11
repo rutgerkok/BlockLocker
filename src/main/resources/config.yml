@@ -8,18 +8,24 @@ languageFile: translations-en.yml
 # All material names can be found here:
 # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
 protectableContainers:
+- ACACIA_FENCE_GATE
 - ANVIL
 - BEACON
+- BIRCH_FENCE_GATE
 - BREWING_STAND
 - BURNING_FURNACE
 - CHEST
+- DARK_OAK_FENCE_GATE
 - DISPENSER
 - DROPPER
 - ENCHANTMENT_TABLE
 - ENDER_CHEST
+- FENCE_GATE
 - FURNACE
 - HOPPER
 - JUKEBOX
+- JUNGLE_FENCE_GATE
+- SPRUCE_FENCE_GATE
 - TRAPPED_CHEST
 - TRAP_DOOR
 - WORKBENCH
