@@ -1,6 +1,7 @@
 package nl.rutgerkok.blocklocker.impl;
 
 import nl.rutgerkok.blocklocker.ChestSettings;
+import nl.rutgerkok.blocklocker.ProtectionType;
 import nl.rutgerkok.blocklocker.SignType;
 import nl.rutgerkok.blocklocker.Translator;
 import nl.rutgerkok.blocklocker.Translator.Translation;
@@ -23,7 +24,7 @@ class ChestSettingsImpl implements ChestSettings {
 
     @Override
     public boolean canProtect(ProtectionType type, Material material) {
-        return config.getProtectables(type).contains(material);
+        return config.canProtect(type, material);
     }
 
     @Override
@@ -39,7 +40,7 @@ class ChestSettingsImpl implements ChestSettings {
     @Override
     public Optional<ProtectionType> getProtectionType(Material material) {
         for (ProtectionType type : PROTECTION_TYPES) {
-            if (config.getProtectables(type).contains(material)) {
+            if (config.canProtect(type, material)) {
                 return Optional.of(type);
             }
         }
@@ -59,6 +60,11 @@ class ChestSettingsImpl implements ChestSettings {
                 return Translation.TAG_PRIVATE;
         }
         throw new AssertionError("Unknown type: " + signType);
+    }
+
+    @Override
+    public boolean canProtect(Material material) {
+        return config.canProtect(material);
     }
 
 }

@@ -42,6 +42,12 @@ protectableDoors:
 - ACACIA_DOOR
 - DARK_OAK_DOOR
 
+# All types of trap doors that can be protected. These blocks must be
+# be recognized by the Bukkit API as a trap door.
+protectableTrapDoors:
+- TRAP_DOOR
+- IRON_TRAPDOOR
+
 # The default amount of seconds a door stays open before closing automatically.
 # Players can override this value by putting a [Timer:X] tag on the sign, where
 # X is a number from 0 to 9.

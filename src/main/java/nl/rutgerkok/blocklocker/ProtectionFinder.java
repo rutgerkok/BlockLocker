@@ -66,5 +66,5 @@ public interface ProtectionFinder {
      *            The sign block.
      * @return True if the sign is placed near a block that can be protected.
      */
-    boolean isSignNearbyProtectionBlock(Block signBlock);
+    boolean isSignNearbyProtection(Block signBlock);
 }

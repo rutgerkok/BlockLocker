@@ -7,16 +7,19 @@ import com.google.common.base.Optional;
 public interface ChestSettings {
 
     /**
-     * The different types of protections.
+     * Checks if the given material can be protected by any protection type.
      *
+     * @param type
+     *            The protection type.
+     * @param material
+     *            The material to check.
+     * @return True if the given material can be protected by any protection
+     *         type, false otherwise.
      */
-    public enum ProtectionType {
-        CONTAINER,
-        DOOR;
-    }
+    boolean canProtect(Material material);
 
     /**
-     * Checks if the given block can be protected by the given type.
+     * Checks if the given material can be protected by the given type.
      *
      * @param type
      *            The protection type.

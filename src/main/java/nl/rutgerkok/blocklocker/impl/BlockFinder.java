@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import nl.rutgerkok.blocklocker.BlockData;
 import nl.rutgerkok.blocklocker.ProtectionSign;
 import nl.rutgerkok.blocklocker.SignParser;
 
@@ -22,11 +23,13 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 public final class BlockFinder {
-    private static BlockFace[] SIGN_ATTACHEMENT_FACES = { BlockFace.NORTH, BlockFace.EAST,
-            BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP };
-    public static BlockFace[] CHEST_LINKING_FACES = { BlockFace.NORTH, BlockFace.EAST,
+    public static final BlockFace[] DOOR_ATTACHMENT_FACES = { BlockFace.UP, BlockFace.DOWN };
+    public static final BlockFace[] CHEST_LINKING_FACES = { BlockFace.NORTH, BlockFace.EAST,
             BlockFace.SOUTH, BlockFace.WEST };
-    private static BlockFace[] UP_DOWN = { BlockFace.UP, BlockFace.DOWN };
+    public static final BlockFace[] TRAP_DOOR_ATTACHMENT_FACES = { BlockFace.NORTH, BlockFace.EAST,
+            BlockFace.SOUTH, BlockFace.WEST };
+    private static final BlockFace[] SIGN_ATTACHMENT_FACES = { BlockFace.NORTH, BlockFace.EAST,
+            BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP };
 
     private SignParser parser;
 
@@ -35,15 +38,15 @@ public final class BlockFinder {
     }
 
     /**
-     * Finds all valid attached signs to a block.
+     * Finds all attached signs to a block, that are valid protection signs.
      *
      * @param block
      *            The block to check attached signs on.
      * @return The signs.
      */
-    private Collection<ProtectionSign> findAttachedSigns(Block block) {
+    public Collection<ProtectionSign> findAttachedSigns(Block block) {
         Collection<ProtectionSign> signs = new ArrayList<ProtectionSign>();
-        for (BlockFace face : SIGN_ATTACHEMENT_FACES) {
+        for (BlockFace face : SIGN_ATTACHMENT_FACES) {
             Block atPosition = block.getRelative(face);
             Material material = atPosition.getType();
             if (material != Material.WALL_SIGN && material != Material.SIGN_POST) {
@@ -61,6 +64,13 @@ public final class BlockFinder {
         return signs;
     }
 
+    /**
+     * Finds all attached signs to a block, that are valid protection signs.
+     *
+     * @param blocks
+     *            The blocks to check attached signs on.
+     * @return The signs.
+     */
     public Collection<ProtectionSign> findAttachedSigns(Collection<Block> blocks) {
         if (blocks.size() == 1) {
             // Avoid creating a builder, iterator and extra set
@@ -75,18 +85,6 @@ public final class BlockFinder {
     }
 
     /**
-     * Gets the block the sign is attached on.
-     * 
-     * @param sign
-     *            The sign.
-     * @return The block the sign is attached on.
-     */
-    public Block findAttachedTo(Sign sign) {
-        Attachable attachable = (Attachable) sign.getData();
-        return sign.getBlock().getRelative(attachable.getAttachedFace());
-    }
-
-    /**
      * Searches for containers of the same type attached to this container.
      *
      * @param block
@@ -98,12 +96,12 @@ public final class BlockFinder {
         // Minecraft connects two chests next to each other that have the same
         // direction. We simply check for that condition, taking both normal
         // and trapped chests into account
-        if (!(getData(block) instanceof Chest)) {
+        if (!(BlockData.get(block) instanceof Chest)) {
             return Collections.singletonList(block);
         }
 
         Material chestMaterial = block.getType(); // CHEST or TRAPPED_CHEST
-        BlockFace chestFacing = ((Directional) getData(block)).getFacing();
+        BlockFace chestFacing = ((Directional) BlockData.get(block)).getFacing();
 
         for (BlockFace face : CHEST_LINKING_FACES) {
             Block atPosition = block.getRelative(face);
@@ -111,7 +109,7 @@ public final class BlockFinder {
                 continue;
             }
 
-            MaterialData materialData = getData(atPosition);
+            MaterialData materialData = BlockData.get(atPosition);
             if (!(materialData instanceof Directional)) {
                 continue;
             }
@@ -128,26 +126,22 @@ public final class BlockFinder {
     }
 
     /**
-     * Fast alternative for the slow {@code block.getState().getData()} call.
-     * This method skips the part where unnecessary BlockStates are created. For
-     * chests this is quite slow, as all items need to be copied.
+     * Gets the block that supports the given block. If the returned block is
+     * destroyed, the given block is destroyed too.
      *
-     * @param block
-     *            The block.
-     * @return The material data of the block.
+     * For blocks that are self-supporting (most blocks in Minecraft), the
+     * method returns the block itself.
+     * 
+     * @param sign
+     *            The sign.
+     * @return The block the sign is attached on.
      */
-    @SuppressWarnings("deprecation")
-    private MaterialData getData(Block block) {
-        Material material = block.getType();
-        byte data = block.getData();
-
-        // Special-case trapped chest, it should have a Chest MaterialData, but
-        // hasn't for some reason
-        if (material == Material.TRAPPED_CHEST) {
-            return new Chest(Material.TRAPPED_CHEST, data);
+    public Block findSupportingBlock(Block block) {
+        MaterialData data = BlockData.get(block);
+        if (data instanceof Attachable) {
+            return block.getRelative(((Attachable) data).getAttachedFace());
         }
-
-        return material.getNewData(data);
+        return block;
     }
 
     /**
@@ -179,20 +173,5 @@ public final class BlockFinder {
         MaterialData materialData = sign.getData();
         BlockFace actualFace = ((org.bukkit.material.Sign) materialData).getAttachedFace();
         return (actualFace == requiredFace);
-    }
-
-    /**
-     * Gets the blocks above and below the given block.
-     * 
-     * @param block
-     *            The block.
-     * @return The blocks above and below the given block.
-     */
-    Collection<Block> getAboveAndBelow(Block block) {
-        ImmutableList.Builder<Block> builder = ImmutableList.builder();
-        for (BlockFace blockFace : UP_DOWN) {
-            builder.add(block.getRelative(blockFace));
-        }
-        return builder.build();
     }
 }

@@ -101,7 +101,7 @@ public class SignChangeListener extends EventListener {
         }
 
         // Sign must be attached to container
-        if (!plugin.getProtectionFinder().isSignNearbyProtectionBlock(block)) {
+        if (!plugin.getProtectionFinder().isSignNearbyProtection(block)) {
             plugin.getTranslator().sendMessage(player, Translation.PROTECTION_NOT_NEARBY);
             block.breakNaturally();
             event.setCancelled(true);

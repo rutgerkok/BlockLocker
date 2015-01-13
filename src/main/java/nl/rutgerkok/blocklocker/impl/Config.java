@@ -1,12 +1,13 @@
 package nl.rutgerkok.blocklocker.impl;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.EnumMap;
 import java.util.EnumSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import nl.rutgerkok.blocklocker.ChestSettings.ProtectionType;
+import nl.rutgerkok.blocklocker.ProtectionType;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -17,6 +18,7 @@ final class Config {
                 LANGUAGE_FILE = "languageFile",
                 PROTECTABLE_CONTAINERS = "protectableContainers",
                 PROTECTABLE_DOORS = "protectableDoors",
+                PROTECTABLE_TRAP_DOORS = "protectableTrapDoors",
                 DEFAULT_DOOR_OPEN_SECONDS = "defaultDoorOpenSeconds";
     }
 
@@ -25,8 +27,12 @@ final class Config {
     private final int defaultDoorOpenSeconds;
     private final String languageFile;
     private final Logger logger;
-    private final Set<Material> protectableContainers;
-    private final Set<Material> protectableDoors;
+
+    private final Map<ProtectionType, Set<Material>> protectableMaterialsMap;
+    /**
+     * Combination of the sets of all individual protection types.
+     */
+    private final Set<Material> protectableMaterialsSet;
 
     Config(Logger logger, FileConfiguration config) {
         this.logger = logger;
@@ -35,8 +41,19 @@ final class Config {
                 DEFAULT_TRANSLATIONS_FILE);
         defaultDoorOpenSeconds = config.getInt(Key.DEFAULT_DOOR_OPEN_SECONDS, 0);
 
-        protectableContainers = toMaterialSet(config.getStringList(Key.PROTECTABLE_CONTAINERS));
-        protectableDoors = toMaterialSet(config.getStringList(Key.PROTECTABLE_DOORS));
+        protectableMaterialsMap = new EnumMap<ProtectionType, Set<Material>>(ProtectionType.class);
+        protectableMaterialsMap.put(ProtectionType.CONTAINER,
+                toMaterialSet(config.getStringList(Key.PROTECTABLE_CONTAINERS)));
+        protectableMaterialsMap.put(ProtectionType.DOOR,
+                toMaterialSet(config.getStringList(Key.PROTECTABLE_DOORS)));
+        protectableMaterialsMap.put(ProtectionType.TRAP_DOOR,
+                toMaterialSet(config.getStringList(Key.PROTECTABLE_TRAP_DOORS)));
+
+        // Create combined set
+        protectableMaterialsSet = EnumSet.noneOf(Material.class);
+        for (Set<Material> protectableByType : protectableMaterialsMap.values()) {
+            protectableMaterialsSet.addAll(protectableByType);
+        }
     }
 
     /**
@@ -60,26 +77,41 @@ final class Config {
     }
 
     /**
-     * Gets an immutable set of all materials that can be protected for the
-     * given type.
-     *
-     * @return The set.
+     * Gets whether the material can be protected by the given type.
+     * @param type
+     *            Protection type that must be checked for being able to protect
+     *            this type.
+     * @param material
+     *            Material to check.
+     * 
+     * @return True if the material can be protected by the given type, false
+     *         otherwise.
      */
-    Set<Material> getProtectables(ProtectionType type) {
-        switch (type) {
-            case CONTAINER:
-                return protectableContainers;
-            case DOOR:
-                return protectableDoors;
-            default:
-                return Collections.emptySet();
+    boolean canProtect(ProtectionType type, Material material) {
+        new Exception("Checking " + material + " for " + type).printStackTrace();
+        Set<Material> materials = this.protectableMaterialsMap.get(type);
+        if (materials == null) {
+            return false;
         }
+        return materials.contains(material);
+    }
+
+    /**
+     * Gets whether the material can be protected by any type.
+     *
+     * @param material
+     *            Material to check.
+     * @return True if the material can be protected by the given type, false
+     *         otherwise.
+     */
+    boolean canProtect(Material material) {
+        return protectableMaterialsSet.contains(material);
     }
 
     /**
      * Transforms the string collection into a material set, by parsing each
      * string using {@link Material#matchMaterial(String)}. The resulting set
-     * will be immutable. All strings that cannot be parsed are logged and then
+     * will be mutable. All strings that cannot be parsed are logged and then
      * ignored.
      *
      * @param strings
@@ -96,6 +128,6 @@ final class Config {
             }
             materials.add(material);
         }
-        return Collections.unmodifiableSet(materials);
+        return materials;
     }
 }

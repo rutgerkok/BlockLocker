@@ -5,9 +5,9 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 import nl.rutgerkok.blocklocker.BlockLockerPlugin;
-import nl.rutgerkok.blocklocker.ChestSettings.ProtectionType;
 import nl.rutgerkok.blocklocker.Permissions;
 import nl.rutgerkok.blocklocker.ProtectionSign;
+import nl.rutgerkok.blocklocker.ProtectionType;
 import nl.rutgerkok.blocklocker.ProtectionUpdater.UpdateMode;
 import nl.rutgerkok.blocklocker.SignType;
 import nl.rutgerkok.blocklocker.Translator.Translation;

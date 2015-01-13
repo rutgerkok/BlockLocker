@@ -2,19 +2,23 @@ package nl.rutgerkok.blocklocker.impl.protection;
 
 import java.util.Collection;
 
+import nl.rutgerkok.blocklocker.BlockData;
 import nl.rutgerkok.blocklocker.ProtectionSign;
 import nl.rutgerkok.blocklocker.impl.BlockFinder;
-import nl.rutgerkok.blocklocker.impl.Door;
 import nl.rutgerkok.blocklocker.profile.Profile;
 import nl.rutgerkok.blocklocker.profile.TimerProfile;
-import nl.rutgerkok.blocklocker.protection.DoorProtection;
 import nl.rutgerkok.blocklocker.protection.Protection;
+import nl.rutgerkok.blocklocker.protection.TrapDoorProtection;
+
+import org.bukkit.block.Block;
+import org.bukkit.material.MaterialData;
+import org.bukkit.material.Openable;
 
 /**
- * Implementation of {@link DoorProtection}.
+ * Implementation of {@link TrapDoorProtection}.
  *
  */
-public final class DoorProtectionImpl extends AbstractProtection implements DoorProtection {
+public final class TrapDoorProtectionImpl extends AbstractProtection implements TrapDoorProtection {
 
     /**
      * Gets a door protection from a door, with only a single sign looked up.
@@ -24,13 +28,13 @@ public final class DoorProtectionImpl extends AbstractProtection implements Door
      *            up, speeding up {@link #getOwner()}.
      * @param blockFinder
      *            The block finder.
-     * @param door
+     * @param trapDoor
      *            The door.
      * 
      * @return The door protection object.
      */
-    public static Protection fromDoorWithSign(ProtectionSign sign, BlockFinder blockFinder, Door door) {
-        return new DoorProtectionImpl(sign, blockFinder, door);
+    public static Protection fromDoorWithSign(ProtectionSign sign, BlockFinder blockFinder, Block trapDoor) {
+        return new TrapDoorProtectionImpl(sign, blockFinder, trapDoor);
     }
 
     /**
@@ -40,32 +44,33 @@ public final class DoorProtectionImpl extends AbstractProtection implements Door
      *            All signs of the protection. Collection may not be empty.
      * @param blockFinder
      *            The block finder.
-     * @param door
+     * @param trapDoor
      *            The door that is protected.
      * @return The protection.
      */
-    public static Protection fromDoorWithSigns(Collection<ProtectionSign> signs, BlockFinder blockFinder, Door door) {
-        return new DoorProtectionImpl(signs, blockFinder, door);
+    public static Protection fromDoorWithSigns(Collection<ProtectionSign> signs, BlockFinder blockFinder, Block trapDoor) {
+        return new TrapDoorProtectionImpl(signs, blockFinder, trapDoor);
     }
 
     private final BlockFinder blockFinder;
-    private final Door door;
+    private final Block trapDoor;
 
-    private DoorProtectionImpl(Collection<ProtectionSign> signs, BlockFinder blockFinder, Door door) {
+    private TrapDoorProtectionImpl(Collection<ProtectionSign> signs, BlockFinder blockFinder, Block trapDoor) {
         super(signs);
-        this.door = door;
+        this.trapDoor = trapDoor;
         this.blockFinder = blockFinder;
     }
 
-    private DoorProtectionImpl(ProtectionSign sign, BlockFinder blockFinder, Door door) {
+    private TrapDoorProtectionImpl(ProtectionSign sign, BlockFinder blockFinder, Block trapDoor) {
         super(sign);
-        this.door = door;
+        this.trapDoor = trapDoor;
         this.blockFinder = blockFinder;
     }
 
     @Override
     protected Collection<ProtectionSign> fetchSigns() {
-        return blockFinder.findAttachedSigns(door.getBlocksForSigns());
+        Block supportingBlock = blockFinder.findSupportingBlock(trapDoor);
+        return blockFinder.findAttachedSigns(supportingBlock);
     }
 
     @Override
@@ -80,12 +85,20 @@ public final class DoorProtectionImpl extends AbstractProtection implements Door
 
     @Override
     public boolean isOpen() {
-        return door.isOpen();
+        MaterialData materialData = BlockData.get(trapDoor);
+        if (materialData instanceof Openable) {
+            return ((Openable) materialData).isOpen();
+        }
+        return false;
     }
 
     @Override
     public void setOpen(boolean open) {
-        door.setOpen(open);
+        MaterialData materialData = BlockData.get(trapDoor);
+        if (materialData instanceof Openable) {
+            ((Openable) materialData).setOpen(open);
+            BlockData.set(trapDoor, materialData);
+        }
     }
 
 }
