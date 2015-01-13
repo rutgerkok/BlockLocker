@@ -88,7 +88,6 @@ final class Config {
      *         otherwise.
      */
     boolean canProtect(ProtectionType type, Material material) {
-        new Exception("Checking " + material + " for " + type).printStackTrace();
         Set<Material> materials = this.protectableMaterialsMap.get(type);
         if (materials == null) {
             return false;
