@@ -25,6 +25,18 @@ public interface ProtectionFinder {
     Optional<Protection> findProtection(Block block);
 
     /**
+     * Gets the protection the given block is part of. If the block is a sign,
+     * the sign must already be filled in.
+     *
+     * @param block
+     *            The block to search at.
+     * @param searchMode
+     *            The search mode.
+     * @return The protection, if any.
+     */
+    Optional<Protection> findProtection(Block block, SearchMode searchMode);
+
+    /**
      * Gets the protection the sign is placed against. The contents of the sign
      * is not checked; in other words: the sign doesn't have to be part of the
      * protection (yet).

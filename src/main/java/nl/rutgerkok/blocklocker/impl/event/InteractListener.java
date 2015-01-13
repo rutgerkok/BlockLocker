@@ -9,6 +9,7 @@ import nl.rutgerkok.blocklocker.Permissions;
 import nl.rutgerkok.blocklocker.ProtectionSign;
 import nl.rutgerkok.blocklocker.ProtectionType;
 import nl.rutgerkok.blocklocker.ProtectionUpdater.UpdateMode;
+import nl.rutgerkok.blocklocker.SearchMode;
 import nl.rutgerkok.blocklocker.SignType;
 import nl.rutgerkok.blocklocker.Translator.Translation;
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;
@@ -196,7 +197,7 @@ public final class InteractListener extends EventListener {
         Player player = event.getPlayer();
         Block block = event.getClickedBlock();
         boolean clickedSign = block.getType() == Material.SIGN_POST || block.getType() == Material.WALL_SIGN;
-        Optional<Protection> protection = plugin.getProtectionFinder().findProtection(block);
+        Optional<Protection> protection = plugin.getProtectionFinder().findProtection(block, SearchMode.NO_SUPPORTING_BLOCKS);
 
         if (!protection.isPresent()) {
             if (tryPlaceSign(event.getPlayer(), block, event.getBlockFace())) {
@@ -210,7 +211,6 @@ public final class InteractListener extends EventListener {
         plugin.getProtectionUpdater().update(protection.get(), UpdateMode.IF_NEEDED);
 
         // Check if player is allowed
-
         if (checkAllowed(player, protection.get(), clickedSign)) {
             handleAllowed(event, protection.get(), clickedSign);
         } else {

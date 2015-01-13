@@ -8,6 +8,7 @@ import nl.rutgerkok.blocklocker.ChestSettings;
 import nl.rutgerkok.blocklocker.ProtectionFinder;
 import nl.rutgerkok.blocklocker.ProtectionSign;
 import nl.rutgerkok.blocklocker.ProtectionType;
+import nl.rutgerkok.blocklocker.SearchMode;
 import nl.rutgerkok.blocklocker.SignType;
 import nl.rutgerkok.blocklocker.impl.protection.ContainerProtectionImpl;
 import nl.rutgerkok.blocklocker.impl.protection.DoorProtectionImpl;
@@ -28,14 +29,8 @@ import com.google.common.base.Preconditions;
 /**
  * Finds a protection.
  *
- * <p>
- * A protection consists of:
- * <ul>
- * <li>Protection blocks, like door or chest blocks.</li>
- * <li>Blocks supporting the protection, can be of any material. For example,
- * the block under the door is a supporting block.</li>
- * <li>Signs.</li>
- * </ul>
+ * See {@link SearchMode} for a description of protection blocks, supporting
+ * blocks and sign blocks.
  */
 class ProtectionFinderImpl implements ProtectionFinder {
     private final BlockFinder blockFinder;
@@ -46,14 +41,96 @@ class ProtectionFinderImpl implements ProtectionFinder {
         this.settings = settings;
     }
 
+    @Override
+    public Optional<Protection> findExistingProtectionForNewSign(Block signBlock) {
+        BlockState blockState = signBlock.getState();
+        if (!(blockState instanceof Sign)) {
+            return Optional.absent();
+        }
+
+        Sign sign = (Sign) blockState;
+        Optional<Block> protectionBlock = this.findProtectableForSign(sign);
+        if (!protectionBlock.isPresent()) {
+            return Optional.absent();
+        }
+
+        return findProtectionForBlock(protectionBlock.get(), SearchMode.NO_SUPPORTING_BLOCKS);
+    }
+
+    /**
+     * Gets the protection block the sign protects.
+     *
+     * @param sign
+     *            The sign, whether properly formatted or not.
+     * @return A block that can be protected, and may or may not be protected
+     *         currently.
+     */
+    private Optional<Block> findProtectableForSign(Sign sign) {
+        Block attachedBlock = blockFinder.findSupportingBlock(sign.getBlock());
+        if (settings.canProtect(ProtectionType.CONTAINER, attachedBlock.getType())) {
+            return Optional.of(attachedBlock);
+        }
+
+        return findProtectableForSupportingBlock(attachedBlock);
+    }
+
+    /**
+     * Gets the protection block that the given block is supporting.
+     *
+     * @param supportingBlock
+     *            The block that is supporting a protection block.
+     * @return The protection block, if any.
+     */
+    private Optional<Block> findProtectableForSupportingBlock(Block supportingBlock) {
+        // Search above and below that block for doors
+        for (BlockFace doorFace : BlockFinder.DOOR_ATTACHMENT_FACES) {
+            Block maybeDoor = supportingBlock.getRelative(doorFace);
+            if (settings.canProtect(ProtectionType.DOOR, maybeDoor.getType())) {
+                return Optional.of(maybeDoor);
+            }
+        }
+
+        // Search around for trap doors
+        for (BlockFace trapDoorFace : BlockFinder.TRAP_DOOR_ATTACHMENT_FACES) {
+            Block maybeTrapDoor = supportingBlock.getRelative(trapDoorFace);
+            if (settings.canProtect(ProtectionType.TRAP_DOOR, maybeTrapDoor.getType())) {
+                return Optional.of(maybeTrapDoor);
+            }
+        }
+
+        return Optional.absent();
+    }
+
+    @Override
+    public Optional<Protection> findProtection(Block block) {
+        return findProtection(block, SearchMode.ALL);
+    }
+
+    @Override
+    public Optional<Protection> findProtection(Block block, SearchMode searchMode) {
+        Preconditions.checkNotNull(block);
+        Material blockMaterial = block.getType();
+
+        // Check for sign
+        if (searchMode.searchForSigns() &&
+                (blockMaterial == Material.WALL_SIGN || blockMaterial == Material.SIGN_POST)) {
+            Sign sign = (Sign) block.getState();
+            return findProtectionForExistingSign(sign);
+        }
+
+        // Check for other blocks
+        return findProtectionForBlock(block, searchMode);
+    }
+
     /**
      * Finds a protection for a protection/supporting block.
      * 
      * @param block
      *            The protection/supporting block.
+     * @param searchMode
      * @return The protection, if any.
      */
-    private Optional<Protection> findProtectionForBlock(Block block) {
+    private Optional<Protection> findProtectionForBlock(Block block, SearchMode searchMode) {
         // Try as protection block
         Optional<Protection> protection = findProtectionForProtectionBlock(block);
         if (protection.isPresent()) {
@@ -61,15 +138,30 @@ class ProtectionFinderImpl implements ProtectionFinder {
         }
 
         // Try as supporting block
-        Optional<Block> oBlock = findProtectableForSupportingBlock(block);
-        if (oBlock.isPresent()) {
-            Block protectionBlock = oBlock.get();
-            if (settings.canProtect(protectionBlock.getType())) {
-                return findProtectionForProtectionBlock(protectionBlock);
+        if (searchMode.searchForSupportingBlocks()) {
+            Optional<Block> protectionBlock = findProtectableForSupportingBlock(block);
+            if (protectionBlock.isPresent() && settings.canProtect(protectionBlock.get().getType())) {
+                return findProtectionForProtectionBlock(protectionBlock.get());
             }
         }
 
         // Failed
+        return Optional.absent();
+    }
+
+    private Optional<Protection> findProtectionForExistingSign(Sign sign) {
+        // Get type of sign
+        Optional<ProtectionSign> parsed = blockFinder.getSignParser().parseSign(sign);
+        if (!parsed.isPresent()) {
+            // Not actually a protection sign, so no protection
+            return Optional.absent();
+        }
+
+        Optional<Block> protectionBlock = findProtectableForSign(sign);
+        if (protectionBlock.isPresent()) {
+            return findProtectionForProtectionBlock(protectionBlock.get(), parsed.get());
+        }
+
         return Optional.absent();
     }
 
@@ -113,102 +205,6 @@ class ProtectionFinderImpl implements ProtectionFinder {
 
     }
 
-    private Optional<Protection> findProtectionForExistingSign(Sign sign) {
-        // Get type of sign
-        Optional<ProtectionSign> parsed = blockFinder.getSignParser().parseSign(sign);
-        if (!parsed.isPresent()) {
-            // Not actually a protection sign, so no protection
-            return Optional.absent();
-        }
-
-        Optional<Block> protectionBlock = findProtectableForSign(sign);
-        if (protectionBlock.isPresent()) {
-            return findProtectionForProtectionBlock(protectionBlock.get(), parsed.get());
-        }
-
-        return Optional.absent();
-    }
-
-    @Override
-    public Optional<Protection> findExistingProtectionForNewSign(Block signBlock) {
-        BlockState blockState = signBlock.getState();
-        if (!(blockState instanceof Sign)) {
-            return Optional.absent();
-        }
-
-        Sign sign = (Sign) blockState;
-        Optional<Block> attachedTo = this.findProtectableForSign(sign);
-        if (!attachedTo.isPresent()) {
-            return Optional.absent();
-        }
-
-        return findProtectionForBlock(attachedTo.get());
-    }
-
-    @Override
-    public Optional<Protection> findProtection(Block block) {
-        Preconditions.checkNotNull(block);
-        Material blockMaterial = block.getType();
-
-        // Check for sign
-        if (blockMaterial == Material.WALL_SIGN || blockMaterial == Material.SIGN_POST) {
-            Sign sign = (Sign) block.getState();
-            return findProtectionForExistingSign(sign);
-        }
-
-        // Check for other blocks
-        return findProtectionForBlock(block);
-    }
-
-    /**
-     * Gets the block the sign protects. The block will be of a type that can be
-     * protected. If the sign is a valid protection sign, this means that the
-     * blocks is protected. If the sign is not yet a valid protection sign, keep
-     * in mind that the block may still be protected by another sign.
-     *
-     * @param sign
-     *            The sign, whether properly formatted or not.
-     * @return A block that can be protected, and may or may not be protected
-     *         currently.
-     */
-    private Optional<Block> findProtectableForSign(Sign sign) {
-        Block attachedBlock = blockFinder.findSupportingBlock(sign.getBlock());
-        if (settings.canProtect(ProtectionType.CONTAINER, attachedBlock.getType())) {
-            return Optional.of(attachedBlock);
-        }
-        return findProtectableForSupportingBlock(attachedBlock);
-    }
-
-    private Optional<Block> findProtectableForSupportingBlock(Block supportingBlock) {
-        // Search above and below that block for doors
-        for (BlockFace doorFace : BlockFinder.DOOR_ATTACHMENT_FACES) {
-            Block maybeDoor = supportingBlock.getRelative(doorFace);
-            if (settings.canProtect(ProtectionType.DOOR, maybeDoor.getType())) {
-                return Optional.of(maybeDoor);
-            }
-        }
-
-        // Search around for trap doors
-        for (BlockFace trapDoorFace : BlockFinder.TRAP_DOOR_ATTACHMENT_FACES) {
-            Block maybeTrapDoor = supportingBlock.getRelative(trapDoorFace);
-            if (settings.canProtect(ProtectionType.TRAP_DOOR, maybeTrapDoor.getType())) {
-                return Optional.of(maybeTrapDoor);
-            }
-        }
-
-        return Optional.absent();
-    }
-
-    @Override
-    public boolean isSignNearbyProtection(Block signBlock) {
-        BlockState blockState = signBlock.getState();
-        if (blockState instanceof Sign) {
-            return findProtectableForSign((Sign) blockState).isPresent();
-        }
-        // Not a sign, so definitely not a sign nearby a protection block
-        return false;
-    }
-
     /**
      * Gets the {@link Protection} for the given block, which is already part of
      * a protection; it must be protection block, not a supporting block or a
@@ -241,6 +237,16 @@ class ProtectionFinderImpl implements ProtectionFinder {
             default:
                 throw new UnsupportedOperationException("Don't know how to handle protection type " + protectionType.get());
         }
+    }
+
+    @Override
+    public boolean isSignNearbyProtection(Block signBlock) {
+        BlockState blockState = signBlock.getState();
+        if (blockState instanceof Sign) {
+            return findProtectableForSign((Sign) blockState).isPresent();
+        }
+        // Not a sign, so definitely not a sign nearby a protection block
+        return false;
     }
 
     @Override
