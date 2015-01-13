@@ -27,7 +27,6 @@ protectableContainers:
 - JUNGLE_FENCE_GATE
 - SPRUCE_FENCE_GATE
 - TRAPPED_CHEST
-- TRAP_DOOR
 - WORKBENCH
 
 # All types of doors that can be protected. These blocks must follow the data
