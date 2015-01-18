@@ -49,11 +49,14 @@ public final class InteractListener extends EventListener {
         PlayerProfile playerProfile = plugin.getProfileFactory().fromPlayer(player);
         boolean allowed = protection.isAllowed(playerProfile);
 
-        // When not clicking a sign, allow admins to bypass the protection
-        if (!allowed && !clickedSign && player.hasPermission(Permissions.CAN_BYPASS)) {
+        // Allow admins to bypass the protection
+        if (!allowed && player.hasPermission(Permissions.CAN_BYPASS)) {
             allowed = true;
-            String ownerName = protection.getOwnerDisplayName();
-            plugin.getTranslator().sendMessage(player, Translation.PROTECTION_BYPASSED, ownerName);
+            if (!clickedSign) {
+                // Only show message about bypass when not clicking a sign
+                String ownerName = protection.getOwnerDisplayName();
+                plugin.getTranslator().sendMessage(player, Translation.PROTECTION_BYPASSED, ownerName);
+            }
         }
 
         return allowed;
@@ -113,7 +116,7 @@ public final class InteractListener extends EventListener {
 
         // Select signs
         if (clickedSign) {
-            if (protection.isOwner(playerProfile)) {
+            if (protection.isOwner(playerProfile) || player.hasPermission(Permissions.CAN_BYPASS)) {
                 Sign sign = (Sign) clickedBlock.getState();
                 plugin.getSignSelector().setSelectedSign(player, sign);
                 plugin.getTranslator().sendMessage(player, Translation.PROTECTION_SELECTED_SIGN);

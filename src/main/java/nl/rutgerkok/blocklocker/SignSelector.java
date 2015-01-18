@@ -22,9 +22,10 @@ public interface SignSelector {
     Optional<Sign> getSelectedSign(Player player);
 
     /**
-     * Sets the sign that the player has selected. The player must have
-     * permission to edit this sign; in other words: the player must be the
-     * owner of the protection the sign belongs to.
+     * Sets the sign that the player has selected. This will grant the right to
+     * use a command as many times as the player wants to edit this specific
+     * sign. In other words: check if the player is actually allowed to edit
+     * this sign before calling this method.
      *
      * @param player
      *            The player.
