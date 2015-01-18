@@ -13,6 +13,7 @@ import nl.rutgerkok.blocklocker.SearchMode;
 import nl.rutgerkok.blocklocker.SignType;
 import nl.rutgerkok.blocklocker.Translator.Translation;
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;
+import nl.rutgerkok.blocklocker.profile.Profile;
 import nl.rutgerkok.blocklocker.protection.DoorProtection;
 import nl.rutgerkok.blocklocker.protection.Protection;
 
@@ -113,14 +114,21 @@ public final class InteractListener extends EventListener {
         Block clickedBlock = event.getClickedBlock();
         Player player = event.getPlayer();
         PlayerProfile playerProfile = plugin.getProfileFactory().fromPlayer(player);
+        boolean isOwner = protection.isOwner(playerProfile);
 
         // Select signs
         if (clickedSign) {
-            if (protection.isOwner(playerProfile) || player.hasPermission(Permissions.CAN_BYPASS)) {
+            if (isOwner || player.hasPermission(Permissions.CAN_BYPASS)) {
                 Sign sign = (Sign) clickedBlock.getState();
                 plugin.getSignSelector().setSelectedSign(player, sign);
                 plugin.getTranslator().sendMessage(player, Translation.PROTECTION_SELECTED_SIGN);
             }
+            return;
+        }
+
+        // Add [More Users] sign
+        if (isOwner && tryPlaceSign(player, clickedBlock, event.getBlockFace(), SignType.MORE_USERS)) {
+            event.setCancelled(true);
             return;
         }
 
@@ -203,7 +211,7 @@ public final class InteractListener extends EventListener {
         Optional<Protection> protection = plugin.getProtectionFinder().findProtection(block, SearchMode.NO_SUPPORTING_BLOCKS);
 
         if (!protection.isPresent()) {
-            if (tryPlaceSign(event.getPlayer(), block, event.getBlockFace())) {
+            if (tryPlaceSign(event.getPlayer(), block, event.getBlockFace(), SignType.PRIVATE)) {
                 plugin.getTranslator().sendMessage(player, Translation.PROTECTION_CLAIMED_CONTAINER);
                 event.setCancelled(true);
             }
@@ -266,7 +274,7 @@ public final class InteractListener extends EventListener {
         block.setTypeIdAndData(materialData.getItemTypeId(), materialData.getData(), false);
     }
 
-    private boolean tryPlaceSign(Player player, Block block, BlockFace clickedSide) {
+    private boolean tryPlaceSign(Player player, Block block, BlockFace clickedSide, SignType signType) {
         if (player.isSneaking()) {
             return false;
         }
@@ -295,8 +303,10 @@ public final class InteractListener extends EventListener {
         Sign sign = (Sign) signBlock.getState();
 
         // Place text on it
-        PlayerProfile profile = plugin.getProfileFactory().fromPlayer(player);
-        ProtectionSign protectionSign = plugin.getProtectionFinder().newProtectionSign(sign, SignType.PRIVATE, profile);
+        Profile profile = signType.isMainSign() ?
+                plugin.getProfileFactory().fromPlayer(player) :
+                plugin.getProfileFactory().fromEveryone();
+        ProtectionSign protectionSign = plugin.getProtectionFinder().newProtectionSign(sign, signType, profile);
         plugin.getSignParser().saveSign(protectionSign);
 
         // Remove the sign from the player's hand

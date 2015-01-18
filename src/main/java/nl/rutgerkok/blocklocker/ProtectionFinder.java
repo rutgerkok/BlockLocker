@@ -1,6 +1,6 @@
 package nl.rutgerkok.blocklocker;
 
-import nl.rutgerkok.blocklocker.profile.PlayerProfile;
+import nl.rutgerkok.blocklocker.profile.Profile;
 import nl.rutgerkok.blocklocker.protection.Protection;
 
 import org.bukkit.block.Block;
@@ -59,11 +59,11 @@ public interface ProtectionFinder {
      *            The sign.
      * @param signType
      *            Type to set the sign to.
-     * @param owner
-     *            Owner for the sign.
+     * @param onFirstLine
+     *            Person to place on the first line.
      * @return The new protection sign.
      */
-    ProtectionSign newProtectionSign(Sign sign, SignType signType, PlayerProfile owner);
+    ProtectionSign newProtectionSign(Sign sign, SignType signType, Profile onFirstLine);
 
     /**
      * Gets whether the given sign is near a block that can be protected. In

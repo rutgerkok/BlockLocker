@@ -13,7 +13,6 @@ import nl.rutgerkok.blocklocker.SignType;
 import nl.rutgerkok.blocklocker.impl.protection.ContainerProtectionImpl;
 import nl.rutgerkok.blocklocker.impl.protection.DoorProtectionImpl;
 import nl.rutgerkok.blocklocker.impl.protection.TrapDoorProtectionImpl;
-import nl.rutgerkok.blocklocker.profile.PlayerProfile;
 import nl.rutgerkok.blocklocker.profile.Profile;
 import nl.rutgerkok.blocklocker.protection.Protection;
 
@@ -250,8 +249,8 @@ class ProtectionFinderImpl implements ProtectionFinder {
     }
 
     @Override
-    public ProtectionSign newProtectionSign(Sign sign, SignType signType, PlayerProfile owner) {
-        return new ProtectionSignImpl(sign.getLocation(), signType, Collections.<Profile> singletonList(owner), true);
+    public ProtectionSign newProtectionSign(Sign sign, SignType signType, Profile onFirstLine) {
+        return new ProtectionSignImpl(sign.getLocation(), signType, Collections.singletonList(onFirstLine), true);
     }
 
 }

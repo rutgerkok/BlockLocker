@@ -17,12 +17,12 @@ import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 
 public class ProfileFactoryImpl implements ProfileFactory {
+    private final Profile everyoneProfile;
     private final String everyoneTagString;
+    private final Profile redstoneProfile;
     private final String redstoneTagString;
     private final String timerTagStart;
     private final Translator translator;
-    private final Profile everyoneProfile;
-    private final Profile redstoneProfile;
 
     public ProfileFactoryImpl(Translator translator) {
         Validate.notNull(translator);
@@ -69,12 +69,9 @@ public class ProfileFactoryImpl implements ProfileFactory {
         return new PlayerProfileImpl(text, Optional.<UUID> absent());
     }
 
-    private int readDigit(char digit) {
-        try {
-            return Integer.parseInt(String.valueOf(digit));
-        } catch (NumberFormatException e) {
-            return -1;
-        }
+    @Override
+    public Profile fromEveryone() {
+        return this.everyoneProfile;
     }
 
     @Override
@@ -89,6 +86,11 @@ public class ProfileFactoryImpl implements ProfileFactory {
         Validate.notNull(player);
         Optional<UUID> uuid = Optional.of(player.getUniqueId());
         return new PlayerProfileImpl(player.getName(), uuid);
+    }
+
+    @Override
+    public Profile fromRedstone() {
+        return this.redstoneProfile;
     }
 
     /**
@@ -136,14 +138,6 @@ public class ProfileFactoryImpl implements ProfileFactory {
         return Optional.absent();
     }
 
-    private <T> Optional<T> getValue(JSONObject object, String key, Class<T> type) {
-        Object value = object.get(key);
-        if (type.isInstance(value)) {
-            return Optional.of(type.cast(value));
-        }
-        return Optional.absent();
-    }
-
     private Optional<UUID> getUniqueId(JSONObject object, String key) {
         Object uuidObject = object.get(key);
         if (!(uuidObject instanceof String)) {
@@ -157,9 +151,20 @@ public class ProfileFactoryImpl implements ProfileFactory {
         }
     }
 
-    @Override
-    public Profile fromRedstone() {
-        return this.redstoneProfile;
+    private <T> Optional<T> getValue(JSONObject object, String key, Class<T> type) {
+        Object value = object.get(key);
+        if (type.isInstance(value)) {
+            return Optional.of(type.cast(value));
+        }
+        return Optional.absent();
+    }
+
+    private int readDigit(char digit) {
+        try {
+            return Integer.parseInt(String.valueOf(digit));
+        } catch (NumberFormatException e) {
+            return -1;
+        }
     }
 
 }

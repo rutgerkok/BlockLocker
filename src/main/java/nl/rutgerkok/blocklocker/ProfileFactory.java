@@ -12,6 +12,14 @@ import com.google.common.base.Optional;
 public interface ProfileFactory {
 
     /**
+     * Gets the profile represented by [Everyone] on a sign. Allows everyone
+     * else to access the sign.
+     * 
+     * @return The profile.
+     */
+    Profile fromEveryone();
+
+    /**
      * Creates a new profile from the given name and id.
      *
      * @param name
