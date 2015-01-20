@@ -5,6 +5,7 @@ import java.util.UUID;
 import nl.rutgerkok.blocklocker.ProfileFactory;
 import nl.rutgerkok.blocklocker.Translator;
 import nl.rutgerkok.blocklocker.Translator.Translation;
+import nl.rutgerkok.blocklocker.group.GroupSystem;
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;
 import nl.rutgerkok.blocklocker.profile.Profile;
 
@@ -16,17 +17,19 @@ import org.json.simple.JSONObject;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 
-public class ProfileFactoryImpl implements ProfileFactory {
+public final class ProfileFactoryImpl implements ProfileFactory {
     private final Profile everyoneProfile;
     private final String everyoneTagString;
+    private final GroupSystem groupSystem;
     private final Profile redstoneProfile;
     private final String redstoneTagString;
     private final String timerTagStart;
     private final Translator translator;
 
-    public ProfileFactoryImpl(Translator translator) {
-        Validate.notNull(translator);
-        this.translator = translator;
+    public ProfileFactoryImpl(GroupSystem groupSystem, Translator translator) {
+        this.groupSystem = Preconditions.checkNotNull(groupSystem);
+        this.translator = Preconditions.checkNotNull(translator);
+
         this.everyoneTagString = "[" + translator.getWithoutColor(Translation.TAG_EVERYONE) + "]";
         this.redstoneTagString = "[" + translator.getWithoutColor(Translation.TAG_REDSTONE) + "]";
         this.timerTagStart = "[" + translator.getWithoutColor(Translation.TAG_TIMER) + ":";
@@ -63,7 +66,7 @@ public class ProfileFactoryImpl implements ProfileFactory {
 
         // [GroupName]
         if (text.startsWith("[") && text.endsWith("]") && text.length() >= 3) {
-            return new GroupProfileImpl(text.substring(1, text.length() - 1));
+            return new GroupProfileImpl(groupSystem, text.substring(1, text.length() - 1));
         }
 
         return new PlayerProfileImpl(text, Optional.<UUID> absent());
@@ -131,7 +134,7 @@ public class ProfileFactoryImpl implements ProfileFactory {
         // Groups
         Optional<String> groupName = getValue(json, GroupProfileImpl.GROUP_KEY, String.class);
         if (groupName.isPresent()) {
-            Profile profile = new GroupProfileImpl(groupName.get());
+            Profile profile = new GroupProfileImpl(groupSystem, groupName.get());
             return Optional.of(profile);
         }
 

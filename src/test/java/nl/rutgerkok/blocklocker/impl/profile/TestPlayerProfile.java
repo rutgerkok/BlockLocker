@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import nl.rutgerkok.blocklocker.ProfileFactory;
 import nl.rutgerkok.blocklocker.Translator.Translation;
+import nl.rutgerkok.blocklocker.group.CombinedGroupSystem;
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;
 import nl.rutgerkok.blocklocker.profile.Profile;
 
@@ -22,7 +23,7 @@ import com.google.common.base.Optional;
 public class TestPlayerProfile {
 
     private ProfileFactoryImpl getProfileFactory() {
-        return new ProfileFactoryImpl(new NullTranslator());
+        return new ProfileFactoryImpl(new CombinedGroupSystem(), new NullTranslator());
     }
 
     @Test

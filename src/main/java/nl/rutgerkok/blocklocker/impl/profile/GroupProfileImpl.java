@@ -2,19 +2,17 @@ package nl.rutgerkok.blocklocker.impl.profile;
 
 import java.util.UUID;
 
-import nl.rutgerkok.blocklocker.Permissions;
+import nl.rutgerkok.blocklocker.group.GroupSystem;
 import nl.rutgerkok.blocklocker.profile.GroupProfile;
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;
 import nl.rutgerkok.blocklocker.profile.Profile;
 
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
 import org.json.simple.JSONObject;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 
 /**
  * Implementation of {@link GroupProfile}. Players are considered part of a
@@ -26,9 +24,11 @@ class GroupProfileImpl implements GroupProfile {
 
     static final String GROUP_KEY = "g";
     private final String groupName;
+    private final GroupSystem groupSystem;
 
-    GroupProfileImpl(String groupName) {
-        this.groupName = groupName;
+    GroupProfileImpl(GroupSystem groupSystem, String groupName) {
+        this.groupSystem = Preconditions.checkNotNull(groupSystem);
+        this.groupName = Preconditions.checkNotNull(groupName);
     }
 
     /**
@@ -82,21 +82,12 @@ class GroupProfileImpl implements GroupProfile {
             return false;
         }
 
-        // Check for relevant permission node
-        Player onlinePlayer = Bukkit.getPlayer(uuid.get());
-        if (onlinePlayer != null && onlinePlayer.hasPermission(Permissions.getGroupNode(groupName))) {
-            return true;
-        }
-
-        // Check for team
-        OfflinePlayer player = (onlinePlayer == null) ? Bukkit.getOfflinePlayer(uuid.get()) : onlinePlayer;
-        Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-        Team playerTeam = scoreboard.getPlayerTeam(player);
-        if (playerTeam == null) {
+        Player player = Bukkit.getPlayer(uuid.get());
+        if (player == null) {
             return false;
         }
 
-        return playerTeam.getName().equalsIgnoreCase(this.groupName);
+        return groupSystem.isInGroup(player, groupName);
     }
 
     @Override

@@ -2,6 +2,9 @@ package nl.rutgerkok.blocklocker;
 
 import java.util.logging.Logger;
 
+import nl.rutgerkok.blocklocker.group.CombinedGroupSystem;
+import nl.rutgerkok.blocklocker.group.GroupSystem;
+
 /**
  * Main entry point of the plugin.
  *
@@ -17,6 +20,15 @@ public interface BlockLockerPlugin {
      * @return The settings object.
      */
     ChestSettings getChestSettings();
+
+    /**
+     * Gets the combined group system of the plugin, which can be used to add
+     * other group systems.
+     *
+     * @return The combined group system.
+     * @see CombinedGroupSystem#addSystem(GroupSystem)
+     */
+    CombinedGroupSystem getGroupSystems();
 
     /**
      * Gets the logger of the plugin.
@@ -38,6 +50,14 @@ public interface BlockLockerPlugin {
      * @return The protection finder.
      */
     ProtectionFinder getProtectionFinder();
+
+    /**
+     * Gets the protection updater, used to mark protections as needing an
+     * update, for example for fixing missing UUIDs.
+     * 
+     * @return The protection updater.
+     */
+    ProtectionUpdater getProtectionUpdater();
 
     /**
      * Gets the {@link SignParser} object.
@@ -83,6 +103,4 @@ public interface BlockLockerPlugin {
      *            In how many ticks the method needs to run.
      */
     void runLater(Runnable runnable, int ticks);
-
-    ProtectionUpdater getProtectionUpdater();
 }

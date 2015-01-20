@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Collection;
 import java.util.logging.Level;
 
 import nl.rutgerkok.blocklocker.BlockLockerPlugin;
@@ -15,12 +16,16 @@ import nl.rutgerkok.blocklocker.ProtectionUpdater;
 import nl.rutgerkok.blocklocker.SignParser;
 import nl.rutgerkok.blocklocker.SignSelector;
 import nl.rutgerkok.blocklocker.Translator;
+import nl.rutgerkok.blocklocker.group.CombinedGroupSystem;
+import nl.rutgerkok.blocklocker.group.GroupSystem;
 import nl.rutgerkok.blocklocker.impl.converter.ProtectionUpdaterImpl;
 import nl.rutgerkok.blocklocker.impl.event.BlockDestroyListener;
 import nl.rutgerkok.blocklocker.impl.event.BlockLockerCommand;
 import nl.rutgerkok.blocklocker.impl.event.BlockPlaceListener;
 import nl.rutgerkok.blocklocker.impl.event.InteractListener;
 import nl.rutgerkok.blocklocker.impl.event.SignChangeListener;
+import nl.rutgerkok.blocklocker.impl.group.PermissionsGroupSystem;
+import nl.rutgerkok.blocklocker.impl.group.ScoreboardGroupSystem;
 import nl.rutgerkok.blocklocker.impl.nms.NMSAccessor;
 import nl.rutgerkok.blocklocker.impl.profile.ProfileFactoryImpl;
 
@@ -31,17 +36,30 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Preconditions;
 
 public class BlockLockerPluginImpl extends JavaPlugin implements
         BlockLockerPlugin {
+    private ChestSettings chestSettings;
+    private CombinedGroupSystem combinedGroupSystem;
+    private NMSAccessor nms;
     private ProfileFactoryImpl profileFactory;
     private ProtectionFinderImpl protectionFinder;
     private ProtectionUpdater protectionUpdater;
-    private Translator translator;
-    private ChestSettings chestSettings;
     private SignParser signParser;
     private SignSelector signSelector;
-    private NMSAccessor nms;
+    private Translator translator;
+
+    @Override
+    public ChestSettings getChestSettings() {
+        return chestSettings;
+    }
+
+    @Override
+    public CombinedGroupSystem getGroupSystems() {
+        Preconditions.checkState(combinedGroupSystem != null);
+        return combinedGroupSystem;
+    }
 
     /**
      * Gets a configuration file from the jar file. Unlike
@@ -79,8 +97,46 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
     }
 
     @Override
+    public ProtectionUpdater getProtectionUpdater() {
+        return protectionUpdater;
+    }
+
+    @Override
+    public SignParser getSignParser() {
+        return signParser;
+    }
+
+    @Override
+    public SignSelector getSignSelector() {
+        return signSelector;
+    }
+
+    @Override
     public Translator getTranslator() {
         return translator;
+    }
+
+    private void loadServices() {
+        // Configuration
+        saveDefaultConfig();
+        Config config = new Config(getLogger(), getConfig());
+
+        // Group systems
+        this.combinedGroupSystem = new CombinedGroupSystem();
+        this.combinedGroupSystem.addSystem(new PermissionsGroupSystem());
+        this.combinedGroupSystem.addSystem(new ScoreboardGroupSystem());
+
+        // Translation
+        translator = loadTranslations(config.getLanguageFileName());
+
+        // Parsers and finders
+        profileFactory = new ProfileFactoryImpl(combinedGroupSystem, translator);
+        chestSettings = new ChestSettingsImpl(translator, config);
+        signParser = new SignParserImpl(chestSettings, nms, profileFactory);
+        BlockFinder blockFinder = new BlockFinder(signParser);
+        protectionFinder = new ProtectionFinderImpl(blockFinder, chestSettings);
+        protectionUpdater = new ProtectionUpdaterImpl(this);
+        signSelector = new SignSelectorImpl(this);
     }
 
     private Translator loadTranslations(String fileName) {
@@ -117,24 +173,6 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
         registerEvents();
     }
 
-    private void loadServices() {
-        // Configuration
-        saveDefaultConfig();
-        Config config = new Config(getLogger(), getConfig());
-
-        // Translation
-        translator = loadTranslations(config.getLanguageFileName());
-
-        // Parsers and finders
-        profileFactory = new ProfileFactoryImpl(translator);
-        chestSettings = new ChestSettingsImpl(translator, config);
-        signParser = new SignParserImpl(chestSettings, nms, profileFactory);
-        BlockFinder blockFinder = new BlockFinder(signParser);
-        protectionFinder = new ProtectionFinderImpl(blockFinder, chestSettings);
-        protectionUpdater = new ProtectionUpdaterImpl(this);
-        signSelector = new SignSelectorImpl(this);
-    }
-
     /**
      * Registers all events of this plugin.
      */
@@ -148,13 +186,14 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
     }
 
     @Override
-    public ChestSettings getChestSettings() {
-        return chestSettings;
-    }
+    public void reload() {
+        Collection<GroupSystem> reloadSurvivors = this.combinedGroupSystem.getReloadSurvivors();
 
-    @Override
-    public SignParser getSignParser() {
-        return signParser;
+        reloadConfig();
+        loadServices();
+
+        // Add back group systems from before the reload
+        this.combinedGroupSystem.addSystems(reloadSurvivors);
     }
 
     @Override
@@ -163,24 +202,8 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
     }
 
     @Override
-    public SignSelector getSignSelector() {
-        return signSelector;
-    }
-
-    @Override
-    public void reload() {
-        reloadConfig();
-        loadServices();
-    }
-
-    @Override
     public void runLater(Runnable runnable, int ticks) {
         getServer().getScheduler().runTaskLater(this, runnable, ticks);
-    }
-
-    @Override
-    public ProtectionUpdater getProtectionUpdater() {
-        return protectionUpdater;
     }
 
 }
