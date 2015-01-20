@@ -114,7 +114,7 @@ public final class BlockLockerCommand implements TabExecutor {
         }
 
         // Check line number in combination with sign type
-        if (signType.get().isMainSign() && lineNumber == 2) {
+        if (signType.get().isMainSign() && lineNumber == 2 && !player.hasPermission(Permissions.CAN_BYPASS)) {
             plugin.getTranslator().sendMessage(player, Translation.COMMAND_CANNOT_EDIT_OWNER);
             return true;
         }
