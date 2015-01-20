@@ -39,6 +39,18 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>com.massivecraft</groupId>
+			<artifactId>MassiveCore</artifactId>
+			<version>2.7.5</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.massivecraft</groupId>
+			<artifactId>Factions</artifactId>
+			<version>2.7.5</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.11</version>

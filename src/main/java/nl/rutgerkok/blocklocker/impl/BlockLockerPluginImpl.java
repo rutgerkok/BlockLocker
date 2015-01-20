@@ -24,6 +24,7 @@ import nl.rutgerkok.blocklocker.impl.event.BlockLockerCommand;
 import nl.rutgerkok.blocklocker.impl.event.BlockPlaceListener;
 import nl.rutgerkok.blocklocker.impl.event.InteractListener;
 import nl.rutgerkok.blocklocker.impl.event.SignChangeListener;
+import nl.rutgerkok.blocklocker.impl.group.FactionsGroupSystem;
 import nl.rutgerkok.blocklocker.impl.group.PermissionsGroupSystem;
 import nl.rutgerkok.blocklocker.impl.group.ScoreboardGroupSystem;
 import nl.rutgerkok.blocklocker.impl.nms.NMSAccessor;
@@ -116,15 +117,23 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
         return translator;
     }
 
+    private void loadGroupSystems() {
+        this.combinedGroupSystem = new CombinedGroupSystem();
+        this.combinedGroupSystem.addSystem(new PermissionsGroupSystem());
+        this.combinedGroupSystem.addSystem(new ScoreboardGroupSystem());
+
+        if (FactionsGroupSystem.isAvailable()) {
+            this.combinedGroupSystem.addSystem(new FactionsGroupSystem());
+        }
+    }
+
     private void loadServices() {
         // Configuration
         saveDefaultConfig();
         Config config = new Config(getLogger(), getConfig());
 
         // Group systems
-        this.combinedGroupSystem = new CombinedGroupSystem();
-        this.combinedGroupSystem.addSystem(new PermissionsGroupSystem());
-        this.combinedGroupSystem.addSystem(new ScoreboardGroupSystem());
+        loadGroupSystems();
 
         // Translation
         translator = loadTranslations(config.getLanguageFileName());
