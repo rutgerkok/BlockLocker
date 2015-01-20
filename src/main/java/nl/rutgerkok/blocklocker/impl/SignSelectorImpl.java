@@ -29,6 +29,9 @@ import com.google.common.base.Optional;
  */
 final class SignSelectorImpl implements SignSelector {
 
+    private static final int EXPIRATION_MINUTES = 4;
+
+    private static final String SIGN_TIME = SignSelectorImpl.class + ".signTime";
     private static final String SIGN_VECTOR = SignSelectorImpl.class + ".signBlock";
     private static final String SIGN_WORLD = SignSelectorImpl.class + ".signWorld";
 
@@ -41,22 +44,29 @@ final class SignSelectorImpl implements SignSelector {
     private void clearValues(Player player) {
         player.removeMetadata(SIGN_VECTOR, plugin);
         player.removeMetadata(SIGN_WORLD, plugin);
+        player.removeMetadata(SIGN_TIME, plugin);
     }
 
     @Override
     public Optional<Sign> getSelectedSign(Player player) {
         List<MetadataValue> signVector = player.getMetadata(SIGN_VECTOR);
         List<MetadataValue> signWorld = player.getMetadata(SIGN_WORLD);
+        List<MetadataValue> signTime = player.getMetadata(SIGN_TIME);
 
-        if (signVector.isEmpty() || signWorld.isEmpty()) {
+        if (signVector.isEmpty() || signWorld.isEmpty() || signTime.isEmpty()) {
             return Optional.absent();
         }
-
-        clearValues(player);
 
         BlockVector vector = (BlockVector) signVector.get(0).value();
         World world = Bukkit.getWorld(signWorld.get(0).asString());
         if (world == null) {
+            return Optional.absent();
+        }
+
+        // Check for expiration
+        long createdMillis = signTime.get(0).asLong();
+        if (isExpired(createdMillis)) {
+            clearValues(player);
             return Optional.absent();
         }
 
@@ -70,12 +80,21 @@ final class SignSelectorImpl implements SignSelector {
         return Optional.absent();
     }
 
+    private boolean isExpired(long time) {
+        long now = System.currentTimeMillis();
+        if ((now - time) > (1000 * 60 * EXPIRATION_MINUTES)) {
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public void setSelectedSign(Player player, Sign sign) {
         BlockVector blockVector = new BlockVector(sign.getX(), sign.getY(), sign.getZ());
 
         player.setMetadata(SIGN_VECTOR, new FixedMetadataValue(plugin, blockVector));
         player.setMetadata(SIGN_WORLD, new FixedMetadataValue(plugin, sign.getWorld().getName()));
+        player.setMetadata(SIGN_TIME, new FixedMetadataValue(plugin, System.currentTimeMillis()));
     }
 
 }
