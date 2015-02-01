@@ -4,6 +4,7 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
+import nl.rutgerkok.blocklocker.BlockData;
 import nl.rutgerkok.blocklocker.BlockLockerPlugin;
 import nl.rutgerkok.blocklocker.Permissions;
 import nl.rutgerkok.blocklocker.ProtectionSign;
@@ -17,6 +18,7 @@ import nl.rutgerkok.blocklocker.profile.Profile;
 import nl.rutgerkok.blocklocker.protection.DoorProtection;
 import nl.rutgerkok.blocklocker.protection.Protection;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -27,6 +29,7 @@ import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
@@ -44,6 +47,21 @@ public final class InteractListener extends EventListener {
 
     public InteractListener(BlockLockerPlugin plugin) {
         super(plugin);
+    }
+
+    private boolean allowedByBlockPlaceEvent(Block placedBlock, BlockState replacedBlockState, Block placedAgainst, Player player) {
+        Material originalMaterial = placedBlock.getType();
+
+        BlockPlaceEvent placeEvent = new BlockPlaceEvent(placedBlock, replacedBlockState, placedAgainst, player.getItemInHand(), player, true);
+        Bukkit.getPluginManager().callEvent(placeEvent);
+
+        Material placedMaterial = placeEvent.getBlockPlaced().getType();
+        if (placeEvent.isCancelled() || !placedMaterial.equals(originalMaterial)) {
+            // We consider the event cancelled too when the placed block was
+            // changed
+            return false;
+        }
+        return true;
     }
 
     private boolean checkAllowed(Player player, Protection protection, boolean clickedSign) {
@@ -269,11 +287,6 @@ public final class InteractListener extends EventListener {
         }, openSeconds * 20);
     }
 
-    @SuppressWarnings("deprecation")
-    private void setBlockMaterialData(Block block, MaterialData materialData) {
-        block.setTypeIdAndData(materialData.getItemTypeId(), materialData.getData(), false);
-    }
-
     private boolean tryPlaceSign(Player player, Block block, BlockFace clickedSide, SignType signType) {
         if (player.isSneaking()) {
             return false;
@@ -296,10 +309,17 @@ public final class InteractListener extends EventListener {
             return false;
         }
 
-        // Create empty sign
+        // Create sign and fire event for the sign to be placed
+        BlockState oldState = signBlock.getState();
+        BlockData.set(signBlock, getSignMaterial(clickedSide, player));
+        if (!allowedByBlockPlaceEvent(signBlock, oldState, block, player)) {
+            // Revert to old state
+            oldState.update(true);
+            return false;
+        }
 
-        // Set base material so that .getState() will be of the correct type
-        setBlockMaterialData(signBlock, getSignMaterial(clickedSide, player));
+        // Get state again now that block has been changed, so that it can
+        // be casted to Sign
         Sign sign = (Sign) signBlock.getState();
 
         // Place text on it
