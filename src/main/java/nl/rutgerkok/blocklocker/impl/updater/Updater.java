@@ -86,7 +86,7 @@ public final class Updater {
     private void updateSync() {
         try {
             UpdateChecker checker = new UpdateChecker();
-            UpdateCheckResult result = checker.checkForUpdatesSync(plugin.getDescription().getVersion());
+            UpdateCheckResult result = checker.checkForUpdatesSync(plugin);
             if (result.needsUpdate()) {
                 updateInstallSync(result);
             } else {
@@ -115,7 +115,7 @@ public final class Updater {
             Optional<String> minecraftVersion = getMinecraftVersion();
             if (result.getMinecraftVersions().containsAll(minecraftVersion.asSet())) {
                 // Update automatically
-                UpdateDownloader downloader = new UpdateDownloader(result, installDestination);
+                UpdateDownloader downloader = new UpdateDownloader(plugin, result, installDestination);
                 downloader.downloadSync();
                 notifyServer(new UpdateResult(Status.AUTOMATICALLY_UPDATED, result));
             } else {

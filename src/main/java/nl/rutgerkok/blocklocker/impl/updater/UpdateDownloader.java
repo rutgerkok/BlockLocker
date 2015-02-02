@@ -6,7 +6,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.Set;
+
+import org.bukkit.plugin.Plugin;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
@@ -22,15 +25,17 @@ final class UpdateDownloader {
 
     private static final Set<String> ALLOWED_HOSTS = ImmutableSet.of("www.spigotmc.org", "spigotmc.org");
 
+    private final Plugin plugin;
     private final URL url;
     private final File downloadTo;
 
-    UpdateDownloader(UpdateCheckResult result, File downloadTo) {
+    UpdateDownloader(Plugin plugin, UpdateCheckResult result, File downloadTo) {
         Optional<URL> url = result.getDownloadUrl();
         Preconditions.checkArgument(url.isPresent(), "No file present in " + result);
         String host = url.get().getHost();
         Preconditions.checkArgument(ALLOWED_HOSTS.contains(host), "Can only download from " + ALLOWED_HOSTS + ", " + host + " is not allowed");
 
+        this.plugin = Preconditions.checkNotNull(plugin);
         this.url = url.get();
         this.downloadTo = Preconditions.checkNotNull(downloadTo);
     }
@@ -49,7 +54,9 @@ final class UpdateDownloader {
         OutputStream outputStream = null;
         boolean threw = true;
         try {
-            inputStream = url.openStream();
+            URLConnection connection = url.openConnection();
+            UserAgent.setFor(plugin, connection);
+            inputStream = connection.getInputStream();
             outputStream = new FileOutputStream(downloadTo);
             ByteStreams.copy(inputStream, outputStream);
             threw = false;

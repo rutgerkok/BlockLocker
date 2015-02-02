@@ -8,6 +8,7 @@ import java.net.URLEncoder;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.BOMInputStream;
+import org.bukkit.plugin.Plugin;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -27,16 +28,20 @@ final class UpdateChecker {
 
     /**
      * Checks online for updates. Blocking method.
-     * @param currentVersion
+     * 
+     * @param plugin
+     *            Plugin to check for.
      * @return The update result.
-     * @throws IOException If an IO error occurs.
+     * @throws IOException
+     *             If an IO error occurs.
      */
-    public UpdateCheckResult checkForUpdatesSync(String currentVersion) throws IOException {
-        String currentVersionEncoded = URLEncoder.encode(currentVersion, "UTF-8");
+    public UpdateCheckResult checkForUpdatesSync(Plugin plugin) throws IOException {
+        String currentVersionEncoded = URLEncoder.encode(plugin.getDescription().getVersion(), "UTF-8");
         URL url = new URL(UPDATE_URL + "?version=" + currentVersionEncoded);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         connection.setRequestProperty("Content-Type", "application/json");
+        UserAgent.setFor(plugin, connection);
 
         InputStream stream = null;
         String response = "";
