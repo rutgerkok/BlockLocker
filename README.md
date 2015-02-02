@@ -12,17 +12,17 @@ Current features:
 * UUIDs are saved to hidden hover text data on the sign, never visible for users.
 * Automatically looks up UUIDs for signs from Lockette and Deadbolt when they are read.
 * All messages can be translated.
-* Group support: adding `[MyGroup]` to the sign will allow anyone with the permission node `blocklocker.group.mygroup` (grant the lowercase node) and anyone in a scoreboard team called `MyGroup` (case insensitive).
+* Group support: adding `[MyGroup]` to the sign will allow anyone with the permission node `blocklocker.group.mygroup` (grant the lowercase node) and anyone in a scoreboard team or in a faction of MassiveCraft Factions called `MyGroup` (case insensitive).
 * Double door support: protecting one half protects the other half, opening one half opens the other half.
 * The owner of a protection can change the signs after creating them using the `/blocklocker <line number> <name>` command.
 * Only the owner of a protection can destroy a protection.
 * Signs placed against a container are automatically filled with `[Private]` and the name of the player.
 * Admins can still open protected doors and containers.
 * Automatically closing doors.
+* Auto-updater, so that patches for exploits can be rolled out automatically.
 
 Planned:
 
-* Auto-updater, so that patches for exploits can be rolled out automatically.
 * Replace NMS access with refection or, if available at that time, an API method. (NMS is needed at the moment to get the TextComponent on the sign.)
 * Integration with other plugins for group support.
 
