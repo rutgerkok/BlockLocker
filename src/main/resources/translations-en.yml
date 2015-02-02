@@ -28,7 +28,6 @@ tag:
   redstone: "Redstone"
   private: "&9[Private]"
   more_users: "&9[More Users]"
-  player_not_found: "~~Not found~~"
 updater:
   more_information: "&6More information: {0}"
   unsupported_server: "&4The latest version of ${project.name} (version {0}) no longer supports this Minecraft version, only Minecraft {1}."
