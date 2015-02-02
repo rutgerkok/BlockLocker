@@ -135,7 +135,6 @@ public final class Updater {
      * Blocking update method, must <b>not</b> be called from the server thread.
      */
     private void updateSync() {
-        System.out.println("Checking for updates");
         try {
             UpdateChecker checker = new UpdateChecker();
             UpdateCheckResult result = checker.checkForUpdatesSync(plugin);
