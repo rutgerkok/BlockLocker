@@ -184,7 +184,7 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
         registerEvents();
 
         // Updater
-        new Updater(config.getUpdatePreference(), translator, this).tryUpdateAsync();
+        new Updater(config.getUpdatePreference(), translator, this).startUpdater();
     }
 
     /**

@@ -11,6 +11,7 @@ import nl.rutgerkok.blocklocker.impl.updater.UpdateResult.Status;
 
 import org.bukkit.craftbukkit.libs.jline.internal.Preconditions;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.google.common.base.Optional;
 
@@ -20,9 +21,24 @@ import com.google.common.base.Optional;
  */
 public final class Updater {
 
+    /**
+     * Every twelve hours.
+     */
+    private static final long CHECK_INTERVAL = 20 * 60 * 60 * 12;
+
     private final File installDestination;
-    private final UpdatePreference preference;
     private final Plugin plugin;
+    private volatile UpdatePreference preference;
+    private final BukkitRunnable task = new BukkitRunnable() {
+        @Override
+        public void run() {
+            if (preference.checkForUpdates()) {
+                updateSync();
+            } else {
+                this.cancel();
+            }
+        }
+    };
     private final Translator translator;
 
     public Updater(UpdatePreference preference, Translator translator, Plugin plugin) {
@@ -32,19 +48,15 @@ public final class Updater {
         this.installDestination = new File(plugin.getServer().getUpdateFolderFile(), plugin.getName() + ".jar");
     }
 
-    /**
-     * Starts the update process. Does nothing if updates have been disabled.
-     */
-    public void tryUpdateAsync() {
-        if (!preference.checkForUpdates()) {
-            return;
+    private Optional<String> getMinecraftVersion() {
+        String serverVersion = plugin.getServer().getVersion();
+        String regex = "MC\\: *([A-Za-z0-9\\._\\-]+)";
+        Matcher matcher = Pattern.compile(regex).matcher(serverVersion);
+        if (matcher.find() && matcher.groupCount() == 1) {
+            return Optional.of(matcher.group(1));
+        } else {
+            return Optional.absent();
         }
-        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, new Runnable() {
-            @Override
-            public void run() {
-                updateSync();
-            }
-        });
     }
 
     /**
@@ -58,6 +70,11 @@ public final class Updater {
         if (!result.hasNotification()) {
             return;
         }
+
+        // Disable further update checks
+        preference = UpdatePreference.DISABLED;
+
+        // Notify admins of existing result
         if (plugin.getServer().isPrimaryThread()) {
             notifyServerFromServerThread(result);
         } else {
@@ -71,6 +88,9 @@ public final class Updater {
     }
 
     private void notifyServerFromServerThread(UpdateResult result) {
+        // Must be called from notifyServer
+        // Result must have a notification
+
         UpdateNotifier notifier = new UpdateNotifier(translator, result);
 
         // Notify players
@@ -81,33 +101,16 @@ public final class Updater {
     }
 
     /**
-     * Blocking update method, must <b>not</b> be called from the server thread.
+     * Starts the update process. Does nothing if updates have been disabled.
+     * 
+     * @throws IllegalStateException
+     *             If this method was called earlier.
      */
-    private void updateSync() {
-        try {
-            UpdateChecker checker = new UpdateChecker();
-            UpdateCheckResult result = checker.checkForUpdatesSync(plugin);
-            if (result.needsUpdate()) {
-                updateInstallSync(result);
-            } else {
-                notifyServer(new UpdateResult(Status.NO_UPDATE, result));
-            }
-        } catch (IOException e) {
-            plugin.getLogger().log(Level.WARNING, "Error during update check"
-                    + " (you can disable automatic updates in the config file)", e);
-            notifyServer(UpdateResult.failed());
+    public void startUpdater() {
+        if (!preference.checkForUpdates()) {
+            return;
         }
-    }
-
-    private Optional<String> getMinecraftVersion() {
-        String serverVersion = plugin.getServer().getVersion();
-        String regex = "MC\\: *([A-Za-z0-9\\._\\-]+)";
-        Matcher matcher = Pattern.compile(regex).matcher(serverVersion);
-        if (matcher.find() && matcher.groupCount() == 1) {
-            return Optional.of(matcher.group(1));
-        } else {
-            return Optional.absent();
-        }
+        task.runTaskTimerAsynchronously(plugin, 1, CHECK_INTERVAL);
     }
 
     private void updateInstallSync(UpdateCheckResult result) throws IOException {
@@ -125,6 +128,26 @@ public final class Updater {
         } else {
             // Don't update automatically, but show notification
             notifyServer(new UpdateResult(Status.MANUAL_UPDATE, result));
+        }
+    }
+
+    /**
+     * Blocking update method, must <b>not</b> be called from the server thread.
+     */
+    private void updateSync() {
+        System.out.println("Checking for updates");
+        try {
+            UpdateChecker checker = new UpdateChecker();
+            UpdateCheckResult result = checker.checkForUpdatesSync(plugin);
+            if (result.needsUpdate()) {
+                updateInstallSync(result);
+            } else {
+                notifyServer(new UpdateResult(Status.NO_UPDATE, result));
+            }
+        } catch (IOException e) {
+            plugin.getLogger().log(Level.WARNING, "Error during update check"
+                    + " (you can disable automatic updates in the config file)", e);
+            notifyServer(UpdateResult.failed());
         }
     }
 
