@@ -28,4 +28,8 @@ tag:
   redstone: "Redstone"
   private: "&9[Private]"
   more_users: "&9[More Users]"
-  player_not_found: "~~Not found~~"
+updater:
+  more_information: "&6More information: {0}"
+  unsupported_server: "&4The latest version of ${project.name} (version {0}) no longer supports this Minecraft version, only Minecraft {1}."
+  update_available: "&6An update for ${project.name} (version {0}) is available for manual download."
+  updated_automatically: "&6${project.name} has just installed an update (version {0}). Restart Spigot to complete the installation."

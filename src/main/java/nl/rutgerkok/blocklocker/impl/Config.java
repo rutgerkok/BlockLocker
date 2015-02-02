@@ -8,9 +8,12 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import nl.rutgerkok.blocklocker.ProtectionType;
+import nl.rutgerkok.blocklocker.impl.updater.UpdatePreference;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
+
+import com.google.common.base.Optional;
 
 final class Config {
     private final static class Key {
@@ -19,7 +22,8 @@ final class Config {
                 PROTECTABLE_CONTAINERS = "protectableContainers",
                 PROTECTABLE_DOORS = "protectableDoors",
                 PROTECTABLE_TRAP_DOORS = "protectableTrapDoors",
-                DEFAULT_DOOR_OPEN_SECONDS = "defaultDoorOpenSeconds";
+                DEFAULT_DOOR_OPEN_SECONDS = "defaultDoorOpenSeconds",
+                UPDATER = "updater";
     }
 
     static final String DEFAULT_TRANSLATIONS_FILE = "translations-en.yml";
@@ -27,12 +31,13 @@ final class Config {
     private final int defaultDoorOpenSeconds;
     private final String languageFile;
     private final Logger logger;
-
     private final Map<ProtectionType, Set<Material>> protectableMaterialsMap;
+
     /**
      * Combination of the sets of all individual protection types.
      */
     private final Set<Material> protectableMaterialsSet;
+    private final UpdatePreference updatePreference;
 
     Config(Logger logger, FileConfiguration config) {
         this.logger = logger;
@@ -40,20 +45,62 @@ final class Config {
         languageFile = config.getString(Key.LANGUAGE_FILE,
                 DEFAULT_TRANSLATIONS_FILE);
         defaultDoorOpenSeconds = config.getInt(Key.DEFAULT_DOOR_OPEN_SECONDS, 0);
+        updatePreference = readUpdatePreference(config.getString(Key.UPDATER));
 
+        // Materials
         protectableMaterialsMap = new EnumMap<ProtectionType, Set<Material>>(ProtectionType.class);
         protectableMaterialsMap.put(ProtectionType.CONTAINER,
-                toMaterialSet(config.getStringList(Key.PROTECTABLE_CONTAINERS)));
+                readMaterialSet(config.getStringList(Key.PROTECTABLE_CONTAINERS)));
         protectableMaterialsMap.put(ProtectionType.DOOR,
-                toMaterialSet(config.getStringList(Key.PROTECTABLE_DOORS)));
+                readMaterialSet(config.getStringList(Key.PROTECTABLE_DOORS)));
         protectableMaterialsMap.put(ProtectionType.TRAP_DOOR,
-                toMaterialSet(config.getStringList(Key.PROTECTABLE_TRAP_DOORS)));
+                readMaterialSet(config.getStringList(Key.PROTECTABLE_TRAP_DOORS)));
 
         // Create combined set
         protectableMaterialsSet = EnumSet.noneOf(Material.class);
         for (Set<Material> protectableByType : protectableMaterialsMap.values()) {
             protectableMaterialsSet.addAll(protectableByType);
         }
+    }
+
+    /**
+     * Gets whether the material can be protected by any type.
+     *
+     * @param material
+     *            Material to check.
+     * @return True if the material can be protected by the given type, false
+     *         otherwise.
+     */
+    boolean canProtect(Material material) {
+        return protectableMaterialsSet.contains(material);
+    }
+
+    /**
+     * Gets the update preference.
+     *
+     * @return The update preference.
+     */
+    UpdatePreference getUpdatePreference() {
+        return updatePreference;
+    }
+
+    /**
+     * Gets whether the material can be protected by the given type.
+     * @param type
+     *            Protection type that must be checked for being able to protect
+     *            this type.
+     * @param material
+     *            Material to check.
+     * 
+     * @return True if the material can be protected by the given type, false
+     *         otherwise.
+     */
+    boolean canProtect(ProtectionType type, Material material) {
+        Set<Material> materials = this.protectableMaterialsMap.get(type);
+        if (materials == null) {
+            return false;
+        }
+        return materials.contains(material);
     }
 
     /**
@@ -77,37 +124,6 @@ final class Config {
     }
 
     /**
-     * Gets whether the material can be protected by the given type.
-     * @param type
-     *            Protection type that must be checked for being able to protect
-     *            this type.
-     * @param material
-     *            Material to check.
-     * 
-     * @return True if the material can be protected by the given type, false
-     *         otherwise.
-     */
-    boolean canProtect(ProtectionType type, Material material) {
-        Set<Material> materials = this.protectableMaterialsMap.get(type);
-        if (materials == null) {
-            return false;
-        }
-        return materials.contains(material);
-    }
-
-    /**
-     * Gets whether the material can be protected by any type.
-     *
-     * @param material
-     *            Material to check.
-     * @return True if the material can be protected by the given type, false
-     *         otherwise.
-     */
-    boolean canProtect(Material material) {
-        return protectableMaterialsSet.contains(material);
-    }
-
-    /**
      * Transforms the string collection into a material set, by parsing each
      * string using {@link Material#matchMaterial(String)}. The resulting set
      * will be mutable. All strings that cannot be parsed are logged and then
@@ -117,7 +133,7 @@ final class Config {
      *            The string collection.
      * @return The material set.
      */
-    private Set<Material> toMaterialSet(Collection<String> strings) {
+    private Set<Material> readMaterialSet(Collection<String> strings) {
         Set<Material> materials = EnumSet.noneOf(Material.class);
         for (String string : strings) {
             Material material = Material.matchMaterial(string);
@@ -128,5 +144,15 @@ final class Config {
             materials.add(material);
         }
         return materials;
+    }
+
+    private UpdatePreference readUpdatePreference(String string) {
+        Optional<UpdatePreference> updatePreference = UpdatePreference.parse(string);
+        if (updatePreference.isPresent()) {
+            return updatePreference.get();
+        } else {
+            logger.warning("Unknown update setting: " + string + ". Disabling automatic updater.");
+            return UpdatePreference.DISABLED;
+        }
     }
 }
