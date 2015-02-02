@@ -35,7 +35,11 @@ public abstract class Translator {
         TAG_MORE_USERS,
         TAG_PRIVATE,
         TAG_REDSTONE,
-        TAG_TIMER;
+        TAG_TIMER,
+        UPDATER_MORE_INFORMATION,
+        UPDATER_UNSUPPORTED_SERVER,
+        UPDATER_UPDATE_AVAILABLE,
+        UPDATER_UPDATED_AUTOMATICALLY;
 
         /**
          * Gets the key used in configuration files.

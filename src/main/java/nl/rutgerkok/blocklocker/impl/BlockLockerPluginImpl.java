@@ -29,6 +29,7 @@ import nl.rutgerkok.blocklocker.impl.group.PermissionsGroupSystem;
 import nl.rutgerkok.blocklocker.impl.group.ScoreboardGroupSystem;
 import nl.rutgerkok.blocklocker.impl.nms.NMSAccessor;
 import nl.rutgerkok.blocklocker.impl.profile.ProfileFactoryImpl;
+import nl.rutgerkok.blocklocker.impl.updater.Updater;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.Configuration;
@@ -43,6 +44,7 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
         BlockLockerPlugin {
     private ChestSettings chestSettings;
     private CombinedGroupSystem combinedGroupSystem;
+    private Config config;
     private NMSAccessor nms;
     private ProfileFactoryImpl profileFactory;
     private ProtectionFinderImpl protectionFinder;
@@ -130,7 +132,7 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
     private void loadServices() {
         // Configuration
         saveDefaultConfig();
-        Config config = new Config(getLogger(), getConfig());
+        config = new Config(getLogger(), getConfig());
 
         // Group systems
         loadGroupSystems();
@@ -180,6 +182,9 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
 
         // Events
         registerEvents();
+
+        // Updater
+        new Updater(config.getUpdatePreference(), translator, this).tryUpdateAsync();
     }
 
     /**

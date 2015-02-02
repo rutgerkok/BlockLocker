@@ -4,6 +4,20 @@
 # The language file used by the plugin. Must be placed next to this file.
 languageFile: translations-en.yml
 
+# The updater. Possible values:
+# AUTO_INSTALL - check for updates, install new files when possible, otherwise
+#                notify the server admins
+# JUST_NOTIFY - check for updates, notify the server admins
+# DISABLED - don't check for updates
+#
+# Before installing an update, the plugin checks that
+# a) the new file is compatible with your Minecraft version
+# b) the file is hosted on spigotmc.org
+# c) it is safe to install this file automatically. When the file is flagged
+#    as needing a manual installation by the author, the file won't be
+#    installed automatically
+updater: AUTO_INSTALL
+
 # All types of containers that can be protected.
 # All material names can be found here:
 # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
