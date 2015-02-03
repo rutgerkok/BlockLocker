@@ -22,7 +22,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.spigotmc.SpigotConfig;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
@@ -325,8 +324,8 @@ final class UUIDHandler {
     private boolean fetchOnlineMode() {
         boolean onlineMode = Bukkit.getServer().getOnlineMode();
         try {
-            onlineMode |= SpigotConfig.bungee;
-        } catch (NoClassDefFoundError e) {
+            onlineMode |= Class.forName("org.spigotmc.SpigotConfig").getField("bungee").getBoolean(null);
+        } catch (ClassNotFoundException e) {
             // No Spigot, ignore
         } catch (Throwable t) {
             // Change in Spigot internals, log and move on

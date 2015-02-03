@@ -2,8 +2,6 @@ package nl.rutgerkok.blocklocker.impl.event;
 
 import java.util.Set;
 
-import javax.annotation.Nullable;
-
 import nl.rutgerkok.blocklocker.BlockData;
 import nl.rutgerkok.blocklocker.BlockLockerPlugin;
 import nl.rutgerkok.blocklocker.Permissions;
@@ -89,8 +87,7 @@ public final class InteractListener extends EventListener {
      *            The inventory.
      * @return The block, or null.
      */
-    @Nullable
-    private Block getInventoryBlock(Inventory inventory) {
+    private Block getInventoryBlockOrNull(Inventory inventory) {
         InventoryHolder holder = inventory.getHolder();
         if (holder instanceof BlockState) {
             return ((BlockState) holder).getBlock();
@@ -194,8 +191,8 @@ public final class InteractListener extends EventListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onInventoryMoveItemEvent(InventoryMoveItemEvent event) {
-        Block from = getInventoryBlock(event.getSource());
-        Block to = getInventoryBlock(event.getDestination());
+        Block from = getInventoryBlockOrNull(event.getSource());
+        Block to = getInventoryBlockOrNull(event.getDestination());
 
         if (from != null) {
             if (isProtectedForRedstone(from)) {

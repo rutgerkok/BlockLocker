@@ -9,11 +9,11 @@ import java.util.regex.Pattern;
 import nl.rutgerkok.blocklocker.Translator;
 import nl.rutgerkok.blocklocker.impl.updater.UpdateResult.Status;
 
-import org.bukkit.craftbukkit.libs.jline.internal.Preconditions;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 
 /**
  * Handles the complete update procedure.

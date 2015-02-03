@@ -3,8 +3,6 @@ package nl.rutgerkok.blocklocker.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 import nl.rutgerkok.blocklocker.ChestSettings;
 import nl.rutgerkok.blocklocker.ProtectionSign;
 import nl.rutgerkok.blocklocker.SignParser;
@@ -45,11 +43,10 @@ class SignParserImpl implements SignParser {
     @Override
     public Optional<SignType> getSignType(Sign sign) {
         String header = sign.getLine(0);
-        return Optional.fromNullable(getSignTypeUnsafe(header));
+        return Optional.fromNullable(getSignTypeOrNull(header));
     }
 
-    @Nullable
-    private SignType getSignTypeUnsafe(String header) {
+    private SignType getSignTypeOrNull(String header) {
         header = ChatColor.stripColor(header).trim();
         for (SignType type : SignType.values()) {
             if (header.equalsIgnoreCase(chestSettings.getSimpleLocalizedHeader(type))) {
@@ -74,7 +71,7 @@ class SignParserImpl implements SignParser {
      * @return
      */
     private Optional<ProtectionSign> parseAdvancedSign(Location location, String header, List<JSONObject> list) {
-        SignType signType = getSignTypeUnsafe(header);
+        SignType signType = getSignTypeOrNull(header);
         if (signType == null) {
             return Optional.absent();
         }
@@ -104,7 +101,7 @@ class SignParserImpl implements SignParser {
      * @return The protection sign, if the header format is correct.
      */
     private Optional<ProtectionSign> parseSimpleSign(Location location, String[] lines) {
-        SignType signType = getSignTypeUnsafe(lines[0]);
+        SignType signType = getSignTypeOrNull(lines[0]);
         if (signType == null) {
             return Optional.absent();
         }
@@ -161,7 +158,7 @@ class SignParserImpl implements SignParser {
 
     @Override
     public Optional<SignType> getSignType(SignChangeEvent event) {
-        return Optional.fromNullable(getSignTypeUnsafe(event.getLine(0)));
+        return Optional.fromNullable(getSignTypeOrNull(event.getLine(0)));
     }
 
 }

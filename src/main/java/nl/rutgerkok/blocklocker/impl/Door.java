@@ -2,8 +2,6 @@ package nl.rutgerkok.blocklocker.impl;
 
 import java.util.Collection;
 
-import javax.annotation.Nullable;
-
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -52,13 +50,13 @@ public final class Door {
 
     private final Material doorMaterial;
 
-    @Nullable
+    /** Top left block, may be null. */
     private final Block topLeftBlock;
-    @Nullable
+    /** Top right block, may be null. */
     private final Block topRightBlock;
-    @Nullable
+    /** Bottom left block, may be null. */
     private final Block bottomLeftBlock;
-    @Nullable
+    /** Bottom right block, may be null. */
     private final Block bottomRightBlock;
 
     /**
@@ -102,10 +100,9 @@ public final class Door {
         }
     }
 
-    @Nullable
-    private Block asDoorMaterialOrNull(@Nullable Block block) {
-        if (block != null && block.getType() == doorMaterial) {
-            return block;
+    private Block asDoorMaterialOrNull(Block nullableBlock) {
+        if (nullableBlock != null && nullableBlock.getType() == doorMaterial) {
+            return nullableBlock;
         }
         return null;
     }

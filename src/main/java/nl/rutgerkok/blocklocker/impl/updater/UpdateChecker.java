@@ -2,12 +2,11 @@ package nl.rutgerkok.blocklocker.impl.updater;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.input.BOMInputStream;
 import org.bukkit.plugin.Plugin;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -44,11 +43,9 @@ final class UpdateChecker {
         UserAgent.setFor(plugin, connection);
 
         InputStream stream = null;
-        String response = "";
         try {
             stream = new BOMInputStream(connection.getInputStream());
-            response = IOUtils.toString(stream, Charsets.UTF_8);
-            Object object = jsonParser.parse(response);
+            Object object = jsonParser.parse(new InputStreamReader(stream, Charsets.UTF_8));
             return new UpdateCheckResult((JSONObject) object);
         } catch (IOException e) {
             // Just rethrow, don't wrap
