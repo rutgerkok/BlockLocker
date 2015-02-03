@@ -8,3 +8,4 @@ target/
 
 # Other
 *.bat
+logs/latest.log
