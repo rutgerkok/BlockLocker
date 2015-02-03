@@ -1,28 +1,20 @@
 package nl.rutgerkok.blocklocker.impl.nms;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.server.v1_8_R1.BlockPosition;
-import net.minecraft.server.v1_8_R1.ChatComponentText;
-import net.minecraft.server.v1_8_R1.ChatHoverable;
-import net.minecraft.server.v1_8_R1.ChatModifier;
-import net.minecraft.server.v1_8_R1.EnumHoverAction;
-import net.minecraft.server.v1_8_R1.IChatBaseComponent;
-import net.minecraft.server.v1_8_R1.TileEntity;
-import net.minecraft.server.v1_8_R1.TileEntitySign;
-import net.minecraft.server.v1_8_R1.WorldServer;
-
 import org.bukkit.Location;
 import org.bukkit.block.Sign;
-import org.bukkit.craftbukkit.v1_8_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_8_R1.util.CraftChatMessage;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
+import com.google.common.base.Throwables;
 
 /**
  * Implementation of methods required by
@@ -31,8 +23,157 @@ import com.google.common.base.Optional;
  */
 public final class NMSAccessor {
 
-    private BlockPosition getBlockPosition(Location location) {
-        return new BlockPosition(
+    private final static String nmsPrefix = "net.minecraft.server.v1_8_R1.";
+    private final static String obcPrefix = "org.bukkit.craftbukkit.v1_8_R1.";
+
+    static Object enumField(Class<Enum<?>> enumClass, String name) {
+        try {
+            Method valueOf = getMethod(Enum.class, "valueOf", Class.class, String.class);
+            return invokeStatic(valueOf, enumClass, name);
+        } catch (Exception e) {
+            throw Throwables.propagate(e);
+        }
+    }
+
+    static Constructor<?> getConstructor(Class<?> clazz, Class<?>... paramTypes) {
+        try {
+            return clazz.getConstructor(paramTypes);
+        } catch (Exception e) {
+            throw Throwables.propagate(e);
+        }
+    }
+
+    static Field getField(Class<?> clazz, String name) {
+        try {
+            return clazz.getField(name);
+        } catch (Exception e) {
+            throw Throwables.propagate(e);
+        }
+    }
+
+    static Method getMethod(Class<?> clazz, String name, Class<?>... parameterTypes) {
+        try {
+            return clazz.getMethod(name, parameterTypes);
+        } catch (Exception e) {
+            throw Throwables.propagate(e);
+        }
+    }
+
+    static Class<?> getNMSClass(String name) {
+        try {
+            return Class.forName(nmsPrefix + name);
+        } catch (ClassNotFoundException e) {
+            throw Throwables.propagate(e);
+        }
+    }
+
+    static Class<Enum<?>> getNMSEnum(String name) {
+        Class<?> clazz = getNMSClass(name);
+        if (!clazz.isEnum()) {
+            throw new IllegalArgumentException(clazz + " is not an enum");
+        }
+        @SuppressWarnings("unchecked")
+        Class<Enum<?>> enumClazz = (Class<Enum<?>>) clazz;
+        return enumClazz;
+    }
+
+    static Class<?> getOBCClass(String name) {
+        try {
+            return Class.forName(obcPrefix + name);
+        } catch (Exception e) {
+            throw Throwables.propagate(e);
+        }
+    }
+
+    static Object retrieve(Object on, Field field) {
+        try {
+            return field.get(on);
+        } catch (Exception e) {
+            throw Throwables.propagate(e);
+        }
+    }
+
+    static Object call(Object on, Method method, Object... parameters) {
+        try {
+            return method.invoke(on, parameters);
+        } catch (Exception e) {
+            throw Throwables.propagate(e);
+        }
+    }
+
+    static Object invokeStatic(Method method, Object... parameters) {
+        return call(null, method, parameters);
+    }
+
+    static Object newInstance(Constructor<?> constructor, Object... params) {
+        try {
+            return constructor.newInstance(params);
+        } catch (Exception e) {
+            throw Throwables.propagate(e);
+        }
+    }
+
+    final Class<?> BlockPosition;
+    final Constructor<?> BlockPosition_new;
+    final Class<?> ChatComponentText;
+    final Constructor<?> ChatComponentText_new;
+    final Class<?> ChatHoverable;
+    final Method ChatHoverable_getChatComponent;
+    final Constructor<?> ChatHoverable_new;
+    final Class<?> ChatModifier;
+    final Method ChatModifier_getChatHoverable;
+    final Constructor<?> ChatModifier_new;
+    final Class<?> CraftChatMessage;
+    final Method CraftChatMessage_fromComponent;
+    final Class<?> CraftWorld;
+    final Method CraftWorld_getHandle;
+    final Class<Enum<?>> EnumHoverAction;
+    final Object EnumHoverAction_SHOW_TEXT;
+    final Class<?> IChatBaseComponent;
+    final Method IChatBaseComponent_getChatModifier;
+    final Method ChatModifier_setChatHoverable;
+    final Class<?> TileEntitySign;
+    final Field TileEntitySign_lines;
+    final Class<?> WorldServer;
+    final Method WorldServer_getTileEntity;
+
+    public NMSAccessor() {
+        BlockPosition = getNMSClass("BlockPosition");
+        WorldServer = getNMSClass("WorldServer");
+        ChatModifier = getNMSClass("ChatModifier");
+        ChatHoverable = getNMSClass("ChatHoverable");
+        IChatBaseComponent = getNMSClass("IChatBaseComponent");
+        EnumHoverAction = getNMSEnum("EnumHoverAction");
+        TileEntitySign = getNMSClass("TileEntitySign");
+        ChatComponentText = getNMSClass("ChatComponentText");
+
+        CraftWorld = getOBCClass("CraftWorld");
+        CraftChatMessage = getOBCClass("util.CraftChatMessage");
+
+        CraftWorld_getHandle = getMethod(CraftWorld, "getHandle");
+        CraftChatMessage_fromComponent = getMethod(CraftChatMessage, "fromComponent", IChatBaseComponent);
+        WorldServer_getTileEntity = getMethod(WorldServer, "getTileEntity", BlockPosition);
+        IChatBaseComponent_getChatModifier = getMethod(IChatBaseComponent, "getChatModifier");
+        ChatModifier_setChatHoverable = getMethod(ChatModifier, "setChatHoverable", ChatHoverable);
+        ChatModifier_getChatHoverable = getMethod(ChatModifier, "i");
+        ChatHoverable_getChatComponent = getMethod(ChatHoverable, "b");
+
+        ChatComponentText_new = getConstructor(ChatComponentText, String.class);
+        BlockPosition_new = getConstructor(BlockPosition, int.class, int.class, int.class);
+        ChatModifier_new = getConstructor(ChatModifier);
+        ChatHoverable_new = getConstructor(ChatHoverable, EnumHoverAction, IChatBaseComponent);
+
+        TileEntitySign_lines = getField(TileEntitySign, "lines");
+
+        EnumHoverAction_SHOW_TEXT = enumField(EnumHoverAction, "SHOW_TEXT");
+    }
+
+    private String chatComponentToString(Object chatComponent) {
+        return (String) invokeStatic(CraftChatMessage_fromComponent, chatComponent);
+    }
+
+    Object getBlockPosition(Location location) {
+        return newInstance(BlockPosition_new,
                 location.getBlockX(),
                 location.getBlockY(),
                 location.getBlockZ());
@@ -50,7 +191,7 @@ public final class NMSAccessor {
      */
     public Optional<List<JSONObject>> getJsonData(Sign sign) {
         // Find sign
-        Optional<TileEntitySign> nmsSign = toNmsSign(sign);
+        Optional<?> nmsSign = toNmsSign(sign);
         if (!nmsSign.isPresent()) {
             return Optional.absent();
         }
@@ -75,14 +216,13 @@ public final class NMSAccessor {
         return Optional.absent();
     }
 
-    private Optional<String> getSecretData(TileEntitySign nmsSign) {
-        IChatBaseComponent line = nmsSign.lines[0];
-        ChatModifier modifier = line.getChatModifier();
-        if (modifier != null) {
-            ChatHoverable hoverable = modifier.i();
-            if (hoverable != null) {
-                return Optional.of(CraftChatMessage.fromComponent(hoverable.b()));
-
+    private Optional<String> getSecretData(Object tileEntitySign) {
+        Object line = ((Object[]) retrieve(tileEntitySign, TileEntitySign_lines))[0];
+        Object chatModifier = call(line, IChatBaseComponent_getChatModifier);
+        if (chatModifier != null) {
+            Object chatHoverable = call(chatModifier, ChatModifier_getChatHoverable);
+            if (chatHoverable != null) {
+                return Optional.of(chatComponentToString(call(chatHoverable, ChatHoverable_getChatComponent)));
             }
         }
 
@@ -100,7 +240,7 @@ public final class NMSAccessor {
      *            The array to store.
      */
     public void setJsonData(Sign sign, JSONArray jsonArray) {
-        Optional<TileEntitySign> nmsSign = toNmsSign(sign);
+        Optional<?> nmsSign = toNmsSign(sign);
         if (!nmsSign.isPresent()) {
             throw new RuntimeException("No sign at " + sign.getLocation());
         }
@@ -108,23 +248,24 @@ public final class NMSAccessor {
         setSecretData(nmsSign.get(), jsonArray.toJSONString());
     }
 
-    private void setSecretData(TileEntitySign nmsSign, String data) {
-        IChatBaseComponent line = nmsSign.lines[0];
-        ChatModifier modifier = Objects.firstNonNull(line.getChatModifier(), new ChatModifier());
-        ChatHoverable hoverable = new ChatHoverable(EnumHoverAction.SHOW_TEXT, new ChatComponentText(data));
-        modifier.setChatHoverable(hoverable);
+    private void setSecretData(Object tileEntitySign, String data) {
+        Object line = ((Object[]) retrieve(tileEntitySign, TileEntitySign_lines))[0];
+        Object modifier = Objects.firstNonNull(call(line, IChatBaseComponent_getChatModifier), newInstance(ChatModifier_new));
+        Object chatComponentText = newInstance(ChatComponentText_new, data);
+        Object hoverable = newInstance(ChatHoverable_new, EnumHoverAction_SHOW_TEXT, chatComponentText);
+        call(modifier, ChatModifier_setChatHoverable, hoverable);
     }
 
-    private Optional<TileEntitySign> toNmsSign(Sign sign) {
+    private Optional<?> toNmsSign(Sign sign) {
         Location location = sign.getLocation();
-        WorldServer nmsWorld = ((CraftWorld) location.getWorld()).getHandle();
+        Object nmsWorld = call(location.getWorld(), CraftWorld_getHandle);
 
-        TileEntity tileEntity = nmsWorld.getTileEntity(getBlockPosition(location));
-        if (!(tileEntity instanceof TileEntitySign)) {
+        Object tileEntity = call(nmsWorld, WorldServer_getTileEntity, getBlockPosition(location));
+        if (!TileEntitySign.isInstance(tileEntity)) {
             return Optional.absent();
         }
 
-        return Optional.of((TileEntitySign) tileEntity);
+        return Optional.of(tileEntity);
     }
 
 }
