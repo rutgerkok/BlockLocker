@@ -136,11 +136,14 @@ final class UUIDHandler {
             for (String name : names) {
                 String urlString = PAST_PROFILE_URL + '/' + name + "?at=" + epochSeconds;
                 URL url = new URL(urlString);
-                JSONObject object = (JSONObject) jsonParser
-                        .parse(new InputStreamReader(url.openStream()));
-                String newName = (String) object.get("name");
-                UUID uuid = parseMojangUniqueId((String) object.get("id"));
-                uuidMap.put(name, new Result(newName, uuid));
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                if (connection.getResponseCode() == 200) {
+                    JSONObject object = (JSONObject) jsonParser
+                            .parse(new InputStreamReader(connection.getInputStream()));
+                    String newName = (String) object.get("name");
+                    UUID uuid = parseMojangUniqueId((String) object.get("id"));
+                    uuidMap.put(name, new Result(newName, uuid));
+                }
 
                 Thread.sleep(100L);
             }
@@ -256,7 +259,6 @@ final class UUIDHandler {
      */
     private static final int MAX_SIGN_LINE_LENGTH = 15;
 
-
     private static final Pattern validUserPattern = Pattern.compile("^[a-zA-Z0-9_]{2,16}$");
     private static final UUID ZERO_UUID = new UUID(0, 0);
 
@@ -339,6 +341,7 @@ final class UUIDHandler {
         stream.flush();
         stream.close();
     }
+
     private final Logger logger;
 
     private final MojangWeb mojangWeb = new MojangWeb();
