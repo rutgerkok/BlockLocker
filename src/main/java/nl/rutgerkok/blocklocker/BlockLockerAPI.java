@@ -2,7 +2,6 @@ package nl.rutgerkok.blocklocker;
 
 import java.util.UUID;
 
-import nl.rutgerkok.blocklocker.ProtectionUpdater.UpdateMode;
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;
 import nl.rutgerkok.blocklocker.profile.Profile;
 import nl.rutgerkok.blocklocker.protection.Protection;
@@ -47,7 +46,7 @@ public final class BlockLockerAPI {
             }
 
             // No uuid looked up yet
-            getPlugin().getProtectionUpdater().update(protection.get(), UpdateMode.FORCED);
+            getPlugin().getProtectionUpdater().update(protection.get());
             return Optional.fromNullable(Bukkit.getOfflinePlayer(owner.getDisplayName()));
         }
 

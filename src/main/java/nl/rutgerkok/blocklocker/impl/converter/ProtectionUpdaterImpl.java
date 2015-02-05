@@ -14,6 +14,7 @@ import nl.rutgerkok.blocklocker.protection.Protection;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 
 /**
@@ -22,6 +23,7 @@ import com.google.common.base.Preconditions;
  */
 public class ProtectionUpdaterImpl implements ProtectionUpdater {
     private final Queue<ProtectionMissingIds> missingUniqueIds;
+    private final ProtectionNameUpdater nameUpdater;
     private final BlockLockerPlugin plugin;
     private final UUIDHandler uuidHandler;
 
@@ -29,6 +31,7 @@ public class ProtectionUpdaterImpl implements ProtectionUpdater {
         this.plugin = plugin;
         this.uuidHandler = new UUIDHandler(plugin.getLogger());
         missingUniqueIds = new ConcurrentLinkedQueue<ProtectionMissingIds>();
+        nameUpdater = new ProtectionNameUpdater(plugin.getSignParser(), plugin.getProfileFactory());
 
         Bukkit.getScheduler().runTaskTimer(
                 JavaPlugin.getProvidingPlugin(getClass()), new Runnable() {
@@ -60,27 +63,34 @@ public class ProtectionUpdaterImpl implements ProtectionUpdater {
     }
 
     @Override
-    public void update(Protection protection, UpdateMode updateMode) {
+    public void update(Protection protection) {
         Preconditions.checkNotNull(protection, "protection");
-        Preconditions.checkNotNull(updateMode, "updateMode");
 
-        if (updateMode == UpdateMode.IF_NEEDED) {
-            if (!protection.needsUpdate(uuidHandler.isOnlineMode())) {
-                return;
-            }
+        if (uuidHandler.isOnlineMode()) {
+            nameUpdater.updateNames(protection);
+            updateForMissingIds(protection);
         }
+    }
 
-        ProtectionMissingIds missingIds = new ProtectionMissingIds(protection);
+    @Override
+    public void update(Protection protection,
+            @SuppressWarnings("deprecation") UpdateMode updateMode) {
+        update(protection);
+    }
+
+    private void updateForMissingIds(Protection protection) {
+        Optional<ProtectionMissingIds> missingIds = ProtectionMissingIds.of(protection);
 
         // Check if there is something that needs to be converted
-        if (missingIds.getNamesMissingUniqueIds().isEmpty()) {
+        if (!missingIds.isPresent()) {
             return;
         }
 
         // Add it to queue
-        if (!missingUniqueIds.contains(missingIds)) {
-            missingUniqueIds.add(missingIds);
+        if (!missingUniqueIds.contains(missingIds.get())) {
+            missingUniqueIds.add(missingIds.get());
         }
     }
+
 
 }

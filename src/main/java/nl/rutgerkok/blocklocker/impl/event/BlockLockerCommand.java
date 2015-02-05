@@ -6,7 +6,6 @@ import java.util.List;
 
 import nl.rutgerkok.blocklocker.BlockLockerPlugin;
 import nl.rutgerkok.blocklocker.Permissions;
-import nl.rutgerkok.blocklocker.ProtectionUpdater.UpdateMode;
 import nl.rutgerkok.blocklocker.SignType;
 import nl.rutgerkok.blocklocker.Translator.Translation;
 import nl.rutgerkok.blocklocker.protection.Protection;
@@ -122,7 +121,7 @@ public final class BlockLockerCommand implements TabExecutor {
         // Update protection
         sign.setLine(lineNumber - 1, name);
         sign.update();
-        plugin.getProtectionUpdater().update(protection.get(), UpdateMode.FORCED);
+        plugin.getProtectionUpdater().update(protection.get());
         plugin.getTranslator().sendMessage(player, Translation.COMMAND_UPDATED_SIGN);
 
         return true;

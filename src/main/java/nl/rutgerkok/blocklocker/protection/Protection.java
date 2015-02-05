@@ -53,15 +53,9 @@ public interface Protection {
     boolean isAllowed(Profile profile);
 
     /**
-     * Gets whether this sign needs an update, for example because UUIDs are
-     * missing, the extra data is not yet stored or the color scheme of the text
-     * doesn't match the current one.
-     *
-     * @param uuidsEnabled
-     *            True if the server is using unique ids, false if not (offline
-     *            mode server).
-     * @return True if this sign needs to be updated, false otherwise.
+     * Just check yourself whether the protection needs an update.
      */
+    @Deprecated
     boolean needsUpdate(boolean uuidsEnabled);
 
     /**

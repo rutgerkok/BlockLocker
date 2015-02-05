@@ -9,23 +9,24 @@ import nl.rutgerkok.blocklocker.protection.Protection;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSet.Builder;
 
+/**
+ * Represents a {@link Protection} missing one or more {@link UUID}s.
+ *
+ */
 final class ProtectionMissingIds {
 
-    private final Set<String> namesMissingUniqueIds;
-    private final Protection protection;
-
     /**
-     * Builds the list of UUIDs to fetch. Must be called on the server thread.
-     *
+     * Creates a {@link ProtectionMissingIds} for the given protection.
+     * 
      * @param protection
-     *            The protection to fetch the UUIDs for.
+     *            The protection.
+     * @return The {@link ProtectionMissingIds}, or absent if the protection is
+     *         not missing ids.
      */
-    ProtectionMissingIds(Protection protection) {
-        this.protection = protection;
-
-        Builder<String> namesMissingUniqueIds = ImmutableSet.builder();
+    static Optional<ProtectionMissingIds> of(Protection protection) {
+        ImmutableSet.Builder<String> namesMissingUniqueIds = ImmutableSet.builder();
+        boolean missingIds = false;
 
         for (Profile profile : protection.getAllowed()) {
             if (!(profile instanceof PlayerProfile)) {
@@ -36,9 +37,29 @@ final class ProtectionMissingIds {
             Optional<UUID> uuid = playerProfile.getUniqueId();
             if (!uuid.isPresent()) {
                 namesMissingUniqueIds.add(playerProfile.getDisplayName());
+                missingIds = true;
             }
         }
 
+        if (missingIds) {
+            return Optional.of(new ProtectionMissingIds(protection, namesMissingUniqueIds));
+        } else {
+            return Optional.absent();
+        }
+    }
+
+    private final Set<String> namesMissingUniqueIds;
+
+    private final Protection protection;
+
+    /**
+     * Builds the list of UUIDs to fetch. Must be called on the server thread.
+     *
+     * @param protection
+     *            The protection to fetch the UUIDs for.
+     */
+    private ProtectionMissingIds(Protection protection, ImmutableSet.Builder<String> namesMissingUniqueIds) {
+        this.protection = protection;
         this.namesMissingUniqueIds = namesMissingUniqueIds.build();
     }
 

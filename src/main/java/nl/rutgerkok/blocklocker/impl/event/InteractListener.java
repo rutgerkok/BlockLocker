@@ -7,7 +7,6 @@ import nl.rutgerkok.blocklocker.BlockLockerPlugin;
 import nl.rutgerkok.blocklocker.Permissions;
 import nl.rutgerkok.blocklocker.ProtectionSign;
 import nl.rutgerkok.blocklocker.ProtectionType;
-import nl.rutgerkok.blocklocker.ProtectionUpdater.UpdateMode;
 import nl.rutgerkok.blocklocker.SearchMode;
 import nl.rutgerkok.blocklocker.SignType;
 import nl.rutgerkok.blocklocker.Translator.Translation;
@@ -234,7 +233,7 @@ public final class InteractListener extends EventListener {
         }
 
         // Check if protection needs update
-        plugin.getProtectionUpdater().update(protection.get(), UpdateMode.IF_NEEDED);
+        plugin.getProtectionUpdater().update(protection.get());
 
         // Check if player is allowed
         if (checkAllowed(player, protection.get(), clickedSign)) {
