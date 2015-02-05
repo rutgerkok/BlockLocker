@@ -151,7 +151,7 @@ public class SignChangeListener extends EventListener {
             public void run() {
                 Optional<Protection> protection = plugin.getProtectionFinder().findProtection(block);
                 if (protection.isPresent()) {
-                    plugin.getProtectionUpdater().update(protection.get());
+                    plugin.getProtectionUpdater().update(protection.get(), true);
                 }
             }
         });

@@ -24,7 +24,7 @@ final class ProtectionMissingIds {
      * @return The {@link ProtectionMissingIds}, or absent if the protection is
      *         not missing ids.
      */
-    static Optional<ProtectionMissingIds> of(Protection protection) {
+    static Optional<ProtectionMissingIds> of(Protection protection, boolean lookupPastNames) {
         ImmutableSet.Builder<String> namesMissingUniqueIds = ImmutableSet.builder();
         boolean missingIds = false;
 
@@ -42,15 +42,15 @@ final class ProtectionMissingIds {
         }
 
         if (missingIds) {
-            return Optional.of(new ProtectionMissingIds(protection, namesMissingUniqueIds));
+            return Optional.of(new ProtectionMissingIds(protection, namesMissingUniqueIds, lookupPastNames));
         } else {
             return Optional.absent();
         }
     }
 
     private final Set<String> namesMissingUniqueIds;
-
     private final Protection protection;
+    private final boolean lookupPastNames;
 
     /**
      * Builds the list of UUIDs to fetch. Must be called on the server thread.
@@ -58,9 +58,10 @@ final class ProtectionMissingIds {
      * @param protection
      *            The protection to fetch the UUIDs for.
      */
-    private ProtectionMissingIds(Protection protection, ImmutableSet.Builder<String> namesMissingUniqueIds) {
+    private ProtectionMissingIds(Protection protection, ImmutableSet.Builder<String> namesMissingUniqueIds, boolean lookupPastNames) {
         this.protection = protection;
         this.namesMissingUniqueIds = namesMissingUniqueIds.build();
+        this.lookupPastNames = lookupPastNames;
     }
 
     @Override
@@ -102,5 +103,15 @@ final class ProtectionMissingIds {
     @Override
     public int hashCode() {
         return protection.hashCode();
+    }
+
+    /**
+     * Gets whether past names from before name changes were allowed must be
+     * looked up. This value should be false for new protections.
+     * 
+     * @return True if past names must be looked up, false otherwise.
+     */
+    public boolean mustLookupPastNames() {
+        return lookupPastNames;
     }
 }

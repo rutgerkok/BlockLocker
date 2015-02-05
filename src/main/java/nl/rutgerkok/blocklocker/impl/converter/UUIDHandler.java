@@ -4,12 +4,15 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -76,10 +79,72 @@ final class UUIDHandler {
                     // Adding a prefix makes the name look invalid to the player
                     name = invalidNamePrefixes[0] + name;
                 }
-                return new Result(name, new UUID(0, 0));
+                return new Result(name, ZERO_UUID);
             }
         };
     }
+
+    private static class MojangWeb {
+        private static JSONParser jsonParser = new JSONParser();
+        private static final String PAST_PROFILE_URL = "https://api.mojang.com/users/profiles/minecraft";
+        private static final double PROFILES_PER_BULK_REQUEST = 100;
+        private static final String BULK_UUID_LOOKUP_URL = "https://api.mojang.com/profiles/minecraft";
+
+        private static HttpURLConnection createConnectionForBulkLookup() throws Exception {
+            URL url = new URL(BULK_UUID_LOOKUP_URL);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setUseCaches(false);
+            connection.setDoInput(true);
+            connection.setDoOutput(true);
+            return connection;
+        }
+
+        Map<String, Result> uuidLookup(List<String> names) throws Exception {
+            Map<String, Result> results = new HashMap<String, Result>();
+            int requests = (int) Math.ceil(names.size() / PROFILES_PER_BULK_REQUEST);
+            for (int i = 0; i < requests; i++) {
+                HttpURLConnection connection = createConnectionForBulkLookup();
+                String body = JSONArray.toJSONString(names.subList(i * 100,
+                        Math.min((i + 1) * 100, names.size())));
+                writeBody(connection, body);
+                JSONArray array = (JSONArray) jsonParser
+                        .parse(new InputStreamReader(connection.getInputStream()));
+                for (Object profile : array) {
+                    Result result = toResult((JSONObject) profile);
+                    results.put(result.name.toLowerCase(), result);
+                }
+                if (i != requests - 1) {
+                    Thread.sleep(100L);
+                }
+            }
+            return results;
+        }
+
+        /**
+         * Very expensive - no bulk lookup available!
+         */
+        Map<String, Result> uuidLookupInPast(List<String> names, Date timestamp) throws Exception {
+            Map<String, Result> uuidMap = new HashMap<String, Result>();
+            long epochSeconds = timestamp.getTime() / 1000;
+
+            for (String name : names) {
+                String urlString = PAST_PROFILE_URL + '/' + name + "?at=" + epochSeconds;
+                URL url = new URL(urlString);
+                JSONObject object = (JSONObject) jsonParser
+                        .parse(new InputStreamReader(url.openStream()));
+                String newName = (String) object.get("name");
+                UUID uuid = parseMojangUniqueId((String) object.get("id"));
+                uuidMap.put(name, new Result(newName, uuid));
+
+                Thread.sleep(100L);
+            }
+
+            return uuidMap;
+        }
+    }
+
     /**
      * A result value from the {@link UUID} lookup.
      *
@@ -163,74 +228,7 @@ final class UUIDHandler {
         public abstract void accept(Map<String, Result> results);
     }
 
-    /**
-     * Class based on EvilMidget's UUIDFetcher.
-     *
-     */
-    private static class UUIDFetcher {
-        private static final String PROFILE_URL = "https://api.mojang.com/profiles/minecraft";
-        private static final double PROFILES_PER_REQUEST = 100;
-
-        private static HttpURLConnection createConnection() throws Exception {
-            URL url = new URL(PROFILE_URL);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "application/json");
-            connection.setUseCaches(false);
-            connection.setDoInput(true);
-            connection.setDoOutput(true);
-            return connection;
-        }
-
-        private static UUID getUUID(String id) {
-            return UUID.fromString(id.substring(0, 8) + "-" + id.substring(8, 12)
-                    + "-" + id.substring(12, 16) + "-" + id.substring(16, 20) + "-"
-                    + id.substring(20, 32));
-        }
-
-        private static void writeBody(HttpURLConnection connection, String body)
-                throws Exception {
-            OutputStream stream = connection.getOutputStream();
-            stream.write(body.getBytes());
-            stream.flush();
-            stream.close();
-        }
-
-        private final JSONParser jsonParser = new JSONParser();
-        private final List<String> names;
-        private final boolean rateLimiting;
-
-        UUIDFetcher(List<String> names) {
-            this.names = names;
-            this.rateLimiting = true;
-        }
-
-        // ChestSignProtect - changed return type to String(lowercase),NameAndId
-        public Map<String, UUID> call() throws Exception {
-            Map<String, UUID> uuidMap = new HashMap<String, UUID>();
-            int requests = (int) Math.ceil(names.size() / PROFILES_PER_REQUEST);
-            for (int i = 0; i < requests; i++) {
-                HttpURLConnection connection = createConnection();
-                String body = JSONArray.toJSONString(names.subList(i * 100,
-                        Math.min((i + 1) * 100, names.size())));
-                writeBody(connection, body);
-                JSONArray array = (JSONArray) jsonParser
-                        .parse(new InputStreamReader(connection.getInputStream()));
-                for (Object profile : array) {
-                    JSONObject jsonProfile = (JSONObject) profile;
-                    String id = (String) jsonProfile.get("id");
-                    String name = (String) jsonProfile.get("name");
-                    UUID uuid = UUIDFetcher.getUUID(id);
-                    uuidMap.put(name, uuid);
-                }
-                if (rateLimiting && i != requests - 1) {
-                    Thread.sleep(100L);
-                }
-            }
-            return uuidMap;
-        }
-
-    }
+    private static final Date BEFORE_NAME_CHANGES;
 
     /**
      * Normally, the first entry of this array is added before each line with an
@@ -244,10 +242,19 @@ final class UUIDHandler {
      */
     private static final int MAX_SIGN_LINE_LENGTH = 15;
 
+
     private static final Pattern validUserPattern = Pattern.compile("^[a-zA-Z0-9_]{2,16}$");
+    private static final UUID ZERO_UUID = new UUID(0, 0);
+
+    static {
+        Calendar beforeNameChanges = Calendar.getInstance(Locale.ENGLISH);
+        beforeNameChanges.set(2015, Calendar.FEBRUARY, 3);
+        BEFORE_NAME_CHANGES = beforeNameChanges.getTime();
+    }
 
     private static Player getPlayerFromNameOnSign(String name) {
         if (name.length() == MAX_SIGN_LINE_LENGTH) {
+            // This assumes Bukkit.getPlayer still does name matching
             return Bukkit.getPlayer(name);
         }
         else {
@@ -291,7 +298,35 @@ final class UUIDHandler {
         return map;
     }
 
+    private static UUID parseMojangUniqueId(String withourDashes) {
+        return UUID.fromString(withourDashes.substring(0, 8) + "-" + withourDashes.substring(8, 12)
+                + "-" + withourDashes.substring(12, 16) + "-" + withourDashes.substring(16, 20) + "-"
+                + withourDashes.substring(20, 32));
+    }
+
+    /**
+     * Transforms an JSON object received from mojang.com to a {@link Result}.
+     *
+     * @param mojangObject
+     *            The object from mojang.com.
+     * @return The result.
+     */
+    private static final Result toResult(JSONObject mojangObject) {
+        String id = (String) mojangObject.get("id");
+        String name = (String) mojangObject.get("name");
+        UUID uuid = parseMojangUniqueId(id);
+        return new Result(name, uuid);
+    }
+    private static void writeBody(HttpURLConnection connection, String body)
+            throws Exception {
+        OutputStream stream = connection.getOutputStream();
+        stream.write(body.getBytes());
+        stream.flush();
+        stream.close();
+    }
+
     private final Logger logger;
+    private final MojangWeb mojangWeb = new MojangWeb();
     private final boolean onlineMode;
 
     public UUIDHandler(Logger logger) {
@@ -343,15 +378,18 @@ final class UUIDHandler {
      *            The names.
      * @param consumer
      *            The result consumer.
+     * @param lookupPastNames
+     *            Whether past names from before name changes were allowed
+     *            should be looked up. Unneeded for new signs.
      */
-    void fetchUniqueIds(Collection<String> names, ResultConsumer consumer) {
+    void fetchUniqueIds(Collection<String> names, ResultConsumer consumer, boolean lookupPastNames) {
         Preconditions.checkState(Bukkit.isPrimaryThread(), "Method must be called on primary thread");
 
         // Get safe names list
         List<String> namesList = Lists.newArrayList(names);
 
         if (this.onlineMode) {
-            fetchUniqueIdsOnlineMode(namesList, consumer);
+            fetchUniqueIdsOnlineMode(namesList, consumer, lookupPastNames);
         } else {
             consumer.accept(newPlayerNameMap(namesList, Functions.OFFLINE_MODE_LOOKUP));
         }
@@ -367,23 +405,40 @@ final class UUIDHandler {
      * @param results
      *            The results already found by looking at the online player
      *            list.
-     * @param consumer
-     *            The consumer that will eventually accept the results.
      */
-    private void fetchUniqueIdsAtMojangAsync(List<String> names, Map<String, Result> results, ResultConsumer consumer) {
-        UUIDFetcher fetcher = new UUIDFetcher(names);
-        try {
-            Map<String, UUID> uuidFetcherResults = fetcher.call();
-            for (Entry<String, UUID> entry : uuidFetcherResults.entrySet()) {
-                results.put(entry.getKey().toLowerCase(), new Result(entry.getKey(), entry.getValue()));
+    private void fetchUniqueIdsAtMojang(List<String> names, Map<String, Result> results) throws Exception {
+        Map<String, Result> newResults = mojangWeb.uuidLookup(names);
+
+        // Remove names that were found
+        for (Iterator<String> it = names.iterator(); it.hasNext();) {
+            String name = it.next();
+            if (newResults.containsKey(name.toLowerCase())) {
+                it.remove();
             }
-            acceptResultsAsync(results, consumer);
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Error fetching names: " + names, e);
         }
+
+        // Modify results array
+        results.putAll(newResults);
     }
 
-    private void fetchUniqueIdsOnlineMode(final List<String> namesList, final ResultConsumer consumer) {
+    /**
+     * Looks up the UUIDs belonging to the given name from before the name
+     * changes. Much more expensive to call than
+     * {@link #fetchUniqueIdsAtMojang(List, Map)}, as there exists no bulk
+     * lookup service. Don't call this method on the server thread!
+     *
+     * @param names
+     *            The names.
+     * @param results
+     *            The results already found by looking at the online player
+     *            list.
+     */
+    private void fetchUniqueIdsFromPastNamesAtMojang(List<String> names, Map<String, Result> results) throws Exception {
+        results.putAll(mojangWeb.uuidLookupInPast(names, BEFORE_NAME_CHANGES));
+    }
+
+    private void fetchUniqueIdsOnlineMode(final List<String> namesList,
+            final ResultConsumer consumer, final boolean lookupPastNames) {
         // Fill map with empty results, will be overwritten when we find
         // something
         final Map<String, Result> results = newPlayerNameMap(namesList, Functions.ONLINE_MODE_PLACEHOLDERS);
@@ -419,11 +474,20 @@ final class UUIDHandler {
         }
 
         // Fetch other names async using UUIDFetcher
-        Plugin plugin = JavaPlugin.getProvidingPlugin(getClass());
+        final Plugin plugin = JavaPlugin.getProvidingPlugin(getClass());
         Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable() {
             @Override
             public void run() {
-                fetchUniqueIdsAtMojangAsync(namesList, results, consumer);
+                try {
+                    fetchUniqueIdsAtMojang(namesList, results);
+                    if (lookupPastNames && !namesList.isEmpty()) {
+                        // Still names that are missing uuids
+                        fetchUniqueIdsFromPastNamesAtMojang(namesList, results);
+                    }
+                    acceptResultsAsync(results, consumer);
+                } catch (Exception e) {
+                    plugin.getLogger().log(Level.WARNING, "Error fetching UUIDs", e);
+                }
             }
         });
     }

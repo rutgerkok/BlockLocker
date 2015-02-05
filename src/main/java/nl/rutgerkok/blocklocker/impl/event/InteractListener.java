@@ -233,7 +233,7 @@ public final class InteractListener extends EventListener {
         }
 
         // Check if protection needs update
-        plugin.getProtectionUpdater().update(protection.get());
+        plugin.getProtectionUpdater().update(protection.get(), false);
 
         // Check if player is allowed
         if (checkAllowed(player, protection.get(), clickedSign)) {

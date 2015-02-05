@@ -48,8 +48,12 @@ public class ProtectionUpdaterImpl implements ProtectionUpdater {
         final Collection<Protection> protectionsToFix = new ArrayList<Protection>();
 
         ProtectionMissingIds protection;
+        boolean lookupPastNames = false;
         while ((protection = missingUniqueIds.poll()) != null) {
             protectionsToFix.add(protection.getProtection());
+            if (protection.mustLookupPastNames()) {
+                lookupPastNames = true;
+            }
             names.addAll(protection.getNamesMissingUniqueIds());
         }
 
@@ -59,27 +63,29 @@ public class ProtectionUpdaterImpl implements ProtectionUpdater {
         }
 
         // Fetch them
-        uuidHandler.fetchUniqueIds(names, new ProtectionUUIDSetter(plugin, protectionsToFix));
+        uuidHandler.fetchUniqueIds(names, new ProtectionUUIDSetter(plugin, protectionsToFix), lookupPastNames);
     }
 
     @Override
-    public void update(Protection protection) {
+    public void update(Protection protection, boolean newProtection) {
         Preconditions.checkNotNull(protection, "protection");
+
+        boolean lookupPastNames = !newProtection;
 
         if (uuidHandler.isOnlineMode()) {
             nameUpdater.updateNames(protection);
-            updateForMissingIds(protection);
+            updateForMissingIds(protection, lookupPastNames);
         }
     }
 
     @Override
     public void update(Protection protection,
             @SuppressWarnings("deprecation") UpdateMode updateMode) {
-        update(protection);
+        update(protection, false);
     }
 
-    private void updateForMissingIds(Protection protection) {
-        Optional<ProtectionMissingIds> missingIds = ProtectionMissingIds.of(protection);
+    private void updateForMissingIds(Protection protection, boolean lookupPastNames) {
+        Optional<ProtectionMissingIds> missingIds = ProtectionMissingIds.of(protection, lookupPastNames);
 
         // Check if there is something that needs to be converted
         if (!missingIds.isPresent()) {

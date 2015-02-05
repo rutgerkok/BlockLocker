@@ -17,8 +17,8 @@ public interface ProtectionUpdater {
     }
 
     /**
-     * @deprecated Use {@link #update(Protection)}. Second parameter is now
-     *             ignored.
+     * @deprecated Use {@link #update(Protection, boolean)}. Second parameter is
+     *             now ignored.
      */
     @Deprecated
     void update(Protection protection, UpdateMode updateMode);
@@ -31,7 +31,10 @@ public interface ProtectionUpdater {
      * @param protection
      *            The protection to fix. If the protection was already queued
      *            for an update, nothing happens.
+     * @param newProtection
+     *            True if this protection is new (lookups of past names are not
+     *            necessary then), false otherwise.
      */
-    void update(Protection protection);
+    void update(Protection protection, boolean newProtection);
 
 }

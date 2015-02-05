@@ -46,7 +46,7 @@ public final class BlockLockerAPI {
             }
 
             // No uuid looked up yet
-            getPlugin().getProtectionUpdater().update(protection.get());
+            getPlugin().getProtectionUpdater().update(protection.get(), false);
             return Optional.fromNullable(Bukkit.getOfflinePlayer(owner.getDisplayName()));
         }
 

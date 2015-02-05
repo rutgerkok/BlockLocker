@@ -121,7 +121,7 @@ public final class BlockLockerCommand implements TabExecutor {
         // Update protection
         sign.setLine(lineNumber - 1, name);
         sign.update();
-        plugin.getProtectionUpdater().update(protection.get());
+        plugin.getProtectionUpdater().update(protection.get(), true);
         plugin.getTranslator().sendMessage(player, Translation.COMMAND_UPDATED_SIGN);
 
         return true;
