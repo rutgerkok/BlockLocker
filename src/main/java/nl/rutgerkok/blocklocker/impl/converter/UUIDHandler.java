@@ -13,7 +13,9 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -29,6 +31,8 @@ import org.json.simple.parser.JSONParser;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -85,10 +89,10 @@ final class UUIDHandler {
     }
 
     private static class MojangWeb {
+        private static final String BULK_UUID_LOOKUP_URL = "https://api.mojang.com/profiles/minecraft";
         private static JSONParser jsonParser = new JSONParser();
         private static final String PAST_PROFILE_URL = "https://api.mojang.com/users/profiles/minecraft";
         private static final double PROFILES_PER_BULK_REQUEST = 100;
-        private static final String BULK_UUID_LOOKUP_URL = "https://api.mojang.com/profiles/minecraft";
 
         private static HttpURLConnection createConnectionForBulkLookup() throws Exception {
             URL url = new URL(BULK_UUID_LOOKUP_URL);
@@ -189,6 +193,16 @@ final class UUIDHandler {
         @Override
         public String toString() {
             return getClass().getSimpleName() + "[name=" + name + ",uuid=" + uuid.orNull() + "]";
+        }
+
+        /**
+         * Gets whether a valid uuid has been specified. The zero uuid is not
+         * considered valid, as that indicates no player exists with that name.
+         *
+         * @return Whether a valid uuid has been specified.
+         */
+        public boolean hasValidId() {
+            return uuid.isPresent() && !uuid.get().equals(ZERO_UUID);
         }
     }
 
@@ -317,6 +331,7 @@ final class UUIDHandler {
         UUID uuid = parseMojangUniqueId(id);
         return new Result(name, uuid);
     }
+
     private static void writeBody(HttpURLConnection connection, String body)
             throws Exception {
         OutputStream stream = connection.getOutputStream();
@@ -324,10 +339,14 @@ final class UUIDHandler {
         stream.flush();
         stream.close();
     }
-
     private final Logger logger;
+
     private final MojangWeb mojangWeb = new MojangWeb();
     private final boolean onlineMode;
+    private final Cache<String, Result> uuidCache = CacheBuilder.newBuilder()
+            .expireAfterAccess(20, TimeUnit.MINUTES)
+            .maximumSize(100)
+            .build();
 
     public UUIDHandler(Logger logger) {
         this.logger = logger;
@@ -422,6 +441,21 @@ final class UUIDHandler {
     }
 
     /**
+     * Adds all results with {@link Result#hasValidId() a valid id} to the
+     * cache. Can be called from any thread.
+     *
+     * @param results
+     *            The results to add.
+     */
+    private void addToCache(Map<String, Result> results) {
+        for (Entry<String, Result> entry : results.entrySet()) {
+            if (entry.getValue().hasValidId()) {
+                uuidCache.put(entry.getKey(), entry.getValue());
+            }
+        }
+    }
+
+    /**
      * Looks up the UUIDs belonging to the given name from before the name
      * changes. Much more expensive to call than
      * {@link #fetchUniqueIdsAtMojang(List, Map)}, as there exists no bulk
@@ -446,10 +480,20 @@ final class UUIDHandler {
         // Get as much results as possible without a web request
         for (ListIterator<String> it = namesList.listIterator(); it.hasNext();) {
             String providedName = it.next();
+            String nameLowercase = providedName.toLowerCase();
 
             // Check for name pattern
             if (!validUserPattern.matcher(providedName).matches()) {
                 // Lookup will fail, so remove it from pending names
+                it.remove();
+                continue;
+            }
+
+            // Get from cache
+            Result cached = uuidCache.getIfPresent(nameLowercase);
+            if (cached != null) {
+                // Success in cache!
+                results.put(nameLowercase, cached);
                 it.remove();
                 continue;
             }
@@ -461,7 +505,7 @@ final class UUIDHandler {
                 // to contact mojang.com for this name
                 // By checking for matching players, we also correct for any
                 // truncated names
-                results.put(providedName.toLowerCase(), new Result(player.getName(), player.getUniqueId()));
+                results.put(nameLowercase, new Result(player.getName(), player.getUniqueId()));
                 it.remove();
                 continue;
             }
@@ -484,6 +528,9 @@ final class UUIDHandler {
                         // Still names that are missing uuids
                         fetchUniqueIdsFromPastNamesAtMojang(namesList, results);
                     }
+
+                    addToCache(results);
+
                     acceptResultsAsync(results, consumer);
                 } catch (Exception e) {
                     plugin.getLogger().log(Level.WARNING, "Error fetching UUIDs", e);
