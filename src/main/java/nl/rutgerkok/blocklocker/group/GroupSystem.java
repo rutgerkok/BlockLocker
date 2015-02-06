@@ -23,6 +23,27 @@ public abstract class GroupSystem {
     public abstract boolean isInGroup(Player player, String groupName);
 
     /**
+     * Gets whether the given player is a leader of the given group. The exact
+     * definition of a leader is up to the implementation. The implementation
+     * should make an effort to make the group name case insensitive, but this
+     * is not strictly required.
+     *
+     * <p>
+     * The default implementation just returns false.
+     * 
+     * @param player
+     *            The player to check.
+     * @param groupName
+     *            The name of the group.
+     *
+     * @return True if the player is a leader of the given group, false
+     *         otherwise.
+     */
+    public boolean isGroupLeader(Player player, String groupName) {
+        return false;
+    }
+
+    /**
      * Gets whether this group system must be kept when the plugin is reloaded
      * using the reload command of the plugin.
      *

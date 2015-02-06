@@ -9,7 +9,6 @@ import nl.rutgerkok.blocklocker.group.GroupSystem;
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;
 import nl.rutgerkok.blocklocker.profile.Profile;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.json.simple.JSONObject;
@@ -48,25 +47,32 @@ public final class ProfileFactoryImpl implements ProfileFactory {
     public Profile fromDisplayText(String text) {
         text = ChatColor.stripColor(text.trim());
 
-        // [Everyone]
-        if (text.equalsIgnoreCase(everyoneTagString)) {
-            return this.everyoneProfile;
-        }
+        if (text.length() > 2) {
+            // [Everyone]
+            if (text.equalsIgnoreCase(everyoneTagString)) {
+                return this.everyoneProfile;
+            }
 
-        // [Redstone]
-        if (text.equalsIgnoreCase(redstoneTagString)) {
-            return this.redstoneProfile;
-        }
+            // [Redstone]
+            if (text.equalsIgnoreCase(redstoneTagString)) {
+                return this.redstoneProfile;
+            }
 
-        // [Timer:X]
-        if (text.startsWith(timerTagStart) && text.endsWith("]")) {
-            int seconds = readDigit(text.charAt(timerTagStart.length()));
-            return new TimerProfileImpl(translator.getWithoutColor(Translation.TAG_TIMER), seconds);
-        }
+            // [Timer:X]
+            if (text.startsWith(timerTagStart) && text.endsWith("]")) {
+                int seconds = readDigit(text.charAt(timerTagStart.length()));
+                return new TimerProfileImpl(translator.getWithoutColor(Translation.TAG_TIMER), seconds);
+            }
 
-        // [GroupName]
-        if (text.startsWith("[") && text.endsWith("]") && text.length() >= 3) {
-            return new GroupProfileImpl(groupSystem, text.substring(1, text.length() - 1));
+            // [GroupName]
+            if (text.startsWith("[") && text.endsWith("]")) {
+                return new GroupProfileImpl(groupSystem, text.substring(1, text.length() - 1));
+            }
+
+            // +GroupName+
+            if (text.startsWith("+") && text.endsWith("+")) {
+                return new GroupLeaderProfileImpl(groupSystem, text.substring(1, text.length() - 1));
+            }
         }
 
         return new PlayerProfileImpl(text, Optional.<UUID> absent());
@@ -86,7 +92,7 @@ public final class ProfileFactoryImpl implements ProfileFactory {
 
     @Override
     public PlayerProfile fromPlayer(Player player) {
-        Validate.notNull(player);
+        Preconditions.checkNotNull(player);
         Optional<UUID> uuid = Optional.of(player.getUniqueId());
         return new PlayerProfileImpl(player.getName(), uuid);
     }
@@ -135,6 +141,13 @@ public final class ProfileFactoryImpl implements ProfileFactory {
         Optional<String> groupName = getValue(json, GroupProfileImpl.GROUP_KEY, String.class);
         if (groupName.isPresent()) {
             Profile profile = new GroupProfileImpl(groupSystem, groupName.get());
+            return Optional.of(profile);
+        }
+
+        // Group leaders
+        groupName = getValue(json, GroupLeaderProfileImpl.GROUP_LEADER_KEY, String.class);
+        if (groupName.isPresent()) {
+            Profile profile = new GroupLeaderProfileImpl(groupSystem, groupName.get());
             return Optional.of(profile);
         }
 

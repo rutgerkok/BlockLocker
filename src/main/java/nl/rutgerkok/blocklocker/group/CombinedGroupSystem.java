@@ -37,6 +37,16 @@ public final class CombinedGroupSystem extends GroupSystem {
         return false;
     }
 
+    @Override
+    public boolean isGroupLeader(Player player, String groupName) {
+        for (GroupSystem system : systems) {
+            if (system.isGroupLeader(player, groupName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Adds a new group system. After calling this method, the
      * {@link #isInGroup(Player, String)} method on this object is guaranteed to
