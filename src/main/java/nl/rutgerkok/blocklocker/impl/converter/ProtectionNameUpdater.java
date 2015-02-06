@@ -42,17 +42,19 @@ final class ProtectionNameUpdater {
             // newProfileCollection is lazily initialized
             List<Profile> newProfileCollection = new ArrayList<Profile>();
             List<Profile> oldProfileCollection = sign.getProfiles();
+            boolean changed = false;
 
             for (Profile profile : oldProfileCollection) {
                 Profile newProfile = withUpdatedNameOrNull(profile);
                 if (newProfile != null) {
                     newProfileCollection.add(newProfile);
+                    changed = true;
                 } else {
                     newProfileCollection.add(profile);
                 }
             }
 
-            if (newProfileCollection != null) {
+            if (changed) {
                 signParser.saveSign(sign.withProfiles(newProfileCollection));
             }
         }
