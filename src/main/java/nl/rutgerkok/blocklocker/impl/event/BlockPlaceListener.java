@@ -3,7 +3,7 @@ package nl.rutgerkok.blocklocker.impl.event;
 import nl.rutgerkok.blocklocker.BlockLockerPlugin;
 import nl.rutgerkok.blocklocker.Permissions;
 import nl.rutgerkok.blocklocker.Translator.Translation;
-import nl.rutgerkok.blocklocker.impl.BlockFinder;
+import nl.rutgerkok.blocklocker.impl.blockfinder.BlockFinder;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -48,7 +48,7 @@ public final class BlockPlaceListener extends EventListener {
     }
 
     private boolean isExistingChestNearby(Block chestBlock) {
-        for (BlockFace blockFace : BlockFinder.CHEST_LINKING_FACES) {
+        for (BlockFace blockFace : BlockFinder.CARDINAL_FACES) {
             if (chestBlock.getRelative(blockFace).getType() == Material.CHEST) {
                 return true;
             }

@@ -18,6 +18,7 @@ import nl.rutgerkok.blocklocker.SignSelector;
 import nl.rutgerkok.blocklocker.Translator;
 import nl.rutgerkok.blocklocker.group.CombinedGroupSystem;
 import nl.rutgerkok.blocklocker.group.GroupSystem;
+import nl.rutgerkok.blocklocker.impl.blockfinder.BlockFinder;
 import nl.rutgerkok.blocklocker.impl.converter.ProtectionUpdaterImpl;
 import nl.rutgerkok.blocklocker.impl.event.BlockDestroyListener;
 import nl.rutgerkok.blocklocker.impl.event.BlockLockerCommand;
@@ -148,7 +149,7 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
         profileFactory = new ProfileFactoryImpl(combinedGroupSystem, translator);
         chestSettings = new ChestSettingsImpl(translator, config);
         signParser = new SignParserImpl(chestSettings, nms, profileFactory);
-        BlockFinder blockFinder = new BlockFinder(signParser);
+        BlockFinder blockFinder = BlockFinder.create(signParser, config.getConnectContainers());
         protectionFinder = new ProtectionFinderImpl(blockFinder, chestSettings);
         protectionUpdater = new ProtectionUpdaterImpl(this);
         signSelector = new SignSelectorImpl(this);

@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 import nl.rutgerkok.blocklocker.ProtectionSign;
-import nl.rutgerkok.blocklocker.impl.BlockFinder;
+import nl.rutgerkok.blocklocker.impl.blockfinder.BlockFinder;
 import nl.rutgerkok.blocklocker.protection.ContainerProtection;
 import nl.rutgerkok.blocklocker.protection.Protection;
 

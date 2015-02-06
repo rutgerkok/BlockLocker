@@ -42,6 +42,12 @@ protectableContainers:
 - TRAPPED_CHEST
 - WORKBENCH
 
+# When set to true, one sign protects all connected nearby blocks of the same
+# type. When false, each container requires a separate sign.
+# Please note that a double chest is one container, so one sign is enough to
+# protect the whole chest, regardless of this setting.
+connectContainers: false
+
 # All types of doors that can be protected. These blocks must follow the data
 # value format as described here:
 # http://minecraft.gamepedia.com/Data_values#Door

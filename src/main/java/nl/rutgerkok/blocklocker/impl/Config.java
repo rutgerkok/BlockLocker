@@ -23,16 +23,17 @@ final class Config {
                 PROTECTABLE_DOORS = "protectableDoors",
                 PROTECTABLE_TRAP_DOORS = "protectableTrapDoors",
                 DEFAULT_DOOR_OPEN_SECONDS = "defaultDoorOpenSeconds",
-                UPDATER = "updater";
+                UPDATER = "updater",
+                CONNECT_CONTAINERS = "connectContainers";
     }
 
     static final String DEFAULT_TRANSLATIONS_FILE = "translations-en.yml";
 
+    private final boolean connectContainers;
     private final int defaultDoorOpenSeconds;
     private final String languageFile;
     private final Logger logger;
     private final Map<ProtectionType, Set<Material>> protectableMaterialsMap;
-
     /**
      * Combination of the sets of all individual protection types.
      */
@@ -46,6 +47,7 @@ final class Config {
                 DEFAULT_TRANSLATIONS_FILE);
         defaultDoorOpenSeconds = config.getInt(Key.DEFAULT_DOOR_OPEN_SECONDS, 0);
         updatePreference = readUpdatePreference(config.getString(Key.UPDATER));
+        connectContainers = config.getBoolean(Key.CONNECT_CONTAINERS);
 
         // Materials
         protectableMaterialsMap = new EnumMap<ProtectionType, Set<Material>>(ProtectionType.class);
@@ -76,12 +78,12 @@ final class Config {
     }
 
     /**
-     * Gets the update preference.
+     * Gets whether containers should be connected.
      *
-     * @return The update preference.
+     * @return True if containers should be connected, false otherwise.
      */
-    UpdatePreference getUpdatePreference() {
-        return updatePreference;
+    boolean getConnectContainers() {
+        return connectContainers;
     }
 
     /**
@@ -121,6 +123,15 @@ final class Config {
      */
     String getLanguageFileName() {
         return languageFile;
+    }
+
+    /**
+     * Gets the update preference.
+     *
+     * @return The update preference.
+     */
+    UpdatePreference getUpdatePreference() {
+        return updatePreference;
     }
 
     /**

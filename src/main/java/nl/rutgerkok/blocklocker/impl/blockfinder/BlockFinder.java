@@ -1,8 +1,7 @@
-package nl.rutgerkok.blocklocker.impl;
+package nl.rutgerkok.blocklocker.impl.blockfinder;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import nl.rutgerkok.blocklocker.BlockData;
@@ -13,28 +12,47 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
+import org.bukkit.craftbukkit.libs.jline.internal.Preconditions;
 import org.bukkit.material.Attachable;
-import org.bukkit.material.Chest;
-import org.bukkit.material.Directional;
 import org.bukkit.material.MaterialData;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
-public final class BlockFinder {
-    public static final BlockFace[] DOOR_ATTACHMENT_FACES = { BlockFace.UP, BlockFace.DOWN };
-    public static final BlockFace[] CHEST_LINKING_FACES = { BlockFace.NORTH, BlockFace.EAST,
-            BlockFace.SOUTH, BlockFace.WEST };
-    public static final BlockFace[] TRAP_DOOR_ATTACHMENT_FACES = { BlockFace.NORTH, BlockFace.EAST,
-            BlockFace.SOUTH, BlockFace.WEST };
-    private static final BlockFace[] SIGN_ATTACHMENT_FACES = { BlockFace.NORTH, BlockFace.EAST,
-            BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP };
+/**
+ * Finds blocks that logically belong together, like the other half of a chest,
+ * the attached signs, etc.
+ *
+ */
+public abstract class BlockFinder {
 
-    private SignParser parser;
+    public static final BlockFace[] CARDINAL_FACES = { BlockFace.NORTH, BlockFace.EAST,
+                BlockFace.SOUTH, BlockFace.WEST };
+    private static final BlockFace[] SIGN_ATTACHMENT_FACES = { BlockFace.NORTH, BlockFace.EAST,
+                BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP };
+    public static final BlockFace[] VERTICAL_FACES = { BlockFace.UP, BlockFace.DOWN };
+
+    /**
+     * Creates a new block finder.
+     * 
+     * @param parser
+     *            The parser of signs.
+     * @param connectContainers
+     *            Whether containers must be connected.
+     * @return The block finder.
+     */
+    public static BlockFinder create(SignParser parser, boolean connectContainers) {
+        if (connectContainers) {
+            return new ConnectedContainersBlockFinder(parser);
+        } else {
+            return new SeparateContainersBlockFinder(parser);
+        }
+    }
+
+    protected final SignParser parser;
 
     BlockFinder(SignParser parser) {
-        this.parser = parser;
+        this.parser = Preconditions.checkNotNull(parser);
     }
 
     /**
@@ -76,7 +94,7 @@ public final class BlockFinder {
             // Avoid creating a builder, iterator and extra set
             return findAttachedSigns(blocks.iterator().next());
         }
-
+    
         ImmutableSet.Builder<ProtectionSign> signs = ImmutableSet.builder();
         for (Block block : blocks) {
             signs.addAll(findAttachedSigns(block));
@@ -91,39 +109,7 @@ public final class BlockFinder {
      *            The container.
      * @return List of attached containers, including the given container.
      */
-    public List<Block> findContainerNeighbors(Block block) {
-        // Currently only chests share an inventory
-        // Minecraft connects two chests next to each other that have the same
-        // direction. We simply check for that condition, taking both normal
-        // and trapped chests into account
-        if (!(BlockData.get(block) instanceof Chest)) {
-            return Collections.singletonList(block);
-        }
-
-        Material chestMaterial = block.getType(); // CHEST or TRAPPED_CHEST
-        BlockFace chestFacing = ((Directional) BlockData.get(block)).getFacing();
-
-        for (BlockFace face : CHEST_LINKING_FACES) {
-            Block atPosition = block.getRelative(face);
-            if (atPosition.getType() != chestMaterial) {
-                continue;
-            }
-
-            MaterialData materialData = BlockData.get(atPosition);
-            if (!(materialData instanceof Directional)) {
-                continue;
-            }
-
-            BlockFace facing = ((Directional) materialData).getFacing();
-            if (!facing.equals(chestFacing)) {
-                continue;
-            }
-
-            return ImmutableList.of(block, atPosition);
-        }
-
-        return Collections.singletonList(block);
-    }
+    public abstract List<Block> findContainerNeighbors(Block block);
 
     /**
      * Gets the block that supports the given block. If the returned block is
@@ -174,4 +160,5 @@ public final class BlockFinder {
         BlockFace actualFace = ((org.bukkit.material.Sign) materialData).getAttachedFace();
         return (actualFace == requiredFace);
     }
+
 }
