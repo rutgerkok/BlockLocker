@@ -127,6 +127,7 @@ abstract class AbstractProtection implements Protection {
     }
 
     @Override
+    @Deprecated
     public final boolean needsUpdate(boolean onlineMode) {
         for (ProtectionSign protectionSign : getSigns()) {
             if (protectionSign.needsUpdate(onlineMode)) {

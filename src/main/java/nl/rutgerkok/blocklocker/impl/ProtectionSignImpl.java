@@ -8,9 +8,7 @@ import nl.rutgerkok.blocklocker.SignType;
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;
 import nl.rutgerkok.blocklocker.profile.Profile;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.Player;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
@@ -23,14 +21,12 @@ final class ProtectionSignImpl implements ProtectionSign {
     private final SignType signType;
     private final List<Profile> profiles;
     private final Location location;
-    private final boolean needsUpdateOverride;
 
     ProtectionSignImpl(Location location, SignType signType,
-            List<Profile> profiles, boolean needsUpdateOverride) {
+            List<Profile> profiles) {
         this.location = location;
         this.signType = Preconditions.checkNotNull(signType);
         this.profiles = ImmutableList.copyOf(profiles);
-        this.needsUpdateOverride = needsUpdateOverride;
         if (profiles.isEmpty() || profiles.size() > MAX_PROFILES) {
             throw new IllegalArgumentException("Invalid size for profiles collection: " + profiles);
         }
@@ -51,7 +47,7 @@ final class ProtectionSignImpl implements ProtectionSign {
 
     @Override
     public ProtectionSign withProfiles(List<Profile> profiles) {
-        return new ProtectionSignImpl(location, signType, profiles, needsUpdateOverride);
+        return new ProtectionSignImpl(location, signType, profiles);
     }
 
     @Override
@@ -98,10 +94,8 @@ final class ProtectionSignImpl implements ProtectionSign {
     }
 
     @Override
+    @Deprecated
     public boolean needsUpdate(boolean useUniqueIds) {
-        if (needsUpdateOverride) {
-            return true;
-        }
         if (!useUniqueIds) {
             return false;
         }
@@ -116,15 +110,10 @@ final class ProtectionSignImpl implements ProtectionSign {
         return false;
     }
 
+    @Deprecated
     private boolean needsUpdateInOnlineMode(PlayerProfile playerProfile) {
         Optional<UUID> uuid = playerProfile.getUniqueId();
-        if (uuid.isPresent()) {
-            // Check if name is up-to-date
-            Player player = Bukkit.getPlayer(uuid.get());
-            if (player != null && player.getName().equals(playerProfile.getDisplayName())) {
-                return true;
-            }
-        } else {
+        if (!uuid.isPresent()) {
             // Missing UUID
             return true;
         }
