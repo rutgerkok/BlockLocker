@@ -32,11 +32,13 @@
 			<version>1.8-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
+
+		<!-- Third party plugins -->
 		<dependency>
-			<groupId>org.spigotmc</groupId>
-			<artifactId>spigot</artifactId>
-			<version>1.8-R0.1-SNAPSHOT</version>
-			<scope>test</scope>
+			<groupId>com.palmergames</groupId>
+			<artifactId>towny</artifactId>
+			<version>0.89.0.0</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.massivecraft</groupId>
@@ -50,10 +52,18 @@
 			<version>2.7.5</version>
 			<scope>provided</scope>
 		</dependency>
+
+		<!-- Tests -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.11</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.spigotmc</groupId>
+			<artifactId>spigot</artifactId>
+			<version>1.8-R0.1-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

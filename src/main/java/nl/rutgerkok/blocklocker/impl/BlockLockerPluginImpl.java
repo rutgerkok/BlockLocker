@@ -27,6 +27,7 @@ import nl.rutgerkok.blocklocker.impl.event.SignChangeListener;
 import nl.rutgerkok.blocklocker.impl.group.FactionsGroupSystem;
 import nl.rutgerkok.blocklocker.impl.group.PermissionsGroupSystem;
 import nl.rutgerkok.blocklocker.impl.group.ScoreboardGroupSystem;
+import nl.rutgerkok.blocklocker.impl.group.TownyGroupSystem;
 import nl.rutgerkok.blocklocker.impl.nms.NMSAccessor;
 import nl.rutgerkok.blocklocker.impl.profile.ProfileFactoryImpl;
 import nl.rutgerkok.blocklocker.impl.updater.Updater;
@@ -126,6 +127,9 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
 
         if (FactionsGroupSystem.isAvailable()) {
             this.combinedGroupSystem.addSystem(new FactionsGroupSystem());
+        }
+        if (TownyGroupSystem.isAvailable()) {
+            this.combinedGroupSystem.addSystem(new TownyGroupSystem());
         }
     }
 
