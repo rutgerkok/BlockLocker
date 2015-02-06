@@ -5,6 +5,7 @@ import nl.rutgerkok.blocklocker.group.GroupSystem;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.google.common.base.Throwables;
 import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.exceptions.NotRegisteredException;
 import com.palmergames.bukkit.towny.object.Nation;
@@ -47,8 +48,13 @@ public final class TownyGroupSystem extends GroupSystem {
             }
 
             return false;
-        } catch (NotRegisteredException e) {
-            return false;
+        } catch (Exception e) {
+            // Cannot use catch (NotRegisteredException e) because the class
+            // cannot be loaded then when Towny isn't present
+            if (e instanceof NotRegisteredException) {
+                return false;
+            }
+            throw Throwables.propagate(e);
         }
     }
 
@@ -71,8 +77,13 @@ public final class TownyGroupSystem extends GroupSystem {
             }
 
             return false;
-        } catch (NotRegisteredException e) {
-            return false;
+        } catch (Exception e) {
+            // Cannot use catch (NotRegisteredException e) because the class
+            // cannot be loaded then when Towny isn't present
+            if (e instanceof NotRegisteredException) {
+                return false;
+            }
+            throw Throwables.propagate(e);
         }
     }
 
