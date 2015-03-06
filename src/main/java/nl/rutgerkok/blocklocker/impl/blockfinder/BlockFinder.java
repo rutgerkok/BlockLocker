@@ -12,11 +12,11 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
-import org.bukkit.craftbukkit.libs.jline.internal.Preconditions;
 import org.bukkit.material.Attachable;
 import org.bukkit.material.MaterialData;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 
 /**
