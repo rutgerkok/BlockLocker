@@ -1524,7 +1524,21 @@ public class TestPlayer implements Player {
     @Override
     public void updateInventory() {
         throw new UnsupportedOperationException();
+    }
 
+    @Override
+    public List<Block> getLastTwoTargetBlocks(Set<Material> arg0, int arg1) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<Block> getLineOfSight(Set<Material> arg0, int arg1) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Block getTargetBlock(Set<Material> arg0, int arg1) {
+        throw new UnsupportedOperationException();
     }
 
 }
