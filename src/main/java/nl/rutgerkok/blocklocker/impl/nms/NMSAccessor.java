@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Sign;
 import org.json.simple.JSONArray;
@@ -23,8 +24,8 @@ import com.google.common.base.Throwables;
  */
 public final class NMSAccessor {
 
-    private final static String nmsPrefix = "net.minecraft.server.v1_8_R1.";
-    private final static String obcPrefix = "org.bukkit.craftbukkit.v1_8_R1.";
+    private final String nmsPrefix;
+    private final String obcPrefix;
 
     static Object enumField(Class<Enum<?>> enumClass, String name) {
         try {
@@ -33,6 +34,20 @@ public final class NMSAccessor {
         } catch (Exception e) {
             throw Throwables.propagate(e);
         }
+    }
+
+    /**
+     * Gets the Minecraft class version of the server, like "v1_8_R2".
+     *
+     * @return Minecraft class version.
+     */
+    private static String getMinecraftClassVersion() {
+        String serverClassName = Bukkit.getServer().getClass().getName();
+        String version = serverClassName.split("\\.")[3];
+        if (!version.startsWith("v")) {
+            throw new AssertionError("Failed to detect Minecraft version, found " + version + " in " + serverClassName);
+        }
+        return version;
     }
 
     static Constructor<?> getConstructor(Class<?> clazz, Class<?>... paramTypes) {
@@ -59,7 +74,7 @@ public final class NMSAccessor {
         }
     }
 
-    static Class<?> getNMSClass(String name) {
+    Class<?> getNMSClass(String name) {
         try {
             return Class.forName(nmsPrefix + name);
         } catch (ClassNotFoundException e) {
@@ -67,7 +82,7 @@ public final class NMSAccessor {
         }
     }
 
-    static Class<Enum<?>> getNMSEnum(String name) {
+    Class<Enum<?>> getNMSEnum(String name) {
         Class<?> clazz = getNMSClass(name);
         if (!clazz.isEnum()) {
             throw new IllegalArgumentException(clazz + " is not an enum");
@@ -77,7 +92,19 @@ public final class NMSAccessor {
         return enumClazz;
     }
 
-    static Class<?> getOBCClass(String name) {
+    Class<Enum<?>> getAnyNMSEnum(String... possibleNames) {
+        Exception lastException = null;
+        for (String name : possibleNames) {
+            try {
+                return getNMSEnum(name);
+            } catch (Exception e) {
+                lastException = e;
+            }
+        }
+        throw Throwables.propagate(lastException);
+    }
+
+    Class<?> getOBCClass(String name) {
         try {
             return Class.forName(obcPrefix + name);
         } catch (Exception e) {
@@ -138,12 +165,16 @@ public final class NMSAccessor {
     final Method WorldServer_getTileEntity;
 
     public NMSAccessor() {
+        String version = getMinecraftClassVersion();
+        nmsPrefix = "net.minecraft.server." + version + ".";
+        obcPrefix = "org.bukkit.craftbukkit." + version + ".";
+
         BlockPosition = getNMSClass("BlockPosition");
         WorldServer = getNMSClass("WorldServer");
         ChatModifier = getNMSClass("ChatModifier");
         ChatHoverable = getNMSClass("ChatHoverable");
         IChatBaseComponent = getNMSClass("IChatBaseComponent");
-        EnumHoverAction = getNMSEnum("EnumHoverAction");
+        EnumHoverAction = getAnyNMSEnum("EnumHoverAction", "ChatHoverable$EnumHoverAction");
         TileEntitySign = getNMSClass("TileEntitySign");
         ChatComponentText = getNMSClass("ChatComponentText");
 
