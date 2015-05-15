@@ -53,12 +53,6 @@ public interface Protection {
     boolean isAllowed(Profile profile);
 
     /**
-     * Just check yourself whether the protection needs an update.
-     */
-    @Deprecated
-    boolean needsUpdate(boolean uuidsEnabled);
-
-    /**
      * Checks if the given profile is the owner of this chest.
      *
      * @param profile

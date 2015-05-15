@@ -127,17 +127,6 @@ abstract class AbstractProtection implements Protection {
     }
 
     @Override
-    @Deprecated
-    public final boolean needsUpdate(boolean onlineMode) {
-        for (ProtectionSign protectionSign : getSigns()) {
-            if (protectionSign.needsUpdate(onlineMode)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
     public final boolean isOwner(Profile profile) {
         Validate.notNull(profile);
 

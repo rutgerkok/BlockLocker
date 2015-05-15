@@ -62,7 +62,4 @@ public interface ProtectionSign {
      */
     Location getLocation();
 
-    @Deprecated
-    boolean needsUpdate(boolean useUniqueIds);
-
 }

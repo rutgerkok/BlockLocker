@@ -10,23 +10,6 @@ import nl.rutgerkok.blocklocker.protection.Protection;
  */
 public interface ProtectionUpdater {
 
-    @Deprecated
-    enum UpdateMode {
-        FORCED,
-        IF_NEEDED
-    }
-
-    /**
-     * @param protection
-     *            The protection to fix.
-     * @param updateMode
-     *            The update mode, now ignored.
-     * @deprecated Use {@link #update(Protection, boolean)}. Second parameter is
-     *             now ignored.
-     */
-    @Deprecated
-    void update(Protection protection, UpdateMode updateMode);
-
     /**
      * Does generic cleaning for the signs on the protection at some point in
      * the near future. Fixes the missing UUIDs in the given protection, by

@@ -1,17 +1,14 @@
 package nl.rutgerkok.blocklocker.impl;
 
 import java.util.List;
-import java.util.UUID;
 
 import nl.rutgerkok.blocklocker.ProtectionSign;
 import nl.rutgerkok.blocklocker.SignType;
-import nl.rutgerkok.blocklocker.profile.PlayerProfile;
 import nl.rutgerkok.blocklocker.profile.Profile;
 
 import org.bukkit.Location;
 
 import com.google.common.base.Objects;
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
@@ -91,33 +88,6 @@ final class ProtectionSignImpl implements ProtectionSign {
             return false;
         }
         return true;
-    }
-
-    @Override
-    @Deprecated
-    public boolean needsUpdate(boolean useUniqueIds) {
-        if (!useUniqueIds) {
-            return false;
-        }
-        for (Profile profile : profiles) {
-            if (profile instanceof PlayerProfile) {
-                PlayerProfile playerProfile = (PlayerProfile) profile;
-                if (needsUpdateInOnlineMode(playerProfile)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    @Deprecated
-    private boolean needsUpdateInOnlineMode(PlayerProfile playerProfile) {
-        Optional<UUID> uuid = playerProfile.getUniqueId();
-        if (!uuid.isPresent()) {
-            // Missing UUID
-            return true;
-        }
-        return false;
     }
 
 }

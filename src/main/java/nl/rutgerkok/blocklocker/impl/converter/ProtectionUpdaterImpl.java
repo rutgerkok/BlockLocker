@@ -78,12 +78,6 @@ public class ProtectionUpdaterImpl implements ProtectionUpdater {
         }
     }
 
-    @Override
-    public void update(Protection protection,
-            @SuppressWarnings("deprecation") UpdateMode updateMode) {
-        update(protection, false);
-    }
-
     private void updateForMissingIds(Protection protection, boolean lookupPastNames) {
         Optional<ProtectionMissingIds> missingIds = ProtectionMissingIds.of(protection, lookupPastNames);
 
