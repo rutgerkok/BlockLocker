@@ -15,9 +15,8 @@ public interface SignParser {
     /**
      * Gets the type of the sign.
      *
-     * @param header
-     *            First line of the sign, may contain extra spaces and color
-     *            codes.
+     * @param sign
+     *            The sign.
      * @return The type of the sign.
      */
     Optional<SignType> getSignType(Sign sign);

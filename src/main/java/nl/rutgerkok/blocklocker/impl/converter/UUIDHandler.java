@@ -126,7 +126,7 @@ final class UUIDHandler {
             return results;
         }
 
-        /**
+        /*
          * Very expensive - no bulk lookup available!
          */
         Map<String, Result> uuidLookupInPast(List<String> names, Date timestamp) throws Exception {
@@ -231,8 +231,8 @@ final class UUIDHandler {
 
         /**
          * This method is called once for each call to
-         * {@link UUIDHandler#fetchUniqueIds(Collection, ResultConsumer)}. If
-         * the constructor of {@link ResultConsumer} was called with the
+         * {@link UUIDHandler#fetchUniqueIds(Collection, ResultConsumer, boolean)}
+         * . If the constructor of {@link ResultConsumer} was called with the
          * parameter set to true, this method will be called from the server
          * thread, otherwise it can be called from any thread (including the
          * server thread).
@@ -427,6 +427,8 @@ final class UUIDHandler {
      * @param results
      *            The results already found by looking at the online player
      *            list.
+     * @throws Exception
+     *             When something goes wrong while contacting Mojang.
      */
     private void fetchUniqueIdsAtMojang(List<String> names, Map<String, Result> results) throws Exception {
         Map<String, Result> newResults = mojangWeb.uuidLookup(names);
@@ -469,6 +471,8 @@ final class UUIDHandler {
      * @param results
      *            The results already found by looking at the online player
      *            list.
+     * @throws Exception
+     *             When something goes wrong while contacting Mojang.
      */
     private void fetchUniqueIdsFromPastNamesAtMojang(List<String> names, Map<String, Result> results) throws Exception {
         results.putAll(mojangWeb.uuidLookupInPast(names, BEFORE_NAME_CHANGES));

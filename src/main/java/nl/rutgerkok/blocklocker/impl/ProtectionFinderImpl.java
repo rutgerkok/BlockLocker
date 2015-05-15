@@ -211,7 +211,7 @@ class ProtectionFinderImpl implements ProtectionFinder {
      * sign. A sign is given as a hint to this method, so that the
      * {@link Protection#getOwner()} method executes a little faster.
      *
-     * @param containerBlock
+     * @param protectionBlock
      *            The block that represents the protection (is a door or
      *            container block).
      * @param sign

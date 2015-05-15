@@ -118,9 +118,9 @@ public abstract class BlockFinder {
      * For blocks that are self-supporting (most blocks in Minecraft), the
      * method returns the block itself.
      * 
-     * @param sign
-     *            The sign.
-     * @return The block the sign is attached on.
+     * @param block
+     *            The block.
+     * @return The block the given block is attached on.
      */
     public Block findSupportingBlock(Block block) {
         MaterialData data = BlockData.get(block);

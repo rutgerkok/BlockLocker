@@ -18,9 +18,11 @@ final class ProtectionMissingIds {
 
     /**
      * Creates a {@link ProtectionMissingIds} for the given protection.
-     * 
+     *
      * @param protection
      *            The protection.
+     * @param lookupPastNames
+     *            Whether past names need to be looked up. False for new signs.
      * @return The {@link ProtectionMissingIds}, or absent if the protection is
      *         not missing ids.
      */
@@ -57,6 +59,10 @@ final class ProtectionMissingIds {
      *
      * @param protection
      *            The protection to fetch the UUIDs for.
+     * @param namesMissingUniqueIds
+     *            The names that need to be looked up.
+     * @param lookupPastNames
+     *            Whether the names may be outdated.
      */
     private ProtectionMissingIds(Protection protection, ImmutableSet.Builder<String> namesMissingUniqueIds, boolean lookupPastNames) {
         this.protection = protection;

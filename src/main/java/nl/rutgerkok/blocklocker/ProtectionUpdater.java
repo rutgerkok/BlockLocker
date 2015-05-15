@@ -17,6 +17,10 @@ public interface ProtectionUpdater {
     }
 
     /**
+     * @param protection
+     *            The protection to fix.
+     * @param updateMode
+     *            The update mode, now ignored.
      * @deprecated Use {@link #update(Protection, boolean)}. Second parameter is
      *             now ignored.
      */

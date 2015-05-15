@@ -64,9 +64,11 @@ class SignParserImpl implements SignParser {
     /**
      * Used for signs where the hidden text was found.
      *
-     * @param jsonArray
-     *            The hidden text.
-     * @param addTo
+     * @param location
+     *            The location of the sign.
+     * @param header
+     *            The header on the sign.
+     * @param list
      *            The profile collection to add all profiles to.
      * @return
      */
@@ -91,6 +93,8 @@ class SignParserImpl implements SignParser {
      * Used for signs where the hidden information was never written or was
      * lost.
      *
+     * @param location
+     *            The location on the sign.
      * @param lines
      *            The lines on the sign.
      * @return The protection sign, if the header format is correct.

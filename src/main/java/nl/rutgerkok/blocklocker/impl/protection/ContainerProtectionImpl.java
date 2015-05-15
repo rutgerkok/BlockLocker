@@ -22,7 +22,7 @@ public final class ContainerProtectionImpl extends AbstractProtection implements
      *            {@link #getOwner()}.
      * @param blockFinder
      *            The sign finder.
-     * @param blocks2
+     * @param blocks
      *            The block that are protected. (Usually one block, multiple for
      *            double chests.)
      *

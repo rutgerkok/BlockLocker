@@ -6,15 +6,15 @@ import org.bukkit.material.Chest;
 import org.bukkit.material.MaterialData;
 
 /**
- * Two methods that Bukkit should really add to their {@link Block) interface.
+ * Two methods that Bukkit should really add to their {@link Block} interface.
  *
  */
 public final class BlockData {
 
     private BlockData() {
-        
+
     }
-    
+
     /**
      * Fast alternative for the slow {@code block.getState().getData()} call.
      * This method skips the part where unnecessary BlockStates are created. For
