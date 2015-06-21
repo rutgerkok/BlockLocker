@@ -11,6 +11,7 @@ import nl.rutgerkok.blocklocker.profile.Profile;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
 import org.json.simple.JSONObject;
 
 import com.google.common.base.Optional;
@@ -59,7 +60,7 @@ public final class ProfileFactoryImpl implements ProfileFactory {
             }
 
             // [Timer:X]
-            if (text.startsWith(timerTagStart) && text.endsWith("]")) {
+            if (StringUtil.startsWithIgnoreCase(text, timerTagStart) && text.endsWith("]")) {
                 int seconds = readDigit(text.charAt(timerTagStart.length()));
                 return new TimerProfileImpl(translator.getWithoutColor(Translation.TAG_TIMER), seconds);
             }
