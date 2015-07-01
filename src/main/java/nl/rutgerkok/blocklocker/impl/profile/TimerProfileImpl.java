@@ -1,5 +1,7 @@
 package nl.rutgerkok.blocklocker.impl.profile;
 
+import java.util.Date;
+
 import nl.rutgerkok.blocklocker.profile.Profile;
 import nl.rutgerkok.blocklocker.profile.TimerProfile;
 
@@ -29,6 +31,11 @@ class TimerProfileImpl implements TimerProfile {
         return "[" + timerTag + ":" + seconds + "]";
     }
 
+    @Override
+    public int getOpenSeconds() {
+        return seconds;
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public JSONObject getSaveObject() {
@@ -44,8 +51,9 @@ class TimerProfileImpl implements TimerProfile {
     }
 
     @Override
-    public int getOpenSeconds() {
-        return seconds;
+    public boolean isExpired(Date cutoffDate) {
+        // These never expire
+        return false;
     }
 
 }

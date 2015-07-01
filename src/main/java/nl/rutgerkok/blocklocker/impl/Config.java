@@ -17,18 +17,14 @@ import com.google.common.base.Optional;
 
 final class Config {
     private final static class Key {
-        private final static String
-                LANGUAGE_FILE = "languageFile",
-                PROTECTABLE_CONTAINERS = "protectableContainers",
-                PROTECTABLE_DOORS = "protectableDoors",
-                PROTECTABLE_TRAP_DOORS = "protectableTrapDoors",
-                DEFAULT_DOOR_OPEN_SECONDS = "defaultDoorOpenSeconds",
-                UPDATER = "updater",
-                CONNECT_CONTAINERS = "connectContainers";
+        private final static String LANGUAGE_FILE = "languageFile", PROTECTABLE_CONTAINERS = "protectableContainers", PROTECTABLE_DOORS = "protectableDoors",
+                PROTECTABLE_TRAP_DOORS = "protectableTrapDoors", DEFAULT_DOOR_OPEN_SECONDS = "defaultDoorOpenSeconds", UPDATER = "updater",
+                CONNECT_CONTAINERS = "connectContainers", AUTO_EXPIRE_DAYS = "autoExpireDays";
     }
 
     static final String DEFAULT_TRANSLATIONS_FILE = "translations-en.yml";
 
+    private final int autoExpireDays;
     private final boolean connectContainers;
     private final int defaultDoorOpenSeconds;
     private final String languageFile;
@@ -43,20 +39,17 @@ final class Config {
     Config(Logger logger, FileConfiguration config) {
         this.logger = logger;
 
-        languageFile = config.getString(Key.LANGUAGE_FILE,
-                DEFAULT_TRANSLATIONS_FILE);
+        languageFile = config.getString(Key.LANGUAGE_FILE, DEFAULT_TRANSLATIONS_FILE);
         defaultDoorOpenSeconds = config.getInt(Key.DEFAULT_DOOR_OPEN_SECONDS, 0);
         updatePreference = readUpdatePreference(config.getString(Key.UPDATER));
         connectContainers = config.getBoolean(Key.CONNECT_CONTAINERS);
+        autoExpireDays = config.getInt(Key.AUTO_EXPIRE_DAYS);
 
         // Materials
         protectableMaterialsMap = new EnumMap<ProtectionType, Set<Material>>(ProtectionType.class);
-        protectableMaterialsMap.put(ProtectionType.CONTAINER,
-                readMaterialSet(config.getStringList(Key.PROTECTABLE_CONTAINERS)));
-        protectableMaterialsMap.put(ProtectionType.DOOR,
-                readMaterialSet(config.getStringList(Key.PROTECTABLE_DOORS)));
-        protectableMaterialsMap.put(ProtectionType.TRAP_DOOR,
-                readMaterialSet(config.getStringList(Key.PROTECTABLE_TRAP_DOORS)));
+        protectableMaterialsMap.put(ProtectionType.CONTAINER, readMaterialSet(config.getStringList(Key.PROTECTABLE_CONTAINERS)));
+        protectableMaterialsMap.put(ProtectionType.DOOR, readMaterialSet(config.getStringList(Key.PROTECTABLE_DOORS)));
+        protectableMaterialsMap.put(ProtectionType.TRAP_DOOR, readMaterialSet(config.getStringList(Key.PROTECTABLE_TRAP_DOORS)));
 
         // Create combined set
         protectableMaterialsSet = EnumSet.noneOf(Material.class);
@@ -78,16 +71,8 @@ final class Config {
     }
 
     /**
-     * Gets whether containers should be connected.
-     *
-     * @return True if containers should be connected, false otherwise.
-     */
-    boolean getConnectContainers() {
-        return connectContainers;
-    }
-
-    /**
      * Gets whether the material can be protected by the given type.
+     * 
      * @param type
      *            Protection type that must be checked for being able to protect
      *            this type.
@@ -103,6 +88,25 @@ final class Config {
             return false;
         }
         return materials.contains(material);
+    }
+
+    /**
+     * Gets the amount of days that a chest owner has to be offline for a chest
+     * to expire. 0 or negative means that chests never expire.
+     * 
+     * @return The amount of days.
+     */
+    int getAutoExpireDays() {
+        return autoExpireDays;
+    }
+
+    /**
+     * Gets whether containers should be connected.
+     *
+     * @return True if containers should be connected, false otherwise.
+     */
+    boolean getConnectContainers() {
+        return connectContainers;
     }
 
     /**

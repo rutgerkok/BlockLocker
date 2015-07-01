@@ -1,6 +1,7 @@
 package nl.rutgerkok.blocklocker.impl.event;
 
 import java.util.Collection;
+import java.util.Date;
 
 import nl.rutgerkok.blocklocker.BlockLockerPlugin;
 import nl.rutgerkok.blocklocker.profile.Profile;
@@ -41,5 +42,13 @@ abstract class EventListener implements Listener {
         }
         Profile redstone = plugin.getProfileFactory().fromRedstone();
         return !protection.get().isAllowed(redstone);
+    }
+
+    boolean isExpired(Protection protection) {
+        Optional<Date> cutoffDate = plugin.getChestSettings().getChestExpireDate();
+        if (cutoffDate.isPresent()) {
+            return protection.isExpired(cutoffDate.get());
+        }
+        return false;
     }
 }

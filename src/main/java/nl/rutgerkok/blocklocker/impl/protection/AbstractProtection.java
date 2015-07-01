@@ -1,6 +1,7 @@
 package nl.rutgerkok.blocklocker.impl.protection;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import nl.rutgerkok.blocklocker.ProtectionSign;
@@ -137,5 +138,17 @@ abstract class AbstractProtection implements Protection {
         }
 
         return owner.get().includes(profile);
+    }
+
+    @Override
+    public boolean isExpired(Date cutoffDate) {
+        Optional<Profile> owner = getOwner();
+
+        if (owner.isPresent()) {
+            return owner.get().isExpired(cutoffDate);
+        }
+
+        // Protections without an owner are invalid, but not expired
+        return false;
     }
 }

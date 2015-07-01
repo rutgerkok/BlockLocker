@@ -1,5 +1,7 @@
 package nl.rutgerkok.blocklocker.impl.profile;
 
+import java.util.Date;
+
 import nl.rutgerkok.blocklocker.profile.Profile;
 
 import org.apache.commons.lang.Validate;
@@ -60,6 +62,12 @@ class EveryoneProfileImpl implements Profile {
     public boolean includes(Profile other) {
         Validate.notNull(other);
         return true;
+    }
+
+    @Override
+    public boolean isExpired(Date cutoffDate) {
+        // The [Everyone] profile never expires
+        return false;
     }
 
     @Override

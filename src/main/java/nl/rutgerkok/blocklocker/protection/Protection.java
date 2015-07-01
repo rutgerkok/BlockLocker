@@ -1,6 +1,7 @@
 package nl.rutgerkok.blocklocker.protection;
 
 import java.util.Collection;
+import java.util.Date;
 
 import nl.rutgerkok.blocklocker.ProtectionSign;
 import nl.rutgerkok.blocklocker.profile.Profile;
@@ -34,6 +35,14 @@ public interface Protection {
     Optional<Profile> getOwner();
 
     /**
+     * Gets the display name of the owner of the protection. If
+     * {@link #getOwner()} is absent, "?" is returned.
+     *
+     * @return The display name.
+     */
+    String getOwnerDisplayName();
+
+    /**
      * Gets all signs used in this protection. Low-level method,
      * {@link #getAllowed()} is preferred. Example usage is changing the
      * contents on the sign.
@@ -53,6 +62,17 @@ public interface Protection {
     boolean isAllowed(Profile profile);
 
     /**
+     * Gets whether this protection is expired. As protection is expired when
+     * the {@link #getOwner() owner profile} is considered
+     * {@link Profile#isExpired(Date) expired}.
+     *
+     * @param cutoffDate
+     *            The cutoff date.
+     * @return True if the profile is expired, false otherwise.
+     */
+    boolean isExpired(Date cutoffDate);
+
+    /**
      * Checks if the given profile is the owner of this chest.
      *
      * @param profile
@@ -61,13 +81,5 @@ public interface Protection {
      * @see #getOwner()
      */
     boolean isOwner(Profile profile);
-
-    /**
-     * Gets the display name of the owner of the protection. If
-     * {@link #getOwner()} is absent, "?" is returned.
-     *
-     * @return The display name.
-     */
-    String getOwnerDisplayName();
 
 }

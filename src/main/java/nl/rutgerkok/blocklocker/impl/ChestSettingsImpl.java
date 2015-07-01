@@ -1,5 +1,9 @@
 package nl.rutgerkok.blocklocker.impl;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
 import nl.rutgerkok.blocklocker.ChestSettings;
 import nl.rutgerkok.blocklocker.ProtectionType;
 import nl.rutgerkok.blocklocker.SignType;
@@ -65,6 +69,21 @@ class ChestSettingsImpl implements ChestSettings {
     @Override
     public boolean canProtect(Material material) {
         return config.canProtect(material);
+    }
+
+    @Override
+    public Optional<Date> getChestExpireDate() {
+        int days = config.getAutoExpireDays();
+        if (days <= 0) {
+            return Optional.absent();
+        }
+
+        // Calculate the cutoff date
+        Calendar calendar = Calendar.getInstance(Locale.US);
+        calendar.add(Calendar.DAY_OF_MONTH, -days);
+        Date cutoffDate = calendar.getTime();
+
+        return Optional.of(cutoffDate);
     }
 
 }

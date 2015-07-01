@@ -1,5 +1,7 @@
 package nl.rutgerkok.blocklocker.profile;
 
+import java.util.Date;
+
 import nl.rutgerkok.blocklocker.protection.Protection;
 
 import org.json.simple.JSONObject;
@@ -35,4 +37,14 @@ public interface Profile {
      * @return True if this profile includes the other profile, false otherwise.
      */
     boolean includes(Profile other);
+
+    /**
+     * Gets whether this profile is expired.
+     * 
+     * @param cutoffDate
+     *            The cutoff date: there must be activity for this profile after
+     *            the given date, or else it's considered expired.
+     * @return True if the profile is expired, false otherwise.
+     */
+    boolean isExpired(Date cutoffDate);
 }

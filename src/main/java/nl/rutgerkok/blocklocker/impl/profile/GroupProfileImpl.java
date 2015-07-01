@@ -1,5 +1,6 @@
 package nl.rutgerkok.blocklocker.impl.profile;
 
+import java.util.Date;
 import java.util.UUID;
 
 import nl.rutgerkok.blocklocker.group.GroupSystem;
@@ -88,6 +89,12 @@ class GroupProfileImpl implements GroupProfile {
         }
 
         return groupSystem.isInGroup(player, groupName);
+    }
+
+    @Override
+    public boolean isExpired(Date cutoffDate) {
+        // Group profiles never expire
+        return false;
     }
 
     @Override

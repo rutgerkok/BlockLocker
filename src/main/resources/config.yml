@@ -73,3 +73,15 @@ protectableTrapDoors:
 # When the door was opened using redstone, the door will never close
 # automatically too.
 defaultDoorOpenSeconds: 0
+
+# The amount of days the owner of a chest can be absent before the chest is
+# unlocked. When zero or negative chests never expire.
+#
+# This setting will only work for online mode servers (or offline mode servers
+# behind an online mode Bungee proxy). The reason is as follows. The last login time
+# is stored in the player file. To access this player file, you nowadays need the UUID
+# of the player. In offline mode, the UUID depends on the case-correct username. In
+# other words: if a player (intentionally or not) puts the wrong cases on the sign
+# (like notch instead of Notch), the chest protection would never expire. This behaviour is
+# undesired, so chest expiration has been disabled altogether in offline mode.
+autoExpireDays: 0

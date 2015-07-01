@@ -17,6 +17,7 @@ protection:
   chest_hint: "&6Place a sign on this chest to protect it."
   claimed_container: "&6Claimed this container. Nobody else can access it."
   claimed_manually: "&6Created a claim. Only the people listed on the sign can access it."
+  expired: "&6The protection of this block has expired due to inactivity of the owner."
   is_claimed_by: "&6This block has been claimed by {0}."
   no_access: "&4You cannot use this block, it is protected by {0}."
   no_permission_for_claim: "&4You don't have permission to claim a container, sorry."

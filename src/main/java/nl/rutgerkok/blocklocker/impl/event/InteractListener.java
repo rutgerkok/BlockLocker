@@ -39,8 +39,7 @@ import com.google.common.collect.ImmutableSet;
 
 public final class InteractListener extends EventListener {
 
-    private static Set<BlockFace> AUTOPLACE_BLOCK_FACES = ImmutableSet.of(
-            BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP);
+    private static Set<BlockFace> AUTOPLACE_BLOCK_FACES = ImmutableSet.of(BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP);
 
     public InteractListener(BlockLockerPlugin plugin) {
         super(plugin);
@@ -64,6 +63,12 @@ public final class InteractListener extends EventListener {
     private boolean checkAllowed(Player player, Protection protection, boolean clickedSign) {
         PlayerProfile playerProfile = plugin.getProfileFactory().fromPlayer(player);
         boolean allowed = protection.isAllowed(playerProfile);
+
+        // Check for expired protection
+        if (!allowed && isExpired(protection)) {
+            plugin.getTranslator().sendMessage(player, Translation.PROTECTION_EXPIRED);
+            allowed = true;
+        }
 
         // Allow admins to bypass the protection
         if (!allowed && player.hasPermission(Permissions.CAN_BYPASS)) {
@@ -161,11 +166,9 @@ public final class InteractListener extends EventListener {
 
     private void handleDisallowed(Player player, Protection protection, boolean clickedSign) {
         if (clickedSign) {
-            plugin.getTranslator().sendMessage(player, Translation.PROTECTION_IS_CLAIMED_BY,
-                    protection.getOwnerDisplayName());
+            plugin.getTranslator().sendMessage(player, Translation.PROTECTION_IS_CLAIMED_BY, protection.getOwnerDisplayName());
         } else {
-            plugin.getTranslator().sendMessage(player, Translation.PROTECTION_NO_ACCESS,
-                    protection.getOwnerDisplayName());
+            plugin.getTranslator().sendMessage(player, Translation.PROTECTION_NO_ACCESS, protection.getOwnerDisplayName());
         }
     }
 
@@ -319,9 +322,7 @@ public final class InteractListener extends EventListener {
         Sign sign = (Sign) signBlock.getState();
 
         // Place text on it
-        Profile profile = signType.isMainSign() ?
-                plugin.getProfileFactory().fromPlayer(player) :
-                plugin.getProfileFactory().fromEveryone();
+        Profile profile = signType.isMainSign() ? plugin.getProfileFactory().fromPlayer(player) : plugin.getProfileFactory().fromEveryone();
         ProtectionSign protectionSign = plugin.getProtectionFinder().newProtectionSign(sign, signType, profile);
         plugin.getSignParser().saveSign(protectionSign);
 

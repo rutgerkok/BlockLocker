@@ -1,10 +1,13 @@
 package nl.rutgerkok.blocklocker.impl.profile;
 
+import java.util.Date;
 import java.util.UUID;
 
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;
 import nl.rutgerkok.blocklocker.profile.Profile;
 
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.json.simple.JSONObject;
 
 import com.google.common.base.Optional;
@@ -90,6 +93,28 @@ class PlayerProfileImpl implements PlayerProfile {
             return uuid.equals(otherProfile.getUniqueId());
         }
         return displayName.equalsIgnoreCase(otherProfile.getDisplayName());
+    }
+
+    @Override
+    public boolean isExpired(Date cutoffDate) {
+
+
+        if (uuid.isPresent()) {
+            OfflinePlayer player = Bukkit.getOfflinePlayer(uuid.get());
+
+            if (player.isOnline()) {
+                return false;
+            }
+            if (player.getLastPlayed() > cutoffDate.getTime()) {
+                return false;
+            }
+
+            // We know for sure: expired
+            return true;
+        }
+
+        // No UUID, so unable to lookup last login
+        return false;
     }
 
     @Override

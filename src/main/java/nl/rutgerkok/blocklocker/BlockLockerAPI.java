@@ -1,5 +1,6 @@
 package nl.rutgerkok.blocklocker;
 
+import java.util.Date;
 import java.util.UUID;
 
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;
@@ -90,9 +91,9 @@ public final class BlockLockerAPI {
      * @param block
      *            The block.
      * @param allowBypass
-     *            If the player has the bypass permission, the plugin will
-     *            return true regardless of whether the player is listed on the
-     *            signs.
+     *            If the player has the bypass permission, or if the protection
+     *            is expired, the plugin will return true regardless of whether
+     *            the player is listed on the signs.
      * @return True if
      *         <ul>
      *         <li>the block is protected and the player is allowed</li>
@@ -103,15 +104,31 @@ public final class BlockLockerAPI {
      *         False otherwise.
      */
     public static boolean isAllowed(Player player, Block block, boolean allowBypass) {
+        // Check admin bypass
         if (allowBypass && player.hasPermission(Permissions.CAN_BYPASS)) {
             return true;
         }
+
         Optional<Protection> protection = getPlugin().getProtectionFinder().findProtection(block);
         if (!protection.isPresent()) {
             return true;
         }
+
+        // Check normal allowance
         PlayerProfile playerProfile = getPlugin().getProfileFactory().fromPlayer(player);
-        return protection.get().isAllowed(playerProfile);
+        if (protection.get().isAllowed(playerProfile)) {
+            return true;
+        }
+
+        // Check expiration
+        if (allowBypass) {
+            Optional<Date> expireDate = getPlugin().getChestSettings().getChestExpireDate();
+            if (expireDate.isPresent() && protection.get().isExpired(expireDate.get())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

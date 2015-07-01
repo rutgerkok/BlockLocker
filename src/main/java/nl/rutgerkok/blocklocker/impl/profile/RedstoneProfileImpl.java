@@ -1,5 +1,7 @@
 package nl.rutgerkok.blocklocker.impl.profile;
 
+import java.util.Date;
+
 import nl.rutgerkok.blocklocker.profile.Profile;
 
 import org.json.simple.JSONObject;
@@ -61,6 +63,12 @@ class RedstoneProfileImpl implements Profile {
     public boolean includes(Profile other) {
         Preconditions.checkNotNull(other);
         return other instanceof RedstoneProfileImpl;
+    }
+
+    @Override
+    public boolean isExpired(Date cutoffDate) {
+        // These never expire
+        return false;
     }
 
     @Override
