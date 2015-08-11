@@ -124,10 +124,11 @@ class ProtectionFinderImpl implements ProtectionFinder {
 
     /**
      * Finds a protection for a protection/supporting block.
-     * 
+     *
      * @param block
      *            The protection/supporting block.
      * @param searchMode
+     *            How the search is carried out.
      * @return The protection, if any.
      */
     private Optional<Protection> findProtectionForBlock(Block block, SearchMode searchMode) {

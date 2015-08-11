@@ -67,9 +67,7 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
     }
 
     /**
-     * Gets a configuration file from the jar file. Unlike
-     * {@link #getFileConfig(String)}, the configuration file is not exported to
-     * the data folder.
+     * Gets a configuration file from the jar file.
      *
      * @param path
      *            Path in the jar file.

@@ -360,9 +360,11 @@ final class UUIDHandler {
      * Called on another thread than the server thread. Calls the consumer
      * directly, or if the consumer requires that, goes back to the server
      * thread and then calls the consumer.
-     * 
+     *
      * @param results
+     *            The results of the UUID lookup.
      * @param consumer
+     *            The consumer to call.
      */
     private void acceptResultsAsync(final Map<String, Result> results, final ResultConsumer consumer) {
         if (consumer.resultsOnServerThread) {

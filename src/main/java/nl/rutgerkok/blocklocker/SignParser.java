@@ -56,8 +56,6 @@ public interface SignParser {
      *
      * @param sign
      *            The sign to save.
-     * @param saveInformation
-     *            Data on the sign to save.
      */
     void saveSign(ProtectionSign sign);
 

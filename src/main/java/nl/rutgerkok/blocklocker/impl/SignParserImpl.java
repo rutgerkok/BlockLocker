@@ -70,7 +70,7 @@ class SignParserImpl implements SignParser {
      *            The header on the sign.
      * @param list
      *            The profile collection to add all profiles to.
-     * @return
+     * @return The parsed sign, if the sign is actually a protection sign.
      */
     private Optional<ProtectionSign> parseAdvancedSign(Location location, String header, List<JSONObject> list) {
         SignType signType = getSignTypeOrNull(header);
