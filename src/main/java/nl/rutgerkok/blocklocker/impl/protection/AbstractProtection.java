@@ -124,6 +124,11 @@ abstract class AbstractProtection implements Protection {
                 return true;
             }
         }
+        if (!getOwner().isPresent()) {
+            // [Private] sign is missing, only [More Users]
+            // signs are remaining. So allow everyone.
+            return true;
+        }
         return false;
     }
 
@@ -134,7 +139,9 @@ abstract class AbstractProtection implements Protection {
         Optional<Profile> owner = getOwner();
 
         if (!owner.isPresent()) {
-            return false;
+            return true; // No owner - so owned by everyone
+            // Only half-broken protections can be in this state;
+            // protections no [Private] sign, but with [More Users] signs
         }
 
         return owner.get().includes(profile);
