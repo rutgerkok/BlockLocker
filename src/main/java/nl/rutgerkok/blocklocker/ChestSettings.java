@@ -6,7 +6,17 @@ import org.bukkit.Material;
 
 import com.google.common.base.Optional;
 
+/**
+ * Represents all settings of the plugin.
+ *
+ */
 public interface ChestSettings {
+
+    /**
+     * Gets whether TNT is allowed to destroy protections.
+     * @return True if TNT is allowed to destroy protections, false otherwise.
+     */
+    boolean allowTntDestroy();
 
     /**
      * Checks if the given material can be protected by any protection type.

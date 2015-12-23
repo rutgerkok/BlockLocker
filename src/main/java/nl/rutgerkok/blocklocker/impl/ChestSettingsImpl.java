@@ -27,8 +27,33 @@ class ChestSettingsImpl implements ChestSettings {
     }
 
     @Override
+    public boolean allowTntDestroy() {
+        return config.allowTntDestroy();
+    }
+
+    @Override
+    public boolean canProtect(Material material) {
+        return config.canProtect(material);
+    }
+
+    @Override
     public boolean canProtect(ProtectionType type, Material material) {
         return config.canProtect(type, material);
+    }
+
+    @Override
+    public Optional<Date> getChestExpireDate() {
+        int days = config.getAutoExpireDays();
+        if (days <= 0) {
+            return Optional.absent();
+        }
+
+        // Calculate the cutoff date
+        Calendar calendar = Calendar.getInstance(Locale.US);
+        calendar.add(Calendar.DAY_OF_MONTH, -days);
+        Date cutoffDate = calendar.getTime();
+
+        return Optional.of(cutoffDate);
     }
 
     @Override
@@ -64,26 +89,6 @@ class ChestSettingsImpl implements ChestSettings {
                 return Translation.TAG_PRIVATE;
         }
         throw new AssertionError("Unknown type: " + signType);
-    }
-
-    @Override
-    public boolean canProtect(Material material) {
-        return config.canProtect(material);
-    }
-
-    @Override
-    public Optional<Date> getChestExpireDate() {
-        int days = config.getAutoExpireDays();
-        if (days <= 0) {
-            return Optional.absent();
-        }
-
-        // Calculate the cutoff date
-        Calendar calendar = Calendar.getInstance(Locale.US);
-        calendar.add(Calendar.DAY_OF_MONTH, -days);
-        Date cutoffDate = calendar.getTime();
-
-        return Optional.of(cutoffDate);
     }
 
 }

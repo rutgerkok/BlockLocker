@@ -85,3 +85,7 @@ defaultDoorOpenSeconds: 0
 # (like notch instead of Notch), the chest protection would never expire. This behaviour is
 # undesired, so chest expiration has been disabled altogether in offline mode.
 autoExpireDays: 0
+
+# Whether TNT is allowed to destroy protections. When set to true, players will
+# be able to use TNT to destroy someone else's protection.
+allowTntDestroy: false

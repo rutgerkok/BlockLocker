@@ -17,13 +17,20 @@ import com.google.common.base.Optional;
 
 final class Config {
     private final static class Key {
-        private final static String LANGUAGE_FILE = "languageFile", PROTECTABLE_CONTAINERS = "protectableContainers", PROTECTABLE_DOORS = "protectableDoors",
-                PROTECTABLE_TRAP_DOORS = "protectableTrapDoors", DEFAULT_DOOR_OPEN_SECONDS = "defaultDoorOpenSeconds", UPDATER = "updater",
-                CONNECT_CONTAINERS = "connectContainers", AUTO_EXPIRE_DAYS = "autoExpireDays";
+        private final static String LANGUAGE_FILE = "languageFile",
+                PROTECTABLE_CONTAINERS = "protectableContainers",
+                PROTECTABLE_DOORS = "protectableDoors",
+                PROTECTABLE_TRAP_DOORS = "protectableTrapDoors",
+                DEFAULT_DOOR_OPEN_SECONDS = "defaultDoorOpenSeconds",
+                UPDATER = "updater",
+                CONNECT_CONTAINERS = "connectContainers",
+                AUTO_EXPIRE_DAYS = "autoExpireDays",
+                ALLOW_TNT_DESTROY = "allowTntDestroy";
     }
 
     static final String DEFAULT_TRANSLATIONS_FILE = "translations-en.yml";
 
+    private final boolean allowTntDestroy;
     private final int autoExpireDays;
     private final boolean connectContainers;
     private final int defaultDoorOpenSeconds;
@@ -44,6 +51,7 @@ final class Config {
         updatePreference = readUpdatePreference(config.getString(Key.UPDATER));
         connectContainers = config.getBoolean(Key.CONNECT_CONTAINERS);
         autoExpireDays = config.getInt(Key.AUTO_EXPIRE_DAYS);
+        allowTntDestroy = config.getBoolean(Key.ALLOW_TNT_DESTROY);
 
         // Materials
         protectableMaterialsMap = new EnumMap<ProtectionType, Set<Material>>(ProtectionType.class);
@@ -56,6 +64,14 @@ final class Config {
         for (Set<Material> protectableByType : protectableMaterialsMap.values()) {
             protectableMaterialsSet.addAll(protectableByType);
         }
+    }
+
+    /**
+     * Gets whether TNT is allowed to destroy protections.
+     * @return True if TNT is allowed to destroy protections, false otherwise.
+     */
+    boolean allowTntDestroy() {
+        return allowTntDestroy;
     }
 
     /**
