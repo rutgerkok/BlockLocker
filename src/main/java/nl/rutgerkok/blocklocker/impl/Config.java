@@ -3,10 +3,12 @@ package nl.rutgerkok.blocklocker.impl;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import nl.rutgerkok.blocklocker.AttackType;
 import nl.rutgerkok.blocklocker.ProtectionType;
 import nl.rutgerkok.blocklocker.impl.updater.UpdatePreference;
 
@@ -25,12 +27,12 @@ final class Config {
                 UPDATER = "updater",
                 CONNECT_CONTAINERS = "connectContainers",
                 AUTO_EXPIRE_DAYS = "autoExpireDays",
-                ALLOW_TNT_DESTROY = "allowTntDestroy";
+                ALLOW_DESTROY_BY = "allowDestroyBy";
     }
 
     static final String DEFAULT_TRANSLATIONS_FILE = "translations-en.yml";
 
-    private final boolean allowTntDestroy;
+    private final Set<AttackType> allowDestroyBy;
     private final int autoExpireDays;
     private final boolean connectContainers;
     private final int defaultDoorOpenSeconds;
@@ -51,7 +53,7 @@ final class Config {
         updatePreference = readUpdatePreference(config.getString(Key.UPDATER));
         connectContainers = config.getBoolean(Key.CONNECT_CONTAINERS);
         autoExpireDays = config.getInt(Key.AUTO_EXPIRE_DAYS);
-        allowTntDestroy = config.getBoolean(Key.ALLOW_TNT_DESTROY);
+        allowDestroyBy = readAttackTypeSet(config.getStringList(Key.ALLOW_DESTROY_BY));
 
         // Materials
         protectableMaterialsMap = new EnumMap<ProtectionType, Set<Material>>(ProtectionType.class);
@@ -67,11 +69,14 @@ final class Config {
     }
 
     /**
-     * Gets whether TNT is allowed to destroy protections.
-     * @return True if TNT is allowed to destroy protections, false otherwise.
+     * Gets whether the given attack type can destroy protections.
+     *
+     * @param attackType
+     *            The attack type.
+     * @return True if the attack type can destroy protections, false otherwise.
      */
-    boolean allowTntDestroy() {
-        return allowTntDestroy;
+    boolean allowDestroyBy(AttackType attackType) {
+        return allowDestroyBy.contains(attackType);
     }
 
     /**
@@ -152,6 +157,19 @@ final class Config {
      */
     UpdatePreference getUpdatePreference() {
         return updatePreference;
+    }
+
+    private Set<AttackType> readAttackTypeSet(List<String> strings) {
+        Set<AttackType> materials = EnumSet.noneOf(AttackType.class);
+        for (String string : strings) {
+            try {
+                materials.add(AttackType.valueOf(string.toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                logger.warning("Cannot recognize attack type " + string + ", ignoring it");
+                continue;
+            }
+        }
+        return materials;
     }
 
     /**

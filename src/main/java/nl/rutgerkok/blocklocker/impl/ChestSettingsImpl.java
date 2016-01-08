@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import nl.rutgerkok.blocklocker.AttackType;
 import nl.rutgerkok.blocklocker.ChestSettings;
 import nl.rutgerkok.blocklocker.ProtectionType;
 import nl.rutgerkok.blocklocker.SignType;
@@ -27,8 +28,8 @@ class ChestSettingsImpl implements ChestSettings {
     }
 
     @Override
-    public boolean allowTntDestroy() {
-        return config.allowTntDestroy();
+    public boolean allowDestroyBy(AttackType attackType) {
+        return config.allowDestroyBy(attackType);
     }
 
     @Override

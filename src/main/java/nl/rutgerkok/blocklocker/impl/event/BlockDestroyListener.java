@@ -3,6 +3,7 @@ package nl.rutgerkok.blocklocker.impl.event;
 import java.util.Iterator;
 import java.util.List;
 
+import nl.rutgerkok.blocklocker.AttackType;
 import nl.rutgerkok.blocklocker.BlockLockerPlugin;
 import nl.rutgerkok.blocklocker.Permissions;
 import nl.rutgerkok.blocklocker.ProtectionSign;
@@ -14,6 +15,11 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
+import org.bukkit.entity.Creeper;
+import org.bukkit.entity.Enderman;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Fireball;
+import org.bukkit.entity.Ghast;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
@@ -22,6 +28,7 @@ import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
+import org.bukkit.event.entity.EntityBreakDoorEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.world.StructureGrowEvent;
@@ -89,6 +96,9 @@ public class BlockDestroyListener extends EventListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockBurnEvent(BlockBurnEvent event) {
+        if (plugin.getChestSettings().allowDestroyBy(AttackType.FIRE)) {
+            return;
+        }
         if (isProtected(event.getBlock())) {
             event.setCancelled(true);
         }
@@ -96,6 +106,9 @@ public class BlockDestroyListener extends EventListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockPistonExtend(BlockPistonExtendEvent event) {
+        if (plugin.getChestSettings().allowDestroyBy(AttackType.PISTON)) {
+            return;
+        }
         if (anyProtected(event.getBlocks())) {
             event.setCancelled(true);
         }
@@ -103,6 +116,9 @@ public class BlockDestroyListener extends EventListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockPistonRetract(BlockPistonRetractEvent event) {
+        if (plugin.getChestSettings().allowDestroyBy(AttackType.PISTON)) {
+            return;
+        }
         if (event.isSticky() && isProtected(event.getBlock())) {
             event.setCancelled(true);
         }
@@ -110,6 +126,15 @@ public class BlockDestroyListener extends EventListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityChangeBlock(EntityChangeBlockEvent event) {
+        AttackType attackType = AttackType.UNKNOWN;
+        if (event instanceof EntityBreakDoorEvent) {
+            attackType = AttackType.ZOMBIE;
+        } else if (event.getEntity() instanceof Enderman) {
+            attackType = AttackType.ENDERMAN;
+        }
+        if (plugin.getChestSettings().allowDestroyBy(attackType)) {
+            return;
+        }
         if (isProtected(event.getBlock())) {
             event.setCancelled(true);
         }
@@ -117,7 +142,18 @@ public class BlockDestroyListener extends EventListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityExplodeEvent(EntityExplodeEvent event) {
-        if (event.getEntity() instanceof TNTPrimed && plugin.getChestSettings().allowTntDestroy()) {
+        AttackType attackType = AttackType.UNKNOWN;
+        Entity attacker = event.getEntity();
+        if (attacker instanceof TNTPrimed) {
+            attackType = AttackType.TNT;
+        } else if (attacker instanceof Creeper) {
+            attackType = AttackType.CREEPER;
+        } else if (attacker instanceof Fireball) {
+            if (((Fireball) attacker).getShooter() instanceof Ghast) {
+                attackType = AttackType.GHAST;
+            }
+        }
+        if (plugin.getChestSettings().allowDestroyBy(attackType)) {
             return;
         }
         for (Iterator<Block> it = event.blockList().iterator(); it.hasNext();) {
@@ -128,8 +164,22 @@ public class BlockDestroyListener extends EventListener {
         }
     }
 
+    @EventHandler
+    public void onRedstone(BlockRedstoneEvent event) {
+        if (event.getNewCurrent() == event.getOldCurrent()) {
+            return;
+        }
+
+        if (isProtectedForRedstone(event.getBlock())) {
+            event.setNewCurrent(event.getOldCurrent());
+        }
+    }
+
     @EventHandler(ignoreCancelled = true)
     public void onStructureGrow(StructureGrowEvent event) {
+        if (plugin.getChestSettings().allowDestroyBy(AttackType.SAPLING)) {
+            return;
+        }
         // Check deleted blocks
         List<BlockState> blocks = event.getBlocks();
         for (Iterator<BlockState> it = blocks.iterator(); it.hasNext();) {
@@ -144,17 +194,6 @@ public class BlockDestroyListener extends EventListener {
             if (isProtected(blockState.getBlock())) {
                 it.remove();
             }
-        }
-    }
-
-    @EventHandler
-    public void onRedstone(BlockRedstoneEvent event) {
-        if (event.getNewCurrent() == event.getOldCurrent()) {
-            return;
-        }
-
-        if (isProtectedForRedstone(event.getBlock())) {
-            event.setNewCurrent(event.getOldCurrent());
         }
     }
 }

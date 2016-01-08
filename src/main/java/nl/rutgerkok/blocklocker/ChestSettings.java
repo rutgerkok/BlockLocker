@@ -13,10 +13,14 @@ import com.google.common.base.Optional;
 public interface ChestSettings {
 
     /**
-     * Gets whether TNT is allowed to destroy protections.
-     * @return True if TNT is allowed to destroy protections, false otherwise.
+     * Gets whether the given attack type is allowed to destroy protections.
+     *
+     * @param attackType
+     *            The attack type.
+     * @return True if the attack type is allowed to destroy protections, false
+     *         otherwise.
      */
-    boolean allowTntDestroy();
+    boolean allowDestroyBy(AttackType attackType);
 
     /**
      * Checks if the given material can be protected by any protection type.

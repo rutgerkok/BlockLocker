@@ -86,6 +86,20 @@ defaultDoorOpenSeconds: 0
 # undesired, so chest expiration has been disabled altogether in offline mode.
 autoExpireDays: 0
 
-# Whether TNT is allowed to destroy protections. When set to true, players will
-# be able to use TNT to destroy someone else's protection.
-allowTntDestroy: false
+# Aside from players breaking protections, this plugin also prevents other things
+# (creepers and TNT for example) from breaking protections. You can add things here
+# if you want those things to destroy protections.
+# For example,  allowDestroyBy: [CREEPER, TNT]  allows creepers and TNT to destroy
+# protections.
+#
+# These are the values you can use, along with how they can destroy protections.
+# CREEPER - creepers can destroy protections by exploding
+# ENDERMAN - endermans can destroy protections by picking up blocks
+# FIRE - fire can burn protections
+# GHAST - ghasts can shoot exploding fireballs
+# PISTON - pistons can remove the protection signs
+# SAPLING - saplings can grow trees, destroying protection signs
+# TNT - TNT can destroy protections by exploding
+# ZOMBIE - zombies can destroy protected doors doors
+# UNKNOWN - special value for all other unrecognized attacks
+allowDestroyBy: []
