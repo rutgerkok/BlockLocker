@@ -46,7 +46,12 @@ public final class SeparateContainersBlockFinder extends BlockFinder {
 
             BlockFace facing = ((Directional) materialData).getFacing();
             if (!facing.equals(chestFacing)) {
-                continue;
+                if (!facing.equals(chestFacing.getOppositeFace())) {
+                    // ^ If the chest was carried over from older Minecraft
+                    // versions, block data can be a bit weird. So opposite
+                    // face is allowed too for chest connections
+                    continue;
+                }
             }
 
             return ImmutableList.of(block, atPosition);
