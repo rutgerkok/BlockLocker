@@ -249,15 +249,21 @@ public final class NMSAccessor {
 
     private Optional<String> getSecretData(Object tileEntitySign) {
         Object line = ((Object[]) retrieve(tileEntitySign, TileEntitySign_lines))[0];
-        Object chatModifier = call(line, IChatBaseComponent_getChatModifier);
-        if (chatModifier != null) {
-            Object chatHoverable = call(chatModifier, ChatModifier_getChatHoverable);
-            if (chatHoverable != null) {
-                return Optional.of(chatComponentToString(call(chatHoverable, ChatHoverable_getChatComponent)));
-            }
+        if (line == null) {
+            return Optional.absent();
         }
 
-        return Optional.absent();
+        Object chatModifier = call(line, IChatBaseComponent_getChatModifier);
+        if (chatModifier == null) {
+            return Optional.absent();
+        }
+
+        Object chatHoverable = call(chatModifier, ChatModifier_getChatHoverable);
+        if (chatHoverable == null) {
+            return Optional.absent();
+        }
+
+        return Optional.of(chatComponentToString(call(chatHoverable, ChatHoverable_getChatComponent)));
     }
 
     /**
