@@ -193,11 +193,6 @@ final class UUIDHandler {
             return uuid;
         }
 
-        @Override
-        public String toString() {
-            return getClass().getSimpleName() + "[name=" + name + ",uuid=" + uuid.orNull() + "]";
-        }
-
         /**
          * Gets whether a valid uuid has been specified. The zero uuid is not
          * considered valid, as that indicates no player exists with that name.
@@ -206,6 +201,11 @@ final class UUIDHandler {
          */
         public boolean hasValidId() {
             return uuid.isPresent() && !uuid.get().equals(ZERO_UUID);
+        }
+
+        @Override
+        public String toString() {
+            return getClass().getSimpleName() + "[name=" + name + ",uuid=" + uuid.orNull() + "]";
         }
     }
 
@@ -300,6 +300,8 @@ final class UUIDHandler {
      * returns a value for each key. The player names will be put as lowercase
      * keys in the map.
      *
+     * @param <V>
+     *            Type of the values.
      * @param keys
      *            The keys.
      * @param valueFunction
@@ -380,6 +382,21 @@ final class UUIDHandler {
         }
     }
 
+    /**
+     * Adds all results with {@link Result#hasValidId() a valid id} to the
+     * cache. Can be called from any thread.
+     *
+     * @param results
+     *            The results to add.
+     */
+    private void addToCache(Map<String, Result> results) {
+        for (Entry<String, Result> entry : results.entrySet()) {
+            if (entry.getValue().hasValidId()) {
+                uuidCache.put(entry.getKey(), entry.getValue());
+            }
+        }
+    }
+
     private boolean fetchOnlineMode() {
         boolean onlineMode = Bukkit.getServer().getOnlineMode();
         try {
@@ -445,21 +462,6 @@ final class UUIDHandler {
 
         // Modify results array
         results.putAll(newResults);
-    }
-
-    /**
-     * Adds all results with {@link Result#hasValidId() a valid id} to the
-     * cache. Can be called from any thread.
-     *
-     * @param results
-     *            The results to add.
-     */
-    private void addToCache(Map<String, Result> results) {
-        for (Entry<String, Result> entry : results.entrySet()) {
-            if (entry.getValue().hasValidId()) {
-                uuidCache.put(entry.getKey(), entry.getValue());
-            }
-        }
     }
 
     /**
