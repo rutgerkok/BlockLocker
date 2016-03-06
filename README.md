@@ -19,12 +19,7 @@ Current features:
 * Signs placed against a container are automatically filled with `[Private]` and the name of the player.
 * Admins can still open protected doors and containers.
 * Automatically closing doors.
-* Auto-updater, so that patches for exploits can be rolled out automatically.
-
-Planned:
-
-* Replace NMS access with refection or, if available at that time, an API method. (NMS is needed at the moment to get the TextComponent on the sign.)
-* Integration with other plugins for group support.
+* Auto-updater, so that you are notified when there is a new version available.
 
 Compilation
 -----------
@@ -90,9 +85,9 @@ If you solely use these methods, your plugin will work with *all* versions of Bl
 
 ### More advanced functionality
 I have kept the number of methods in BlockLockerAPI small, as each method will need
-to be around in all future versions of BlockLocker for the Bukkit API. If you need to
-do something more advanced, you need to venture outside the class. Keep in mind that
-your plugin might break in the future.
+to be around in all future versions of BlockLocker. If you need to do something more
+advanced, you need to venture outside the class. Keep in mind that your plugin might
+break in the future.
 
 Here's an example for checking whether redstone is allowed in the protection:
 
