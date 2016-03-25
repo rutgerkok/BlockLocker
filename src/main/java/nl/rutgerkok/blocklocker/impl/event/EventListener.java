@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Date;
 
 import nl.rutgerkok.blocklocker.BlockLockerPlugin;
+import nl.rutgerkok.blocklocker.SearchMode;
 import nl.rutgerkok.blocklocker.profile.Profile;
 import nl.rutgerkok.blocklocker.protection.Protection;
 
@@ -36,7 +37,7 @@ abstract class EventListener implements Listener {
     }
 
     boolean isProtectedForRedstone(Block block) {
-        Optional<Protection> protection = plugin.getProtectionFinder().findProtection(block);
+        Optional<Protection> protection = plugin.getProtectionFinder().findProtection(block, SearchMode.NO_SUPPORTING_BLOCKS);
         if (!protection.isPresent()) {
             return false;
         }

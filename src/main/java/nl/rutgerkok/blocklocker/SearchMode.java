@@ -29,7 +29,7 @@ public enum SearchMode {
 
     /**
      * Gets whether supporting blocks should be searched for. If the block being
-     * searched is a supporting bloc, the protection won't be found if this
+     * searched is a supporting block, the protection won't be found if this
      * method returns false.
      *
      * @return True if supporting blocks should be searched for, false
