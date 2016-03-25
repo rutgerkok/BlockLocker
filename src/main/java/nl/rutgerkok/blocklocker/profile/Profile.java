@@ -2,13 +2,11 @@ package nl.rutgerkok.blocklocker.profile;
 
 import java.util.Date;
 
-import nl.rutgerkok.blocklocker.protection.Protection;
-
 import org.json.simple.JSONObject;
 
 /**
- * Represents a profile. A profile is something that owns or is allowed access
- * to a {@link Protection}.
+ * Represents a profile. A profile is usually a player, but it may also be a whole group or something abstract like
+ * "Redstone".
  *
  */
 public interface Profile {
