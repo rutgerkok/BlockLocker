@@ -100,6 +100,6 @@ autoExpireDays: 0
 # PISTON - pistons can remove the protection signs
 # SAPLING - saplings can grow trees, destroying protection signs
 # TNT - TNT can destroy protections by exploding
-# ZOMBIE - zombies can destroy protected doors doors
+# ZOMBIE - zombies can destroy protected doors
 # UNKNOWN - special value for all other unrecognized attacks
 allowDestroyBy: []
