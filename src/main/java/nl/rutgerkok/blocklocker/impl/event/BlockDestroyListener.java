@@ -14,7 +14,6 @@ import nl.rutgerkok.blocklocker.protection.Protection;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
-import org.bukkit.block.Sign;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
@@ -46,8 +45,7 @@ public class BlockDestroyListener extends EventListener {
             return Optional.absent();
         }
 
-        Sign sign = (Sign) block.getState();
-        Optional<ProtectionSign> protectionSign = plugin.getSignParser().parseSign(sign);
+        Optional<ProtectionSign> protectionSign = plugin.getSignParser().parseSign(block);
         if (!protectionSign.isPresent()) {
             return Optional.absent();
         }

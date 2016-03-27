@@ -8,6 +8,7 @@ import nl.rutgerkok.blocklocker.ProtectionSign;
 import nl.rutgerkok.blocklocker.SignParser;
 import nl.rutgerkok.blocklocker.SignType;
 import nl.rutgerkok.blocklocker.impl.nms.NMSAccessor;
+import nl.rutgerkok.blocklocker.impl.nms.NMSAccessor.JsonSign;
 import nl.rutgerkok.blocklocker.impl.profile.ProfileFactoryImpl;
 import nl.rutgerkok.blocklocker.profile.Profile;
 
@@ -46,6 +47,11 @@ class SignParserImpl implements SignParser {
         return Optional.fromNullable(getSignTypeOrNull(header));
     }
 
+    @Override
+    public Optional<SignType> getSignType(SignChangeEvent event) {
+        return Optional.fromNullable(getSignTypeOrNull(event.getLine(0)));
+    }
+
     private SignType getSignTypeOrNull(String header) {
         header = ChatColor.stripColor(header).trim();
         for (SignType type : SignType.values()) {
@@ -72,7 +78,7 @@ class SignParserImpl implements SignParser {
      *            The profile collection to add all profiles to.
      * @return The parsed sign, if the sign is actually a protection sign.
      */
-    private Optional<ProtectionSign> parseAdvancedSign(Location location, String header, List<JSONObject> list) {
+    private Optional<ProtectionSign> parseAdvancedSign(Location location, String header, Iterable<JSONObject> list) {
         SignType signType = getSignTypeOrNull(header);
         if (signType == null) {
             return Optional.absent();
@@ -87,6 +93,22 @@ class SignParserImpl implements SignParser {
         }
 
         return Optional.<ProtectionSign> of(new ProtectionSignImpl(location, signType, profiles));
+    }
+
+    @Override
+    public Optional<ProtectionSign> parseSign(Block sign) {
+        JsonSign foundTextData = nms.getJsonData(sign.getWorld(), sign.getX(), sign.getY(), sign.getZ());
+        if (foundTextData.hasData()) {
+            return parseAdvancedSign(sign.getLocation(), foundTextData.getFirstLine(), foundTextData);
+        } else {
+            return parseSimpleSign(sign.getLocation(), ((Sign)sign.getState()).getLines());
+        }
+    }
+
+    @Override
+    @Deprecated
+    public Optional<ProtectionSign> parseSign(Sign sign) {
+        return parseSign(sign.getBlock());
     }
 
     /**
@@ -116,16 +138,6 @@ class SignParserImpl implements SignParser {
         return Optional.<ProtectionSign> of(new ProtectionSignImpl(location, signType, profiles));
     }
 
-    @Override
-    public Optional<ProtectionSign> parseSign(Sign sign) {
-        Optional<List<JSONObject>> foundTextData = nms.getJsonData(sign);
-        if (foundTextData.isPresent()) {
-            return parseAdvancedSign(sign.getLocation(), sign.getLine(0), foundTextData.get());
-        } else {
-            return parseSimpleSign(sign.getLocation(), sign.getLines());
-        }
-    }
-
     @SuppressWarnings("unchecked")
     @Override
     public void saveSign(ProtectionSign sign) {
@@ -153,11 +165,6 @@ class SignParserImpl implements SignParser {
         // (JSON after text, to avoid text overwriting the JSON)
         signState.update();
         nms.setJsonData(signState, jsonArray);
-    }
-
-    @Override
-    public Optional<SignType> getSignType(SignChangeEvent event) {
-        return Optional.fromNullable(getSignTypeOrNull(event.getLine(0)));
     }
 
 }

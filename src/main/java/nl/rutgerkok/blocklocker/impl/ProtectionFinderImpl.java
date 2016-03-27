@@ -48,8 +48,7 @@ class ProtectionFinderImpl implements ProtectionFinder {
             return Optional.absent();
         }
 
-        Sign sign = (Sign) blockState;
-        Optional<Block> protectionBlock = this.findProtectableForSign(sign);
+        Optional<Block> protectionBlock = this.findProtectableForSign(signBlock);
         if (!protectionBlock.isPresent()) {
             return Optional.absent();
         }
@@ -65,8 +64,8 @@ class ProtectionFinderImpl implements ProtectionFinder {
      * @return A block that can be protected, and may or may not be protected
      *         currently.
      */
-    private Optional<Block> findProtectableForSign(Sign sign) {
-        Block attachedBlock = blockFinder.findSupportingBlock(sign.getBlock());
+    private Optional<Block> findProtectableForSign(Block sign) {
+        Block attachedBlock = blockFinder.findSupportingBlock(sign);
         if (settings.canProtect(ProtectionType.CONTAINER, attachedBlock.getType())) {
             return Optional.of(attachedBlock);
         }
@@ -114,8 +113,7 @@ class ProtectionFinderImpl implements ProtectionFinder {
         // Check for sign
         if (searchMode.searchForSigns() &&
                 (blockMaterial == Material.WALL_SIGN || blockMaterial == Material.SIGN_POST)) {
-            Sign sign = (Sign) block.getState();
-            return findProtectionForExistingSign(sign);
+            return findProtectionForExistingSign(block);
         }
 
         // Check for other blocks
@@ -150,7 +148,7 @@ class ProtectionFinderImpl implements ProtectionFinder {
         return Optional.absent();
     }
 
-    private Optional<Protection> findProtectionForExistingSign(Sign sign) {
+    private Optional<Protection> findProtectionForExistingSign(Block sign) {
         // Get type of sign
         Optional<ProtectionSign> parsed = blockFinder.getSignParser().parseSign(sign);
         if (!parsed.isPresent()) {
@@ -244,7 +242,7 @@ class ProtectionFinderImpl implements ProtectionFinder {
     public boolean isSignNearbyProtection(Block signBlock) {
         BlockState blockState = signBlock.getState();
         if (blockState instanceof Sign) {
-            return findProtectableForSign((Sign) blockState).isPresent();
+            return findProtectableForSign(signBlock).isPresent();
         }
         // Not a sign, so definitely not a sign nearby a protection block
         return false;

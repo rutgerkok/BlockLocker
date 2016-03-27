@@ -3,11 +3,10 @@ package nl.rutgerkok.blocklocker.impl.nms;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Iterator;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Sign;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -15,7 +14,9 @@ import org.json.simple.JSONValue;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
+import com.google.common.collect.Iterators;
 
 /**
  * Implementation of methods required by
@@ -24,8 +25,51 @@ import com.google.common.base.Throwables;
  */
 public final class NMSAccessor {
 
-    private final String nmsPrefix;
-    private final String obcPrefix;
+    /**
+     * Holds the JSON data on a sign.
+     */
+    public static class JsonSign implements Iterable<JSONObject> {
+        private static final JsonSign EMPTY = new JsonSign("", new JSONArray());
+
+        private final String firstLine;
+        private final JSONArray jsonData;
+
+        private JsonSign(String firstLine, JSONArray jsonData) {
+            this.firstLine = Preconditions.checkNotNull(firstLine);
+            this.jsonData = Preconditions.checkNotNull(jsonData);
+        }
+
+        /**
+         * Gets the text on the first line of a sign, may be an empty string.
+         * 
+         * @return The text.
+         */
+        public String getFirstLine() {
+            return firstLine;
+        }
+
+        /**
+         * Gets whether there is data on this sign.
+         * 
+         * @return True if there is data, false otherwise.
+         */
+        public boolean hasData() {
+            return this != EMPTY;
+        }
+
+        @Override
+        public Iterator<JSONObject> iterator() {
+            return Iterators.filter(jsonData.iterator(), JSONObject.class);
+        }
+    }
+
+    static Object call(Object on, Method method, Object... parameters) {
+        try {
+            return method.invoke(on, parameters);
+        } catch (Exception e) {
+            throw Throwables.propagate(e);
+        }
+    }
 
     static Object enumField(Class<Enum<?>> enumClass, String name) {
         try {
@@ -34,20 +78,6 @@ public final class NMSAccessor {
         } catch (Exception e) {
             throw Throwables.propagate(e);
         }
-    }
-
-    /**
-     * Gets the Minecraft class version of the server, like "v1_8_R2".
-     *
-     * @return Minecraft class version.
-     */
-    private static String getMinecraftClassVersion() {
-        String serverClassName = Bukkit.getServer().getClass().getName();
-        String version = serverClassName.split("\\.")[3];
-        if (!version.startsWith("v")) {
-            throw new AssertionError("Failed to detect Minecraft version, found " + version + " in " + serverClassName);
-        }
-        return version;
     }
 
     static Constructor<?> getConstructor(Class<?> clazz, Class<?>... paramTypes) {
@@ -74,58 +104,18 @@ public final class NMSAccessor {
         }
     }
 
-    Class<?> getNMSClass(String name) {
-        try {
-            return Class.forName(nmsPrefix + name);
-        } catch (ClassNotFoundException e) {
-            throw Throwables.propagate(e);
+    /**
+     * Gets the Minecraft class version of the server, like "v1_8_R2".
+     *
+     * @return Minecraft class version.
+     */
+    private static String getMinecraftClassVersion() {
+        String serverClassName = Bukkit.getServer().getClass().getName();
+        String version = serverClassName.split("\\.")[3];
+        if (!version.startsWith("v")) {
+            throw new AssertionError("Failed to detect Minecraft version, found " + version + " in " + serverClassName);
         }
-    }
-
-    Class<Enum<?>> getNMSEnum(String name) {
-        Class<?> clazz = getNMSClass(name);
-        if (!clazz.isEnum()) {
-            throw new IllegalArgumentException(clazz + " is not an enum");
-        }
-        @SuppressWarnings("unchecked")
-        Class<Enum<?>> enumClazz = (Class<Enum<?>>) clazz;
-        return enumClazz;
-    }
-
-    Class<Enum<?>> getAnyNMSEnum(String... possibleNames) {
-        Exception lastException = null;
-        for (String name : possibleNames) {
-            try {
-                return getNMSEnum(name);
-            } catch (Exception e) {
-                lastException = e;
-            }
-        }
-        throw Throwables.propagate(lastException);
-    }
-
-    Class<?> getOBCClass(String name) {
-        try {
-            return Class.forName(obcPrefix + name);
-        } catch (Exception e) {
-            throw Throwables.propagate(e);
-        }
-    }
-
-    static Object retrieve(Object on, Field field) {
-        try {
-            return field.get(on);
-        } catch (Exception e) {
-            throw Throwables.propagate(e);
-        }
-    }
-
-    static Object call(Object on, Method method, Object... parameters) {
-        try {
-            return method.invoke(on, parameters);
-        } catch (Exception e) {
-            throw Throwables.propagate(e);
-        }
+        return version;
     }
 
     static Object invokeStatic(Method method, Object... parameters) {
@@ -139,6 +129,18 @@ public final class NMSAccessor {
             throw Throwables.propagate(e);
         }
     }
+
+    static Object retrieve(Object on, Field field) {
+        try {
+            return field.get(on);
+        } catch (Exception e) {
+            throw Throwables.propagate(e);
+        }
+    }
+
+    private final String nmsPrefix;
+
+    private final String obcPrefix;
 
     final Class<?> BlockPosition;
     final Constructor<?> BlockPosition_new;
@@ -203,11 +205,20 @@ public final class NMSAccessor {
         return (String) invokeStatic(CraftChatMessage_fromComponent, chatComponent);
     }
 
-    Object getBlockPosition(Location location) {
-        return newInstance(BlockPosition_new,
-                location.getBlockX(),
-                location.getBlockY(),
-                location.getBlockZ());
+    Class<Enum<?>> getAnyNMSEnum(String... possibleNames) {
+        Exception lastException = null;
+        for (String name : possibleNames) {
+            try {
+                return getNMSEnum(name);
+            } catch (Exception e) {
+                lastException = e;
+            }
+        }
+        throw Throwables.propagate(lastException);
+    }
+
+    Object getBlockPosition(int x, int y, int z) {
+        return newInstance(BlockPosition_new, x, y, z);
     }
 
     /**
@@ -216,35 +227,65 @@ public final class NMSAccessor {
      * non-null {@link JSONObject}s stored in the sign will be added to the
      * list.
      * 
-     * @param sign
-     *            The sign.
+     * @param world
+     *            The world the sign is in.
+     * @param x
+     *            The x position of the sign.
+     * @param y
+     *            The y position of the sign.
+     * @param z
+     *            The z position of the sign.
      * @return The extra data, or empty if not found.
      */
-    public Optional<List<JSONObject>> getJsonData(Sign sign) {
+    public JsonSign getJsonData(World world, int x, int y, int z) {
         // Find sign
-        Optional<?> nmsSign = toNmsSign(sign);
+        Optional<?> nmsSign = toNmsSign(world, x, y, z);
         if (!nmsSign.isPresent()) {
-            return Optional.absent();
+            return JsonSign.EMPTY;
         }
 
         // Find strings stored in hovertext
         Optional<String> secretData = getSecretData(nmsSign.get());
         if (!secretData.isPresent()) {
-            return Optional.absent();
+            return JsonSign.EMPTY;
         }
+
+        // Find first line
+        Object firstLineObj = ((Object[]) retrieve(nmsSign.get(), TileEntitySign_lines))[0];
+        String firstLine = firstLineObj == null ? "" : chatComponentToString(firstLineObj);
 
         // Parse and sanitize the sting
         Object data = JSONValue.parse(secretData.get());
         if (data instanceof JSONArray) {
-            List<JSONObject> result = new ArrayList<JSONObject>();
-            for (Object object : (JSONArray) data) {
-                if (object instanceof JSONObject) {
-                    result.add((JSONObject) object);
-                }
-            }
-            return Optional.of(result);
+            return new JsonSign(firstLine, (JSONArray) data);
         }
-        return Optional.absent();
+        return JsonSign.EMPTY;
+    }
+
+    Class<?> getNMSClass(String name) {
+        try {
+            return Class.forName(nmsPrefix + name);
+        } catch (ClassNotFoundException e) {
+            throw Throwables.propagate(e);
+        }
+    }
+
+    Class<Enum<?>> getNMSEnum(String name) {
+        Class<?> clazz = getNMSClass(name);
+        if (!clazz.isEnum()) {
+            throw new IllegalArgumentException(clazz + " is not an enum");
+        }
+        @SuppressWarnings("unchecked")
+        Class<Enum<?>> enumClazz = (Class<Enum<?>>) clazz;
+        return enumClazz;
+    }
+
+    Class<?> getOBCClass(String name) {
+        try {
+            return Class.forName(obcPrefix + name);
+        } catch (Exception e) {
+            throw Throwables.propagate(e);
+        }
     }
 
     private Optional<String> getSecretData(Object tileEntitySign) {
@@ -270,14 +311,14 @@ public final class NMSAccessor {
      * Sets the given JSON array on the sign. The JSON array can have as many
      * elements as you want, and can contain anything that can be serialized as
      * JSON.
-     * 
+     *
      * @param sign
-     *            The sign.
+     *            The sign to set the text on.
      * @param jsonArray
      *            The array to store.
      */
     public void setJsonData(Sign sign, JSONArray jsonArray) {
-        Optional<?> nmsSign = toNmsSign(sign);
+        Optional<?> nmsSign = toNmsSign(sign.getWorld(), sign.getX(), sign.getY(), sign.getZ());
         if (!nmsSign.isPresent()) {
             throw new RuntimeException("No sign at " + sign.getLocation());
         }
@@ -293,11 +334,10 @@ public final class NMSAccessor {
         call(modifier, ChatModifier_setChatHoverable, hoverable);
     }
 
-    private Optional<?> toNmsSign(Sign sign) {
-        Location location = sign.getLocation();
-        Object nmsWorld = call(location.getWorld(), CraftWorld_getHandle);
+    private Optional<?> toNmsSign(World world, int x, int y, int z) {
+        Object nmsWorld = call(world, CraftWorld_getHandle);
 
-        Object tileEntity = call(nmsWorld, WorldServer_getTileEntity, getBlockPosition(location));
+        Object tileEntity = call(nmsWorld, WorldServer_getTileEntity, getBlockPosition(x, y, z));
         if (!TileEntitySign.isInstance(tileEntity)) {
             return Optional.absent();
         }

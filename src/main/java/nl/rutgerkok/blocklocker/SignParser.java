@@ -1,5 +1,6 @@
 package nl.rutgerkok.blocklocker;
 
+import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.event.block.SignChangeEvent;
 
@@ -45,10 +46,21 @@ public interface SignParser {
     /**
      * Parses the given sign for all names on it.
      *
-     * @param sign
+     * @param signBlock
      *            The sign to parse.
      * @return The parsed sign.
      */
+    Optional<ProtectionSign> parseSign(Block signBlock);
+
+    /**
+     * Parses the given sign for all names on it.
+     *
+     * @param sign
+     *            The sign to parse.
+     * @return The parsed sign.
+     * @deprecated Use {@link #parseSign(Block)} instead.
+     */
+    @Deprecated
     Optional<ProtectionSign> parseSign(Sign sign);
 
     /**

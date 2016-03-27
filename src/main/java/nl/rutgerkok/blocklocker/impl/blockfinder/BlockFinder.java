@@ -11,7 +11,6 @@ import nl.rutgerkok.blocklocker.SignParser;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.Sign;
 import org.bukkit.material.Attachable;
 import org.bukkit.material.MaterialData;
 
@@ -70,11 +69,10 @@ public abstract class BlockFinder {
             if (material != Material.WALL_SIGN && material != Material.SIGN_POST) {
                 continue;
             }
-            Sign sign = (Sign) atPosition.getState();
-            if (!isAttachedSign(sign, atPosition, block)) {
+            if (!isAttachedSign(atPosition, block)) {
                 continue;
             }
-            Optional<ProtectionSign> parsedSign = parser.parseSign(sign);
+            Optional<ProtectionSign> parsedSign = parser.parseSign(atPosition);
             if (parsedSign.isPresent()) {
                 signs.add(parsedSign.get());
             }
@@ -143,20 +141,17 @@ public abstract class BlockFinder {
      * Checks if the sign at the given position is attached to the container.
      * Doens't check the text on the sign.
      *
-     * @param sign
-     *            The sign to check.
      * @param signBlock
-     *            The block the sign is on ({@link Block#getState()}
-     *            {@code .equals(sign)} must return true)
+     *            The block that is a sign.
      * @param attachedTo
      *            The block the sign must be attached to. If this is not the
      *            case, the method returns false.
      * @return True if the direction and header of the sign are valid, false
      *         otherwise.
      */
-    private boolean isAttachedSign(Sign sign, Block signBlock, Block attachedTo) {
+    private boolean isAttachedSign(Block signBlock, Block attachedTo) {
         BlockFace requiredFace = signBlock.getFace(attachedTo);
-        MaterialData materialData = sign.getData();
+        MaterialData materialData = BlockData.get(signBlock);
         BlockFace actualFace = ((org.bukkit.material.Sign) materialData).getAttachedFace();
         return (actualFace == requiredFace);
     }
