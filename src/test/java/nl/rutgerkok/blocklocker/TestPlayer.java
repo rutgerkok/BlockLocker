@@ -16,21 +16,22 @@ import org.bukkit.Instrument;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Note;
+import org.bukkit.Particle;
 import org.bukkit.Server;
 import org.bukkit.Sound;
 import org.bukkit.Statistic;
 import org.bukkit.WeatherType;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
 import org.bukkit.conversations.Conversation;
 import org.bukkit.conversations.ConversationAbandonedEvent;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Egg;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
-import org.bukkit.entity.Snowball;
+import org.bukkit.entity.Villager;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.EntityEquipment;
@@ -38,6 +39,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.InventoryView.Property;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.MainHand;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.map.MapView;
 import org.bukkit.metadata.MetadataValue;
@@ -90,7 +92,6 @@ public class TestPlayer implements Player {
     @Override
     public void _INVALID_damage(int amount) {
         throw new UnsupportedOperationException();
-
     }
 
     @Override
@@ -312,6 +313,11 @@ public class TestPlayer implements Player {
     }
 
     @Override
+    public AttributeInstance getAttribute(Attribute attribute) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Location getBedSpawnLocation() {
         throw new UnsupportedOperationException();
 
@@ -484,6 +490,11 @@ public class TestPlayer implements Player {
     }
 
     @Override
+    public List<Block> getLastTwoTargetBlocks(Set<Material> arg0, int arg1) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Entity getLeashHolder() throws IllegalStateException {
         throw new UnsupportedOperationException();
 
@@ -497,6 +508,11 @@ public class TestPlayer implements Player {
 
     @Override
     public List<Block> getLineOfSight(HashSet<Byte> transparent, int maxDistance) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<Block> getLineOfSight(Set<Material> arg0, int arg1) {
         throw new UnsupportedOperationException();
     }
 
@@ -516,6 +532,11 @@ public class TestPlayer implements Player {
     public Location getLocation(Location loc) {
         throw new UnsupportedOperationException();
 
+    }
+
+    @Override
+    public MainHand getMainHand() {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -638,6 +659,11 @@ public class TestPlayer implements Player {
     }
 
     @Override
+    public Entity getSpectatorTarget() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public int getStatistic(Statistic statistic) throws IllegalArgumentException {
         throw new UnsupportedOperationException();
 
@@ -657,6 +683,11 @@ public class TestPlayer implements Player {
 
     @Override
     public Block getTargetBlock(HashSet<Byte> transparent, int maxDistance) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Block getTargetBlock(Set<Material> arg0, int arg1) {
         throw new UnsupportedOperationException();
     }
 
@@ -723,6 +754,10 @@ public class TestPlayer implements Player {
     public boolean hasAchievement(Achievement achievement) {
         throw new UnsupportedOperationException();
 
+    }
+
+    public boolean hasAI() {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -819,6 +854,10 @@ public class TestPlayer implements Player {
         throw new UnsupportedOperationException();
     }
 
+    public boolean isCollidable() {
+        throw new UnsupportedOperationException();
+    }
+
     @Override
     public boolean isConversing() {
         throw new UnsupportedOperationException();
@@ -850,6 +889,16 @@ public class TestPlayer implements Player {
     }
 
     @Override
+    public boolean isGliding() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean isGlowing() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public boolean isHealthScaled() {
         throw new UnsupportedOperationException();
 
@@ -859,6 +908,10 @@ public class TestPlayer implements Player {
     public boolean isInsideVehicle() {
         throw new UnsupportedOperationException();
 
+    }
+
+    public boolean isInvulnerable() {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -984,6 +1037,11 @@ public class TestPlayer implements Player {
     }
 
     @Override
+    public InventoryView openMerchant(Villager trader, boolean force) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public InventoryView openWorkbench(Location location, boolean force) {
         throw new UnsupportedOperationException();
     }
@@ -1091,6 +1149,11 @@ public class TestPlayer implements Player {
     }
 
     @Override
+    public void resetTitle() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void saveData() {
         throw new UnsupportedOperationException();
 
@@ -1151,9 +1214,22 @@ public class TestPlayer implements Player {
     }
 
     @Override
+    public void sendTitle(String title, String subtitle) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Map<String, Object> serialize() {
         throw new UnsupportedOperationException();
 
+    }
+
+    public void setAi(boolean ai) {
+        throw new UnsupportedOperationException();
+    }
+
+    public void setAI(boolean ai) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -1184,6 +1260,10 @@ public class TestPlayer implements Player {
     public void setCanPickupItems(boolean pickup) {
         throw new UnsupportedOperationException();
 
+    }
+
+    public void setCollidable(boolean collidable) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -1258,6 +1338,16 @@ public class TestPlayer implements Player {
     }
 
     @Override
+    public void setGliding(boolean gliding) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setGlowing(boolean flag) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void setHealth(double health) {
         throw new UnsupportedOperationException();
 
@@ -1273,6 +1363,10 @@ public class TestPlayer implements Player {
     public void setHealthScaled(boolean scale) {
         throw new UnsupportedOperationException();
 
+    }
+
+    public void setInvulnerable(boolean invulnerable) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -1407,6 +1501,11 @@ public class TestPlayer implements Player {
     }
 
     @Override
+    public void setSpectatorTarget(Entity entity) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void setSprinting(boolean sprinting) {
         throw new UnsupportedOperationException();
 
@@ -1472,14 +1571,77 @@ public class TestPlayer implements Player {
     }
 
     @Override
-    public Arrow shootArrow() {
+    public void showPlayer(Player player) {
+        throw new UnsupportedOperationException();
+
+    }
+
+    @Override
+    public void spawnParticle(Particle particle, double x, double y, double z, int count) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void showPlayer(Player player) {
+    public void spawnParticle(Particle particle, double x, double y, double z, int count, double offsetX,
+            double offsetY, double offsetZ) {
         throw new UnsupportedOperationException();
+    }
 
+    @Override
+    public void spawnParticle(Particle particle, double x, double y, double z, int count, double offsetX,
+            double offsetY, double offsetZ, double extra) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <T> void spawnParticle(Particle particle, double x, double y, double z, int count, double offsetX,
+            double offsetY, double offsetZ, double extra, T data) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <T> void spawnParticle(Particle particle, double x, double y, double z, int count, double offsetX,
+            double offsetY, double offsetZ, T data) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <T> void spawnParticle(Particle particle, double x, double y, double z, int count, T data) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void spawnParticle(Particle particle, Location location, int count) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void spawnParticle(Particle particle, Location location, int count, double offsetX, double offsetY,
+            double offsetZ) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void spawnParticle(Particle particle, Location location, int count, double offsetX, double offsetY,
+            double offsetZ, double extra) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <T> void spawnParticle(Particle particle, Location location, int count, double offsetX, double offsetY,
+            double offsetZ, double extra, T data) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <T> void spawnParticle(Particle particle, Location location, int count, double offsetX, double offsetY,
+            double offsetZ, T data) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <T> void spawnParticle(Particle particle, Location location, int count, T data) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -1512,32 +1674,7 @@ public class TestPlayer implements Player {
     }
 
     @Override
-    public Egg throwEgg() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Snowball throwSnowball() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public void updateInventory() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public List<Block> getLastTwoTargetBlocks(Set<Material> arg0, int arg1) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public List<Block> getLineOfSight(Set<Material> arg0, int arg1) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Block getTargetBlock(Set<Material> arg0, int arg1) {
         throw new UnsupportedOperationException();
     }
 

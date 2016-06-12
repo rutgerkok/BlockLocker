@@ -13,6 +13,7 @@ import nl.rutgerkok.blocklocker.Translator.Translation;
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;
 import nl.rutgerkok.blocklocker.profile.Profile;
 import nl.rutgerkok.blocklocker.protection.DoorProtection;
+import nl.rutgerkok.blocklocker.protection.DoorProtection.SoundCondition;
 import nl.rutgerkok.blocklocker.protection.Protection;
 
 import org.bukkit.Bukkit;
@@ -29,6 +30,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -48,7 +50,8 @@ public final class InteractListener extends EventListener {
     private boolean allowedByBlockPlaceEvent(Block placedBlock, BlockState replacedBlockState, Block placedAgainst, Player player) {
         Material originalMaterial = placedBlock.getType();
 
-        BlockPlaceEvent placeEvent = new BlockPlaceEvent(placedBlock, replacedBlockState, placedAgainst, player.getItemInHand(), player, true);
+        BlockPlaceEvent placeEvent = new BlockPlaceEvent(placedBlock, replacedBlockState, placedAgainst,
+                player.getInventory().getItemInMainHand(), player, true, EquipmentSlot.HAND);
         Bukkit.getPluginManager().callEvent(placeEvent);
 
         Material placedMaterial = placeEvent.getBlockPlaced().getType();
@@ -154,11 +157,12 @@ public final class InteractListener extends EventListener {
         // Open (double) doors manually
         if (protection instanceof DoorProtection && !isSneakPlacing(player)) {
             event.setCancelled(true);
+
             DoorProtection doorProtection = (DoorProtection) protection;
             if (doorProtection.isOpen()) {
-                doorProtection.setOpen(false);
+                doorProtection.setOpen(false, SoundCondition.AUTOMATIC);
             } else {
-                doorProtection.setOpen(true);
+                doorProtection.setOpen(true, SoundCondition.AUTOMATIC);
                 scheduleClose(doorProtection);
             }
         }
@@ -281,7 +285,7 @@ public final class InteractListener extends EventListener {
         plugin.runLater(new Runnable() {
             @Override
             public void run() {
-                doorProtection.setOpen(false);
+                doorProtection.setOpen(false, SoundCondition.ALWAYS);
             }
         }, openSeconds * 20);
     }

@@ -9,12 +9,33 @@ package nl.rutgerkok.blocklocker.protection;
 public interface DoorProtection extends Protection {
 
     /**
-     * Opens or closes the door, as specified.
+     * When to play a sound for opening a door.
      *
-     * @param open
-     *            True to open the door, false otherwise.
      */
-    void setOpen(boolean open);
+    enum SoundCondition {
+        /**
+         * Never play a sound.
+         */
+        NEVER,
+        /**
+         * Only play a sound for doors that Minecraft doesn't play a sound for a
+         * player opens it.
+         */
+        AUTOMATIC,
+        /**
+         * Always play a sound.
+         */
+        ALWAYS
+    }
+
+    /**
+     * Gets the amount of seconds the door should stay open, before closing
+     * automatically. If no amount of seconds was specified on the door, -1 is
+     * returned.
+     *
+     * @return The amount of ticks, or -1 if unspecified.
+     */
+    int getOpenSeconds();
 
     /**
      * Gets whether the door is currently opened. If only parts of the door are
@@ -25,11 +46,20 @@ public interface DoorProtection extends Protection {
     boolean isOpen();
 
     /**
-     * Gets the amount of seconds the door should stay open, before closing
-     * automatically. If no amount of seconds was specified on the door, -1 is
-     * returned.
+     * Opens or closes the door, as specified. Plays no sound.
      *
-     * @return The amount of ticks, or -1 if unspecified.
+     * @param open
+     *            True to open the door, false otherwise.
+     * @see #setOpen(boolean, SoundCondition) Control over sound playing.
      */
-    int getOpenSeconds();
+    void setOpen(boolean open);
+
+    /**
+     * Opens or closes the door, as specified.
+     *
+     * @param open
+     *            True to open the door, false otherwise.
+     * @param playSound Whether to play a sound.
+     */
+    void setOpen(boolean open, SoundCondition playSound);
 }

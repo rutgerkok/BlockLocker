@@ -3,7 +3,7 @@ package nl.rutgerkok.blocklocker.impl.protection;
 import java.util.Collection;
 
 import nl.rutgerkok.blocklocker.ProtectionSign;
-import nl.rutgerkok.blocklocker.impl.Door;
+import nl.rutgerkok.blocklocker.impl.CompleteDoor;
 import nl.rutgerkok.blocklocker.impl.blockfinder.BlockFinder;
 import nl.rutgerkok.blocklocker.profile.Profile;
 import nl.rutgerkok.blocklocker.profile.TimerProfile;
@@ -29,7 +29,7 @@ public final class DoorProtectionImpl extends AbstractProtection implements Door
      * 
      * @return The door protection object.
      */
-    public static Protection fromDoorWithSign(ProtectionSign sign, BlockFinder blockFinder, Door door) {
+    public static Protection fromDoorWithSign(ProtectionSign sign, BlockFinder blockFinder, CompleteDoor door) {
         return new DoorProtectionImpl(sign, blockFinder, door);
     }
 
@@ -44,20 +44,20 @@ public final class DoorProtectionImpl extends AbstractProtection implements Door
      *            The door that is protected.
      * @return The protection.
      */
-    public static Protection fromDoorWithSigns(Collection<ProtectionSign> signs, BlockFinder blockFinder, Door door) {
+    public static Protection fromDoorWithSigns(Collection<ProtectionSign> signs, BlockFinder blockFinder, CompleteDoor door) {
         return new DoorProtectionImpl(signs, blockFinder, door);
     }
 
     private final BlockFinder blockFinder;
-    private final Door door;
+    private final CompleteDoor door;
 
-    private DoorProtectionImpl(Collection<ProtectionSign> signs, BlockFinder blockFinder, Door door) {
+    private DoorProtectionImpl(Collection<ProtectionSign> signs, BlockFinder blockFinder, CompleteDoor door) {
         super(signs);
         this.door = door;
         this.blockFinder = blockFinder;
     }
 
-    private DoorProtectionImpl(ProtectionSign sign, BlockFinder blockFinder, Door door) {
+    private DoorProtectionImpl(ProtectionSign sign, BlockFinder blockFinder, CompleteDoor door) {
         super(sign);
         this.door = door;
         this.blockFinder = blockFinder;
@@ -85,7 +85,12 @@ public final class DoorProtectionImpl extends AbstractProtection implements Door
 
     @Override
     public void setOpen(boolean open) {
-        door.setOpen(open);
+        door.setOpen(open, SoundCondition.NEVER);
+    }
+
+    @Override
+    public void setOpen(boolean open, SoundCondition playSound) {
+        door.setOpen(open, playSound);
     }
 
 }

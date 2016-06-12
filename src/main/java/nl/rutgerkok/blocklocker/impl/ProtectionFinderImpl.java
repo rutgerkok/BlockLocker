@@ -183,7 +183,7 @@ class ProtectionFinderImpl implements ProtectionFinder {
                 return Optional.of(ContainerProtectionImpl.fromBlocksWithSigns(
                         signs, blocks, blockFinder));
             case DOOR:
-                Door door = new Door(protectionBlock);
+                CompleteDoor door = new CompleteDoor(protectionBlock);
                 Collection<ProtectionSign> doorSigns = blockFinder.findAttachedSigns(door.getBlocksForSigns());
                 if (doorSigns.isEmpty()) {
                     return Optional.absent();
@@ -229,7 +229,7 @@ class ProtectionFinderImpl implements ProtectionFinder {
                 return Optional.of(ContainerProtectionImpl.fromBlocksWithSign(
                         sign, blocks, blockFinder));
             case DOOR:
-                Door door = new Door(protectionBlock);
+                CompleteDoor door = new CompleteDoor(protectionBlock);
                 return Optional.of(DoorProtectionImpl.fromDoorWithSign(sign, blockFinder, door));
             case TRAP_DOOR:
                 return Optional.of(TrapDoorProtectionImpl.fromDoorWithSign(sign, blockFinder, protectionBlock));

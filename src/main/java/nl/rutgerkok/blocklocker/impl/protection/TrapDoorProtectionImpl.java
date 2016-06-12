@@ -10,6 +10,7 @@ import nl.rutgerkok.blocklocker.profile.TimerProfile;
 import nl.rutgerkok.blocklocker.protection.Protection;
 import nl.rutgerkok.blocklocker.protection.TrapDoorProtection;
 
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.material.MaterialData;
 import org.bukkit.material.Openable;
@@ -94,10 +95,19 @@ public final class TrapDoorProtectionImpl extends AbstractProtection implements 
 
     @Override
     public void setOpen(boolean open) {
+        setOpen(open, SoundCondition.NEVER);
+    }
+
+    @Override
+    public void setOpen(boolean open, SoundCondition playSound) {
         MaterialData materialData = BlockData.get(trapDoor);
         if (materialData instanceof Openable) {
             ((Openable) materialData).setOpen(open);
             BlockData.set(trapDoor, materialData);
+        }
+
+        if (playSound == SoundCondition.ALWAYS) {
+            trapDoor.getWorld().playSound(trapDoor.getLocation(), Sound.BLOCK_WOODEN_TRAPDOOR_OPEN, 1f, 0.7f);
         }
     }
 
