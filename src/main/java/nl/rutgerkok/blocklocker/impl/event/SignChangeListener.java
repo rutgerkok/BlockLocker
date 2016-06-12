@@ -22,13 +22,6 @@ public class SignChangeListener extends EventListener {
         super(plugin);
     }
 
-    private void destroySignIfNew(Block signBlock) {
-        if (isExistingSign(signBlock)) {
-            return;
-        }
-        signBlock.breakNaturally();
-    }
-
     private void handleSignNearbyProtection(SignChangeEvent event, Protection protection) {
         Block block = event.getBlock();
         Player player = event.getPlayer();
@@ -36,11 +29,8 @@ public class SignChangeListener extends EventListener {
         Profile playerProfile = plugin.getProfileFactory().fromPlayer(player);
         Optional<SignType> parsedSign = plugin.getSignParser().getSignType(event);
 
-        // Only protection signs are allowed nearby a protection
+        // Only protection signs should be handled
         if (!parsedSign.isPresent()) {
-            plugin.getTranslator().sendMessage(player, Translation.PROTECTION_CAN_ONLY_ADD_PROTECTION_SIGN);
-            destroySignIfNew(block);
-            event.setCancelled(true);
             return;
         }
 
