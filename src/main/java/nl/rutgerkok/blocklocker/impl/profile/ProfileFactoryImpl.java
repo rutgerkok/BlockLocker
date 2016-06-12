@@ -61,8 +61,7 @@ public final class ProfileFactoryImpl implements ProfileFactory {
 
             // [Timer:X]
             if (StringUtil.startsWithIgnoreCase(text, timerTagStart) && text.endsWith("]")) {
-                int seconds = readDigit(text.charAt(timerTagStart.length()));
-                return new TimerProfileImpl(translator.getWithoutColor(Translation.TAG_TIMER), seconds);
+                return readTimerProfile(text);
             }
 
             // [GroupName]
@@ -182,6 +181,16 @@ public final class ProfileFactoryImpl implements ProfileFactory {
         } catch (NumberFormatException e) {
             return -1;
         }
+    }
+
+    private Profile readTimerProfile(String text) {
+        char digit = text.charAt(timerTagStart.length());
+        if (digit == ' ') {
+            // In format [Timer: X]
+            digit = text.charAt(timerTagStart.length() + 1);
+        }
+        int seconds = readDigit(digit);
+        return new TimerProfileImpl(translator.getWithoutColor(Translation.TAG_TIMER), seconds);
     }
 
 }
