@@ -13,7 +13,7 @@ import nl.rutgerkok.blocklocker.SignType;
 import nl.rutgerkok.blocklocker.impl.blockfinder.BlockFinder;
 import nl.rutgerkok.blocklocker.impl.protection.ContainerProtectionImpl;
 import nl.rutgerkok.blocklocker.impl.protection.DoorProtectionImpl;
-import nl.rutgerkok.blocklocker.impl.protection.TrapDoorProtectionImpl;
+import nl.rutgerkok.blocklocker.impl.protection.AttachedProtectionImpl;
 import nl.rutgerkok.blocklocker.profile.Profile;
 import nl.rutgerkok.blocklocker.protection.Protection;
 
@@ -196,7 +196,7 @@ class ProtectionFinderImpl implements ProtectionFinder {
                 if (trapDoorSigns.isEmpty()) {
                     return Optional.absent();
                 }
-                return Optional.of(TrapDoorProtectionImpl.fromDoorWithSigns(
+                return Optional.of(AttachedProtectionImpl.fromBlockWithSigns(
                         trapDoorSigns, blockFinder, protectionBlock));
             default:
                 throw new UnsupportedOperationException("Don't know how to handle protection type " + protectionType.get());
@@ -232,7 +232,7 @@ class ProtectionFinderImpl implements ProtectionFinder {
                 CompleteDoor door = new CompleteDoor(protectionBlock);
                 return Optional.of(DoorProtectionImpl.fromDoorWithSign(sign, blockFinder, door));
             case TRAP_DOOR:
-                return Optional.of(TrapDoorProtectionImpl.fromDoorWithSign(sign, blockFinder, protectionBlock));
+                return Optional.of(AttachedProtectionImpl.fromBlockWithSign(sign, blockFinder, protectionBlock));
             default:
                 throw new UnsupportedOperationException("Don't know how to handle protection type " + protectionType.get());
         }

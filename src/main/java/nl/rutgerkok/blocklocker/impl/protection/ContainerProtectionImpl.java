@@ -3,12 +3,16 @@ package nl.rutgerkok.blocklocker.impl.protection;
 import java.util.Collection;
 import java.util.List;
 
+import nl.rutgerkok.blocklocker.BlockData;
 import nl.rutgerkok.blocklocker.ProtectionSign;
 import nl.rutgerkok.blocklocker.impl.blockfinder.BlockFinder;
 import nl.rutgerkok.blocklocker.protection.ContainerProtection;
 import nl.rutgerkok.blocklocker.protection.Protection;
 
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.material.MaterialData;
+import org.bukkit.material.Openable;
 
 public final class ContainerProtectionImpl extends AbstractProtection implements ContainerProtection {
 
@@ -55,20 +59,69 @@ public final class ContainerProtectionImpl extends AbstractProtection implements
     private final BlockFinder blockFinder;
     private final Collection<Block> blocks;
 
-    private ContainerProtectionImpl(ProtectionSign mainSign, Collection<Block> blocks, BlockFinder blockFinder) {
-        super(mainSign);
-        this.blocks = blocks;
-        this.blockFinder = blockFinder;
-    }
-
     private ContainerProtectionImpl(Collection<ProtectionSign> allSigns, Collection<Block> blocks, BlockFinder blockFinder) {
         super(allSigns);
         this.blocks = blocks;
         this.blockFinder = blockFinder;
     }
 
+    private ContainerProtectionImpl(ProtectionSign mainSign, Collection<Block> blocks, BlockFinder blockFinder) {
+        super(mainSign);
+        this.blocks = blocks;
+        this.blockFinder = blockFinder;
+    }
+
+    @Override
     protected Collection<ProtectionSign> fetchSigns() {
         return blockFinder.findAttachedSigns(blocks);
+    }
+
+    @Override
+    public boolean isOpen() {
+        for (Block block : blocks) {
+            MaterialData materialData = BlockData.get(block);
+            if (materialData instanceof Openable) {
+                return ((Openable) materialData).isOpen();
+            }
+        }
+        return false;
+    }
+
+    private boolean setBlockOpen(Block block, boolean open) {
+        MaterialData materialData = BlockData.get(block);
+        if (!(materialData instanceof Openable)) {
+            return false;
+        }
+
+        Openable openable = (Openable) materialData;
+        if (openable.isOpen() == open) {
+            return false;
+        }
+
+        // Change the state
+        openable.setOpen(open);
+        BlockData.set(block, materialData);
+        return true;
+    }
+
+    @Override
+    public void setOpen(boolean open) {
+        setOpen(open, SoundCondition.NEVER);
+    }
+
+    @Override
+    public void setOpen(boolean open, SoundCondition playSound) {
+        boolean changed = false;
+        Block aBlock = null;
+        for (Block block : blocks) {
+            changed |= setBlockOpen(block, open);
+            aBlock = block;
+        }
+
+        if (changed && playSound == SoundCondition.ALWAYS) {
+            Sound sound = open ? Sound.BLOCK_FENCE_GATE_OPEN : Sound.BLOCK_FENCE_GATE_CLOSE;
+            aBlock.getWorld().playSound(aBlock.getLocation(), sound, 1, 0.7f);
+        }
     }
 
 }

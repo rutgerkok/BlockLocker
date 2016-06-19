@@ -3,7 +3,7 @@ package nl.rutgerkok.blocklocker.impl;
 import java.util.Collection;
 
 import nl.rutgerkok.blocklocker.BlockData;
-import nl.rutgerkok.blocklocker.protection.DoorProtection.SoundCondition;
+import nl.rutgerkok.blocklocker.protection.Protection.SoundCondition;
 
 import org.bukkit.Material;
 import org.bukkit.Sound;

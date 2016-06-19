@@ -1,8 +1,8 @@
 package nl.rutgerkok.blocklocker;
 
+import nl.rutgerkok.blocklocker.protection.AttachedProtection;
 import nl.rutgerkok.blocklocker.protection.ContainerProtection;
 import nl.rutgerkok.blocklocker.protection.DoorProtection;
-import nl.rutgerkok.blocklocker.protection.TrapDoorProtection;
 
 /**
  * The different types of protections.
@@ -18,7 +18,7 @@ public enum ProtectionType {
      */
     DOOR,
     /**
-     * A trap door, represented by {@link TrapDoorProtection}.
+     * A trap door, represented by {@link AttachedProtection}.
      */
     TRAP_DOOR;
 }

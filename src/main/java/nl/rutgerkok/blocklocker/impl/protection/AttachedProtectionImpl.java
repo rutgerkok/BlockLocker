@@ -5,10 +5,8 @@ import java.util.Collection;
 import nl.rutgerkok.blocklocker.BlockData;
 import nl.rutgerkok.blocklocker.ProtectionSign;
 import nl.rutgerkok.blocklocker.impl.blockfinder.BlockFinder;
-import nl.rutgerkok.blocklocker.profile.Profile;
-import nl.rutgerkok.blocklocker.profile.TimerProfile;
+import nl.rutgerkok.blocklocker.protection.AttachedProtection;
 import nl.rutgerkok.blocklocker.protection.Protection;
-import nl.rutgerkok.blocklocker.protection.TrapDoorProtection;
 
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -16,10 +14,10 @@ import org.bukkit.material.MaterialData;
 import org.bukkit.material.Openable;
 
 /**
- * Implementation of {@link TrapDoorProtection}.
+ * Implementation of {@link AttachedProtection}.
  *
  */
-public final class TrapDoorProtectionImpl extends AbstractProtection implements TrapDoorProtection {
+public final class AttachedProtectionImpl extends AbstractProtection implements AttachedProtection {
 
     /**
      * Gets a door protection from a door, with only a single sign looked up.
@@ -29,13 +27,13 @@ public final class TrapDoorProtectionImpl extends AbstractProtection implements 
      *            up, speeding up {@link #getOwner()}.
      * @param blockFinder
      *            The block finder.
-     * @param trapDoor
+     * @param protectionBlock
      *            The door.
      * 
      * @return The door protection object.
      */
-    public static Protection fromDoorWithSign(ProtectionSign sign, BlockFinder blockFinder, Block trapDoor) {
-        return new TrapDoorProtectionImpl(sign, blockFinder, trapDoor);
+    public static Protection fromBlockWithSign(ProtectionSign sign, BlockFinder blockFinder, Block protectionBlock) {
+        return new AttachedProtectionImpl(sign, blockFinder, protectionBlock);
     }
 
     /**
@@ -49,44 +47,34 @@ public final class TrapDoorProtectionImpl extends AbstractProtection implements 
      *            The door that is protected.
      * @return The protection.
      */
-    public static Protection fromDoorWithSigns(Collection<ProtectionSign> signs, BlockFinder blockFinder, Block trapDoor) {
-        return new TrapDoorProtectionImpl(signs, blockFinder, trapDoor);
+    public static Protection fromBlockWithSigns(Collection<ProtectionSign> signs, BlockFinder blockFinder, Block trapDoor) {
+        return new AttachedProtectionImpl(signs, blockFinder, trapDoor);
     }
 
     private final BlockFinder blockFinder;
-    private final Block trapDoor;
+    private final Block protecionBlock;
 
-    private TrapDoorProtectionImpl(Collection<ProtectionSign> signs, BlockFinder blockFinder, Block trapDoor) {
+    private AttachedProtectionImpl(Collection<ProtectionSign> signs, BlockFinder blockFinder, Block trapDoor) {
         super(signs);
-        this.trapDoor = trapDoor;
+        this.protecionBlock = trapDoor;
         this.blockFinder = blockFinder;
     }
 
-    private TrapDoorProtectionImpl(ProtectionSign sign, BlockFinder blockFinder, Block trapDoor) {
+    private AttachedProtectionImpl(ProtectionSign sign, BlockFinder blockFinder, Block trapDoor) {
         super(sign);
-        this.trapDoor = trapDoor;
+        this.protecionBlock = trapDoor;
         this.blockFinder = blockFinder;
     }
 
     @Override
     protected Collection<ProtectionSign> fetchSigns() {
-        Block supportingBlock = blockFinder.findSupportingBlock(trapDoor);
+        Block supportingBlock = blockFinder.findSupportingBlock(protecionBlock);
         return blockFinder.findAttachedSigns(supportingBlock);
     }
 
     @Override
-    public int getOpenSeconds() {
-        for (Profile profile : getAllowed()) {
-            if (profile instanceof TimerProfile) {
-                return ((TimerProfile) profile).getOpenSeconds();
-            }
-        }
-        return -1;
-    }
-
-    @Override
     public boolean isOpen() {
-        MaterialData materialData = BlockData.get(trapDoor);
+        MaterialData materialData = BlockData.get(protecionBlock);
         if (materialData instanceof Openable) {
             return ((Openable) materialData).isOpen();
         }
@@ -100,14 +88,23 @@ public final class TrapDoorProtectionImpl extends AbstractProtection implements 
 
     @Override
     public void setOpen(boolean open, SoundCondition playSound) {
-        MaterialData materialData = BlockData.get(trapDoor);
-        if (materialData instanceof Openable) {
-            ((Openable) materialData).setOpen(open);
-            BlockData.set(trapDoor, materialData);
+        MaterialData materialData = BlockData.get(protecionBlock);
+        if (!(materialData instanceof Openable)) {
+            return;
         }
 
+        Openable openable = (Openable) materialData;
+
+        if (openable.isOpen() == open) {
+            return;
+        }
+
+        openable.setOpen(open);
+        BlockData.set(protecionBlock, materialData);
+
         if (playSound == SoundCondition.ALWAYS) {
-            trapDoor.getWorld().playSound(trapDoor.getLocation(), Sound.BLOCK_WOODEN_TRAPDOOR_OPEN, 1f, 0.7f);
+            Sound sound = open ? Sound.BLOCK_WOODEN_TRAPDOOR_OPEN : Sound.BLOCK_WOODEN_TRAPDOOR_CLOSE;
+            protecionBlock.getWorld().playSound(protecionBlock.getLocation(), sound, 1f, 0.7f);
         }
     }
 

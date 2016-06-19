@@ -6,6 +6,7 @@ import java.util.List;
 
 import nl.rutgerkok.blocklocker.ProtectionSign;
 import nl.rutgerkok.blocklocker.profile.Profile;
+import nl.rutgerkok.blocklocker.profile.TimerProfile;
 import nl.rutgerkok.blocklocker.protection.Protection;
 
 import org.apache.commons.lang.Validate;
@@ -24,6 +25,18 @@ abstract class AbstractProtection implements Protection {
     private Optional<Collection<ProtectionSign>> allSigns = Optional.absent();
 
     /**
+     * Constructor for creating the protection with all signs already looked up.
+     * Collection may not be empty.
+     * 
+     * @param signs
+     *            All signs.
+     */
+    AbstractProtection(Collection<ProtectionSign> signs) {
+        Validate.notEmpty(signs);
+        this.allSigns = Optional.of(signs);
+    }
+
+    /**
      * Constructor for creating the protection with just a single sign looked
      * up. Not all signs are found yet. If it turns out that all signs are
      * needed, {@link #fetchSigns()} will be called.
@@ -38,18 +51,6 @@ abstract class AbstractProtection implements Protection {
                 this.owner = Optional.of(profiles.get(0));
             }
         }
-    }
-
-    /**
-     * Constructor for creating the protection with all signs already looked up.
-     * Collection may not be empty.
-     * 
-     * @param signs
-     *            All signs.
-     */
-    AbstractProtection(Collection<ProtectionSign> signs) {
-        Validate.notEmpty(signs);
-        this.allSigns = Optional.of(signs);
     }
 
     private Collection<Profile> fetchAllowed(Collection<ProtectionSign> signs) {
@@ -89,6 +90,16 @@ abstract class AbstractProtection implements Protection {
             allAllowed = Optional.of(fetchAllowed(getSigns()));
         }
         return allAllowed.get();
+    }
+
+    @Override
+    public final int getOpenSeconds() {
+        for (Profile profile : getAllowed()) {
+            if (profile instanceof TimerProfile) {
+                return ((TimerProfile) profile).getOpenSeconds();
+            }
+        }
+        return -1;
     }
 
     @Override
@@ -133,6 +144,18 @@ abstract class AbstractProtection implements Protection {
     }
 
     @Override
+    public boolean isExpired(Date cutoffDate) {
+        Optional<Profile> owner = getOwner();
+
+        if (owner.isPresent()) {
+            return owner.get().isExpired(cutoffDate);
+        }
+
+        // Protections without an owner are invalid, but not expired
+        return false;
+    }
+
+    @Override
     public final boolean isOwner(Profile profile) {
         Validate.notNull(profile);
 
@@ -145,17 +168,5 @@ abstract class AbstractProtection implements Protection {
         }
 
         return owner.get().includes(profile);
-    }
-
-    @Override
-    public boolean isExpired(Date cutoffDate) {
-        Optional<Profile> owner = getOwner();
-
-        if (owner.isPresent()) {
-            return owner.get().isExpired(cutoffDate);
-        }
-
-        // Protections without an owner are invalid, but not expired
-        return false;
     }
 }

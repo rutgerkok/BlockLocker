@@ -5,8 +5,6 @@ import java.util.Collection;
 import nl.rutgerkok.blocklocker.ProtectionSign;
 import nl.rutgerkok.blocklocker.impl.CompleteDoor;
 import nl.rutgerkok.blocklocker.impl.blockfinder.BlockFinder;
-import nl.rutgerkok.blocklocker.profile.Profile;
-import nl.rutgerkok.blocklocker.profile.TimerProfile;
 import nl.rutgerkok.blocklocker.protection.DoorProtection;
 import nl.rutgerkok.blocklocker.protection.Protection;
 
@@ -66,16 +64,6 @@ public final class DoorProtectionImpl extends AbstractProtection implements Door
     @Override
     protected Collection<ProtectionSign> fetchSigns() {
         return blockFinder.findAttachedSigns(door.getBlocksForSigns());
-    }
-
-    @Override
-    public int getOpenSeconds() {
-        for (Profile profile : getAllowed()) {
-            if (profile instanceof TimerProfile) {
-                return ((TimerProfile) profile).getOpenSeconds();
-            }
-        }
-        return -1;
     }
 
     @Override

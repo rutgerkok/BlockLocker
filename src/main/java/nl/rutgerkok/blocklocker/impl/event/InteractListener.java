@@ -12,9 +12,8 @@ import nl.rutgerkok.blocklocker.SignType;
 import nl.rutgerkok.blocklocker.Translator.Translation;
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;
 import nl.rutgerkok.blocklocker.profile.Profile;
-import nl.rutgerkok.blocklocker.protection.DoorProtection;
-import nl.rutgerkok.blocklocker.protection.DoorProtection.SoundCondition;
 import nl.rutgerkok.blocklocker.protection.Protection;
+import nl.rutgerkok.blocklocker.protection.Protection.SoundCondition;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -154,17 +153,18 @@ public final class InteractListener extends EventListener {
             return;
         }
 
-        // Open (double) doors manually
-        if (protection instanceof DoorProtection && !isSneakPlacing(player)) {
+        // Open (double/trap/fence) doors manually
+        if (!isSneakPlacing(player)) {
             event.setCancelled(true);
 
-            DoorProtection doorProtection = (DoorProtection) protection;
-            if (doorProtection.isOpen()) {
-                doorProtection.setOpen(false, SoundCondition.AUTOMATIC);
+            if (protection.isOpen()) {
+                protection.setOpen(false, SoundCondition.AUTOMATIC);
             } else {
-                doorProtection.setOpen(true, SoundCondition.AUTOMATIC);
-                scheduleClose(doorProtection);
+                protection.setOpen(true, SoundCondition.AUTOMATIC);
             }
+
+            // Schedule automatic close
+            scheduleClose(protection);
         }
     }
 
@@ -270,11 +270,11 @@ public final class InteractListener extends EventListener {
         }
     }
 
-    private void scheduleClose(final DoorProtection doorProtection) {
-        if (!doorProtection.isOpen()) {
+    private void scheduleClose(final Protection protection) {
+        if (!protection.isOpen()) {
             return;
         }
-        int openSeconds = doorProtection.getOpenSeconds();
+        int openSeconds = protection.getOpenSeconds();
         if (openSeconds == -1) {
             // Not specified, use default
             openSeconds = plugin.getChestSettings().getDefaultDoorOpenSeconds();
@@ -285,7 +285,7 @@ public final class InteractListener extends EventListener {
         plugin.runLater(new Runnable() {
             @Override
             public void run() {
-                doorProtection.setOpen(false, SoundCondition.ALWAYS);
+                protection.setOpen(false, SoundCondition.ALWAYS);
             }
         }, openSeconds * 20);
     }
