@@ -3,6 +3,7 @@ package nl.rutgerkok.blocklocker.impl.protection;
 import java.util.Collection;
 
 import nl.rutgerkok.blocklocker.BlockData;
+import nl.rutgerkok.blocklocker.OpenBlockSound;
 import nl.rutgerkok.blocklocker.ProtectionSign;
 import nl.rutgerkok.blocklocker.impl.blockfinder.BlockFinder;
 import nl.rutgerkok.blocklocker.protection.AttachedProtection;
@@ -103,7 +104,7 @@ public final class AttachedProtectionImpl extends AbstractProtection implements 
         BlockData.set(protecionBlock, materialData);
 
         if (playSound == SoundCondition.ALWAYS) {
-            Sound sound = open ? Sound.BLOCK_WOODEN_TRAPDOOR_OPEN : Sound.BLOCK_WOODEN_TRAPDOOR_CLOSE;
+            Sound sound = OpenBlockSound.get(materialData.getItemType(), open);
             protecionBlock.getWorld().playSound(protecionBlock.getLocation(), sound, 1f, 0.7f);
         }
     }

@@ -3,6 +3,7 @@ package nl.rutgerkok.blocklocker.impl;
 import java.util.Collection;
 
 import nl.rutgerkok.blocklocker.BlockData;
+import nl.rutgerkok.blocklocker.OpenBlockSound;
 import nl.rutgerkok.blocklocker.protection.Protection.SoundCondition;
 
 import org.bukkit.Material;
@@ -199,12 +200,7 @@ public final class CompleteDoor {
             return;
         }
 
-        Sound sound;
-        if (ironDoor) {
-            sound = open ? Sound.BLOCK_IRON_DOOR_OPEN : Sound.BLOCK_IRON_DOOR_CLOSE;
-        } else {
-            sound = open ? Sound.BLOCK_WOODEN_DOOR_OPEN : Sound.BLOCK_WOODEN_DOOR_CLOSE;
-        }
+        Sound sound = OpenBlockSound.get(bottomBlock.getType(), open);
 
         bottomBlock.getWorld().playSound(bottomBlock.getLocation(), sound, 1f, 0.7f);
     }

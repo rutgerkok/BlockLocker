@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 import nl.rutgerkok.blocklocker.BlockData;
+import nl.rutgerkok.blocklocker.OpenBlockSound;
 import nl.rutgerkok.blocklocker.ProtectionSign;
 import nl.rutgerkok.blocklocker.impl.blockfinder.BlockFinder;
 import nl.rutgerkok.blocklocker.protection.ContainerProtection;
@@ -119,7 +120,7 @@ public final class ContainerProtectionImpl extends AbstractProtection implements
         }
 
         if (changed && playSound == SoundCondition.ALWAYS) {
-            Sound sound = open ? Sound.BLOCK_FENCE_GATE_OPEN : Sound.BLOCK_FENCE_GATE_CLOSE;
+            Sound sound = OpenBlockSound.get(aBlock.getType(), open);
             aBlock.getWorld().playSound(aBlock.getLocation(), sound, 1, 0.7f);
         }
     }
