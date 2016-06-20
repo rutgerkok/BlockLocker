@@ -62,6 +62,11 @@ public final class DoorProtectionImpl extends AbstractProtection implements Door
     }
 
     @Override
+    public boolean canBeOpened() {
+        return true;
+    }
+
+    @Override
     protected Collection<ProtectionSign> fetchSigns() {
         return blockFinder.findAttachedSigns(door.getBlocksForSigns());
     }

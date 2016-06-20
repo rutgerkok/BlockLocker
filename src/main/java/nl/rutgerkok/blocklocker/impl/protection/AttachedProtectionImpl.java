@@ -68,6 +68,11 @@ public final class AttachedProtectionImpl extends AbstractProtection implements 
     }
 
     @Override
+    public boolean canBeOpened() {
+        return Openable.class.isAssignableFrom(protecionBlock.getType().getData());
+    }
+
+    @Override
     protected Collection<ProtectionSign> fetchSigns() {
         Block supportingBlock = blockFinder.findSupportingBlock(protecionBlock);
         return blockFinder.findAttachedSigns(supportingBlock);

@@ -154,7 +154,7 @@ public final class InteractListener extends EventListener {
         }
 
         // Open (double/trap/fence) doors manually
-        if (!isSneakPlacing(player)) {
+        if (protection.canBeOpened() && !isSneakPlacing(player)) {
             event.setCancelled(true);
 
             if (protection.isOpen()) {

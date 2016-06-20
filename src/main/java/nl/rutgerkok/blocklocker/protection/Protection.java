@@ -35,6 +35,12 @@ public interface Protection {
     }
 
     /**
+     * Gets whether the protection can be opened as a door/gate/trapdoor.
+     * @return True if the protection can be opened, false otherwise.
+     */
+    boolean canBeOpened();
+
+    /**
      * Gets the allowed profiles in this protection. Allowed profiles can
      * place/take items and open doors, but cannot break the protection. This
      * list includes the {@link #getOwner() owner}.
@@ -133,7 +139,8 @@ public interface Protection {
      *
      * @param open
      *            True to open the door, false otherwise.
-     * @param playSound Whether to play a sound.
+     * @param playSound
+     *            Whether to play a sound.
      */
     void setOpen(boolean open, SoundCondition playSound);
 

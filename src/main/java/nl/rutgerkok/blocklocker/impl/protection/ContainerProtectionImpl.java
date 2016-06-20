@@ -73,6 +73,18 @@ public final class ContainerProtectionImpl extends AbstractProtection implements
     }
 
     @Override
+    public boolean canBeOpened() {
+        for (Block block : blocks) {
+            if (Openable.class.isAssignableFrom(block.getType().getData())) {
+                return true;
+            }
+            // Only try first block, as all blocks should be of the same type
+            return false;
+        }
+        return false;
+    }
+
+    @Override
     protected Collection<ProtectionSign> fetchSigns() {
         return blockFinder.findAttachedSigns(blocks);
     }
