@@ -3,6 +3,7 @@ package nl.rutgerkok.blocklocker.impl;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Set;
 
 import nl.rutgerkok.blocklocker.AttackType;
 import nl.rutgerkok.blocklocker.ChestSettings;
@@ -40,6 +41,16 @@ class ChestSettingsImpl implements ChestSettings {
     @Override
     public boolean canProtect(ProtectionType type, Material material) {
         return config.canProtect(type, material);
+    }
+
+    @Override
+    public boolean canProtect(Set<ProtectionType> types, Material material) {
+        for (ProtectionType type : types) {
+            if (canProtect(type, material)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

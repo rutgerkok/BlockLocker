@@ -83,6 +83,7 @@ public final class CompleteDoor {
 
     /** Top left block, may be null. */
     private final Block topLeftBlock;
+
     /** Top right block, may be null. */
     private final Block topRightBlock;
     /** Bottom left block, may be null. */
@@ -146,29 +147,65 @@ public final class CompleteDoor {
 
     /**
      * Gets a collection of all blocks where attached protection signs are used
-     * for this door.
+     * for this door. This includes the blocks above and below the door, and the
+     * blocks on the left and right of the door.
      *
      * @return All blocks that can have protection signs attached.
      */
     public Collection<Block> getBlocksForSigns() {
+        BlockFace toLeft = getFaceToLeftDoor();
+        BlockFace toRight = toLeft.getOppositeFace();
+
         ImmutableList.Builder<Block> blocks = ImmutableList.builder();
         if (bottomLeftBlock != null) {
             blocks.add(bottomLeftBlock);
             blocks.add(bottomLeftBlock.getRelative(BlockFace.DOWN));
+            blocks.add(bottomLeftBlock.getRelative(toLeft));
+            if (bottomRightBlock == null) {
+                // Single door, add block to the right too
+                blocks.add(bottomLeftBlock.getRelative(toRight));
+            }
         }
         if (bottomRightBlock != null) {
             blocks.add(bottomRightBlock);
             blocks.add(bottomRightBlock.getRelative(BlockFace.DOWN));
+            blocks.add(bottomRightBlock.getRelative(toRight));
+            if (bottomLeftBlock == null) {
+                // Single door, add block to the left too
+                blocks.add(bottomRightBlock.getRelative(toLeft));
+            }
         }
         if (topLeftBlock != null) {
             blocks.add(topLeftBlock);
             blocks.add(topLeftBlock.getRelative(BlockFace.UP));
+            blocks.add(topLeftBlock.getRelative(toLeft));
+            if (topRightBlock == null) {
+                // Single door, add block to the right too
+                blocks.add(topLeftBlock.getRelative(toRight));
+            }
         }
         if (topRightBlock != null) {
             blocks.add(topRightBlock);
             blocks.add(topRightBlock.getRelative(BlockFace.UP));
+            blocks.add(topRightBlock.getRelative(toRight));
+            if (topLeftBlock == null) {
+                // Single door, add block to the left too
+                blocks.add(topRightBlock.getRelative(toLeft));
+            }
         }
         return blocks.build();
+    }
+
+    private BlockFace getFaceToLeftDoor() {
+        Block bottomBlock = asDoorBlockOrNull(this.bottomLeftBlock);
+        if (bottomBlock == null) {
+            bottomBlock = asDoorBlockOrNull(this.bottomRightBlock);
+            if (bottomBlock == null) {
+                return BlockFace.SELF;
+            }
+        }
+
+        return getFaceToLeftDoor(bottomBlock);
     }
 
     /**

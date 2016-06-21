@@ -2,7 +2,9 @@ package nl.rutgerkok.blocklocker.impl;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 import nl.rutgerkok.blocklocker.ChestSettings;
 import nl.rutgerkok.blocklocker.ProtectionFinder;
@@ -11,9 +13,9 @@ import nl.rutgerkok.blocklocker.ProtectionType;
 import nl.rutgerkok.blocklocker.SearchMode;
 import nl.rutgerkok.blocklocker.SignType;
 import nl.rutgerkok.blocklocker.impl.blockfinder.BlockFinder;
+import nl.rutgerkok.blocklocker.impl.protection.AttachedProtectionImpl;
 import nl.rutgerkok.blocklocker.impl.protection.ContainerProtectionImpl;
 import nl.rutgerkok.blocklocker.impl.protection.DoorProtectionImpl;
-import nl.rutgerkok.blocklocker.impl.protection.AttachedProtectionImpl;
 import nl.rutgerkok.blocklocker.profile.Profile;
 import nl.rutgerkok.blocklocker.protection.Protection;
 
@@ -35,6 +37,8 @@ import com.google.common.base.Preconditions;
 class ProtectionFinderImpl implements ProtectionFinder {
     private final BlockFinder blockFinder;
     private final ChestSettings settings;
+
+    private final Set<ProtectionType> anyDoor = EnumSet.of(ProtectionType.DOOR, ProtectionType.TRAP_DOOR);
 
     ProtectionFinderImpl(BlockFinder lookup, ChestSettings settings) {
         blockFinder = lookup;
@@ -83,17 +87,17 @@ class ProtectionFinderImpl implements ProtectionFinder {
     private Optional<Block> findProtectableForSupportingBlock(Block supportingBlock) {
         // Search above and below that block for doors
         for (BlockFace doorFace : BlockFinder.VERTICAL_FACES) {
-            Block maybeDoor = supportingBlock.getRelative(doorFace);
-            if (settings.canProtect(ProtectionType.DOOR, maybeDoor.getType())) {
-                return Optional.of(maybeDoor);
+            Block maybeNormalDoor = supportingBlock.getRelative(doorFace);
+            if (settings.canProtect(ProtectionType.DOOR, maybeNormalDoor.getType())) {
+                return Optional.of(maybeNormalDoor);
             }
         }
 
         // Search around for trap doors
         for (BlockFace trapDoorFace : BlockFinder.CARDINAL_FACES) {
-            Block maybeTrapDoor = supportingBlock.getRelative(trapDoorFace);
-            if (settings.canProtect(ProtectionType.TRAP_DOOR, maybeTrapDoor.getType())) {
-                return Optional.of(maybeTrapDoor);
+            Block maybeAnyDoor = supportingBlock.getRelative(trapDoorFace);
+            if (settings.canProtect(anyDoor, maybeAnyDoor.getType())) {
+                return Optional.of(maybeAnyDoor);
             }
         }
 

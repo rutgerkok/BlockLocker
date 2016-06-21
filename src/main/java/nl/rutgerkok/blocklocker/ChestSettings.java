@@ -1,6 +1,7 @@
 package nl.rutgerkok.blocklocker;
 
 import java.util.Date;
+import java.util.Set;
 
 import org.bukkit.Material;
 
@@ -39,10 +40,23 @@ public interface ChestSettings {
      *            The protection type.
      * @param material
      *            The material to check.
-     * @return True if the protection can protect the given material, false
+     * @return True if the protection type can protect the given material, false
      *         otherwise.
      */
     boolean canProtect(ProtectionType type, Material material);
+
+    /**
+     * Checks if the given material can be protected by any of the the given
+     * types.
+     *
+     * @param types
+     *            The protection types.
+     * @param material
+     *            The material to check.
+     * @return True if one of the protection types can protect the given
+     *         material, false otherwise.
+     */
+    boolean canProtect(Set<ProtectionType> types, Material material);
 
     /**
      * Gets the actual date that chests must have activity after. If a chest

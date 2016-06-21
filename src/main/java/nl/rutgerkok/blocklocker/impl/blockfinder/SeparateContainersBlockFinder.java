@@ -15,7 +15,7 @@ import org.bukkit.material.MaterialData;
 
 import com.google.common.collect.ImmutableList;
 
-public final class SeparateContainersBlockFinder extends BlockFinder {
+final class SeparateContainersBlockFinder extends BlockFinder {
     SeparateContainersBlockFinder(SignParser parser) {
         super(parser);
     }

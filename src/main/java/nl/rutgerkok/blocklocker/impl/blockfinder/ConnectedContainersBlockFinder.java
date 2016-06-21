@@ -9,7 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
-public final class ConnectedContainersBlockFinder extends BlockFinder {
+final class ConnectedContainersBlockFinder extends BlockFinder {
     private static final int MAX_SEARCH_DISTANCE = 10;
 
     ConnectedContainersBlockFinder(SignParser parser) {
