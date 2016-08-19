@@ -7,8 +7,8 @@ import nl.rutgerkok.blocklocker.ChestSettings;
 import nl.rutgerkok.blocklocker.ProtectionSign;
 import nl.rutgerkok.blocklocker.SignParser;
 import nl.rutgerkok.blocklocker.SignType;
-import nl.rutgerkok.blocklocker.impl.nms.NMSAccessor;
-import nl.rutgerkok.blocklocker.impl.nms.NMSAccessor.JsonSign;
+import nl.rutgerkok.blocklocker.impl.nms.ServerSpecific;
+import nl.rutgerkok.blocklocker.impl.nms.ServerSpecific.JsonSign;
 import nl.rutgerkok.blocklocker.impl.profile.ProfileFactoryImpl;
 import nl.rutgerkok.blocklocker.profile.Profile;
 
@@ -31,10 +31,10 @@ import com.google.common.base.Optional;
 class SignParserImpl implements SignParser {
 
     private final ChestSettings chestSettings;
-    private final NMSAccessor nms;
+    private final ServerSpecific nms;
     private final ProfileFactoryImpl profileFactory;
 
-    SignParserImpl(ChestSettings chestSettings, NMSAccessor nms,
+    SignParserImpl(ChestSettings chestSettings, ServerSpecific nms,
             ProfileFactoryImpl profileFactory) {
         this.nms = nms;
         this.profileFactory = profileFactory;

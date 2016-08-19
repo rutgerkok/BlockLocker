@@ -29,7 +29,9 @@ import nl.rutgerkok.blocklocker.impl.group.FactionsGroupSystem;
 import nl.rutgerkok.blocklocker.impl.group.PermissionsGroupSystem;
 import nl.rutgerkok.blocklocker.impl.group.ScoreboardGroupSystem;
 import nl.rutgerkok.blocklocker.impl.group.TownyGroupSystem;
+import nl.rutgerkok.blocklocker.impl.nms.CNAccessor;
 import nl.rutgerkok.blocklocker.impl.nms.NMSAccessor;
+import nl.rutgerkok.blocklocker.impl.nms.ServerSpecific;
 import nl.rutgerkok.blocklocker.impl.profile.ProfileFactoryImpl;
 import nl.rutgerkok.blocklocker.impl.updater.Updater;
 
@@ -47,7 +49,7 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
     private ChestSettings chestSettings;
     private CombinedGroupSystem combinedGroupSystem;
     private Config config;
-    private NMSAccessor nms;
+    private ServerSpecific nms;
     private ProfileFactoryImpl profileFactory;
     private ProtectionFinderImpl protectionFinder;
     private ProtectionUpdater protectionUpdater;
@@ -174,11 +176,17 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
     public void onEnable() {
         // NMS checks
         try {
-            nms = new NMSAccessor();
-        } catch (Throwable t) {
-            getLogger().log(Level.SEVERE, "This Minecraft version is not supported. Find another version of the plugin, if available.", t);
-            Bukkit.getPluginManager().disablePlugin(this);
-            return;
+            nms = new CNAccessor();
+        } catch (ClassNotFoundException e) {
+            try {
+                nms = new NMSAccessor();
+            } catch (Throwable t) {
+                getLogger().log(Level.SEVERE,
+                        "This Minecraft version is not supported. Find another version of the plugin, if available.",
+                        t);
+                Bukkit.getPluginManager().disablePlugin(this);
+                return;
+            }
         }
 
         loadServices();

@@ -3,65 +3,25 @@ package nl.rutgerkok.blocklocker.impl.nms;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Iterator;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.Sign;
 import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
-import com.google.common.collect.Iterators;
 
 /**
  * Implementation of methods required by
  * nl.rutgerkok.chestsignprotect.impl.NMSAccessor for Minecraft 1.7.8 and 1.7.9.
  *
  */
-public final class NMSAccessor {
+public final class NMSAccessor implements ServerSpecific {
 
-    /**
-     * Holds the JSON data on a sign.
-     */
-    public static class JsonSign implements Iterable<JSONObject> {
-        private static final JsonSign EMPTY = new JsonSign("", new JSONArray());
 
-        private final String firstLine;
-        private final JSONArray jsonData;
-
-        private JsonSign(String firstLine, JSONArray jsonData) {
-            this.firstLine = Preconditions.checkNotNull(firstLine);
-            this.jsonData = Preconditions.checkNotNull(jsonData);
-        }
-
-        /**
-         * Gets the text on the first line of a sign, may be an empty string.
-         * 
-         * @return The text.
-         */
-        public String getFirstLine() {
-            return firstLine;
-        }
-
-        /**
-         * Gets whether there is data on this sign.
-         * 
-         * @return True if there is data, false otherwise.
-         */
-        public boolean hasData() {
-            return this != EMPTY;
-        }
-
-        @Override
-        public Iterator<JSONObject> iterator() {
-            return Iterators.filter(jsonData.iterator(), JSONObject.class);
-        }
-    }
 
     static Object call(Object on, Method method, Object... parameters) {
         try {
@@ -221,22 +181,7 @@ public final class NMSAccessor {
         return newInstance(BlockPosition_new, x, y, z);
     }
 
-    /**
-     * Gets the stored {@link JSONObject}s. If the sign contains no extra data
-     * at all, an empty {@link Optional} will be returned. Otherwise, all
-     * non-null {@link JSONObject}s stored in the sign will be added to the
-     * list.
-     * 
-     * @param world
-     *            The world the sign is in.
-     * @param x
-     *            The x position of the sign.
-     * @param y
-     *            The y position of the sign.
-     * @param z
-     *            The z position of the sign.
-     * @return The extra data, or empty if not found.
-     */
+    @Override
     public JsonSign getJsonData(World world, int x, int y, int z) {
         // Find sign
         Optional<?> nmsSign = toNmsSign(world, x, y, z);
@@ -307,16 +252,7 @@ public final class NMSAccessor {
         return Optional.of(chatComponentToString(call(chatHoverable, ChatHoverable_getChatComponent)));
     }
 
-    /**
-     * Sets the given JSON array on the sign. The JSON array can have as many
-     * elements as you want, and can contain anything that can be serialized as
-     * JSON.
-     *
-     * @param sign
-     *            The sign to set the text on.
-     * @param jsonArray
-     *            The array to store.
-     */
+    @Override
     public void setJsonData(Sign sign, JSONArray jsonArray) {
         Optional<?> nmsSign = toNmsSign(sign.getWorld(), sign.getX(), sign.getY(), sign.getZ());
         if (!nmsSign.isPresent()) {
