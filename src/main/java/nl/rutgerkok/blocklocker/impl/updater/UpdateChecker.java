@@ -27,7 +27,7 @@ final class UpdateChecker {
 
     /**
      * Checks online for updates. Blocking method.
-     * 
+     *
      * @param plugin
      *            Plugin to check for.
      * @return The update result.
@@ -44,7 +44,7 @@ final class UpdateChecker {
 
         InputStream stream = null;
         try {
-            stream = new BOMInputStream(connection.getInputStream());
+            stream = connection.getInputStream();
             Object object = jsonParser.parse(new InputStreamReader(stream, Charsets.UTF_8));
             return new UpdateCheckResult((JSONObject) object);
         } catch (IOException e) {
