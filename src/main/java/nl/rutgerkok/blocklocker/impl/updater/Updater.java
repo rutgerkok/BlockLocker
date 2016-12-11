@@ -45,7 +45,20 @@ public final class Updater {
         this.preference = Preconditions.checkNotNull(preference);
         this.translator = Preconditions.checkNotNull(translator);
         this.plugin = Preconditions.checkNotNull(plugin);
-        this.installDestination = new File(plugin.getServer().getUpdateFolderFile(), plugin.getName() + ".jar");
+
+        this.installDestination = new File(plugin.getServer().getUpdateFolderFile(), getJarFileName());
+    }
+
+    /**
+     * Gets the name of the JAR file we're in, like BlockLocker-1.2.4.jar.
+     * @return The name of the JAR file.
+     */
+    private String getJarFileName() {
+        return new File(Updater.class.getProtectionDomain()
+                .getCodeSource()
+                .getLocation()
+                .getPath())
+                        .getName();
     }
 
     private Optional<String> getMinecraftVersion() {
@@ -102,7 +115,7 @@ public final class Updater {
 
     /**
      * Starts the update process. Does nothing if updates have been disabled.
-     * 
+     *
      * @throws IllegalStateException
      *             If this method was called earlier.
      */
