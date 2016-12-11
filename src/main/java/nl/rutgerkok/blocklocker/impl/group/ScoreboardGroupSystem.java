@@ -16,7 +16,7 @@ public final class ScoreboardGroupSystem extends GroupSystem {
     @Override
     public boolean isInGroup(Player player, String groupName) {
         Scoreboard mainScoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-        Team team = mainScoreboard.getPlayerTeam(player);
+        Team team = mainScoreboard.getEntryTeam(player.getName());
         if (team == null) {
             return false;
         }
