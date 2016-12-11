@@ -33,6 +33,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.material.MaterialData;
 
 import com.google.common.base.Optional;
@@ -177,19 +178,30 @@ public final class InteractListener extends EventListener {
     }
 
     private boolean hasSignInHand(Player player) {
-        ItemStack itemInHand = player.getItemInHand();
-        if (itemInHand == null || itemInHand.getAmount() == 0 || itemInHand.getType() != Material.SIGN) {
+        PlayerInventory inventory = player.getInventory();
+        return isOfType(inventory.getItemInMainHand(), Material.SIGN)
+                || isOfType(inventory.getItemInOffHand(), Material.SIGN);
+    }
+
+    private boolean isNullOrAir(ItemStack stack) {
+        return stack == null || stack.getType() == Material.AIR || stack.getAmount() == 0 ;
+    }
+
+    private boolean isOfType(ItemStack stackOrNull, Material material) {
+        if (stackOrNull == null) {
             return false;
         }
-        return true;
+        return stackOrNull.getType() == material;
     }
 
     private boolean isSneakPlacing(Player player) {
         if (!player.isSneaking()) {
             return false;
         }
-        ItemStack inHand = player.getItemInHand();
-        if (inHand == null || inHand.getType() == Material.AIR) {
+        if (isNullOrAir(player.getInventory().getItemInMainHand())) {
+            return false;
+        }
+        if (isNullOrAir(player.getInventory().getItemInOffHand())) {
             return false;
         }
         return true;
@@ -243,30 +255,36 @@ public final class InteractListener extends EventListener {
         plugin.getProtectionUpdater().update(protection.get(), false);
 
         // Check if player is allowed
-        if (checkAllowed(player, protection.get(), clickedSign)) {
-            handleAllowed(event, protection.get(), clickedSign);
-        } else {
-            handleDisallowed(player, protection.get(), clickedSign);
-            event.setCancelled(true);
+        if (event.getHand() == EquipmentSlot.HAND) {
+            if (checkAllowed(player, protection.get(), clickedSign)) {
+                handleAllowed(event, protection.get(), clickedSign);
+            } else {
+                handleDisallowed(player, protection.get(), clickedSign);
+                event.setCancelled(true);
+            }
         }
 
     }
 
-    private void removeSingleItemFromHand(Player player) {
+    private ItemStack removeOneItem(ItemStack item) {
+        if (item.getAmount() > 1) {
+            item.setAmount(item.getAmount() - 1);
+            return item;
+        } else {
+            return null;
+        }
+    }
+
+    private void removeSingleSignFromHand(Player player) {
         if (player.getGameMode() == GameMode.CREATIVE) {
             return;
         }
 
-        ItemStack itemInHand = player.getItemInHand();
-        if (itemInHand == null) {
-            return;
-        }
-
-        if (itemInHand.getAmount() > 1) {
-            itemInHand.setAmount(itemInHand.getAmount() - 1);
-            player.setItemInHand(itemInHand);
-        } else {
-            player.setItemInHand(null);
+        PlayerInventory inventory = player.getInventory();
+        if (isOfType(inventory.getItemInMainHand(), Material.SIGN)) {
+            inventory.setItemInMainHand(removeOneItem(inventory.getItemInOffHand()));
+        } else if (isOfType(inventory.getItemInOffHand(), Material.SIGN)) {
+            inventory.setItemInOffHand(removeOneItem(inventory.getItemInOffHand()));
         }
     }
 
@@ -331,7 +349,7 @@ public final class InteractListener extends EventListener {
         plugin.getSignParser().saveSign(protectionSign);
 
         // Remove the sign from the player's hand
-        removeSingleItemFromHand(player);
+        removeSingleSignFromHand(player);
         return true;
     }
 
