@@ -282,7 +282,7 @@ public final class InteractListener extends EventListener {
 
         PlayerInventory inventory = player.getInventory();
         if (isOfType(inventory.getItemInMainHand(), Material.SIGN)) {
-            inventory.setItemInMainHand(removeOneItem(inventory.getItemInOffHand()));
+            inventory.setItemInMainHand(removeOneItem(inventory.getItemInMainHand()));
         } else if (isOfType(inventory.getItemInOffHand(), Material.SIGN)) {
             inventory.setItemInOffHand(removeOneItem(inventory.getItemInOffHand()));
         }
