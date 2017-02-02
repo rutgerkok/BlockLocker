@@ -255,15 +255,12 @@ public final class InteractListener extends EventListener {
         plugin.getProtectionUpdater().update(protection.get(), false);
 
         // Check if player is allowed
-        if (event.getHand() == EquipmentSlot.HAND) {
-            if (checkAllowed(player, protection.get(), clickedSign)) {
-                handleAllowed(event, protection.get(), clickedSign);
-            } else {
-                handleDisallowed(player, protection.get(), clickedSign);
-                event.setCancelled(true);
-            }
+        if (checkAllowed(player, protection.get(), clickedSign)) {
+            handleAllowed(event, protection.get(), clickedSign);
+        } else {
+            handleDisallowed(player, protection.get(), clickedSign);
+            event.setCancelled(true);
         }
-
     }
 
     private ItemStack removeOneItem(ItemStack item) {
