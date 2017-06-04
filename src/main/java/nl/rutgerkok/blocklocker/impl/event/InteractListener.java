@@ -41,13 +41,15 @@ import com.google.common.collect.ImmutableSet;
 
 public final class InteractListener extends EventListener {
 
-    private static Set<BlockFace> AUTOPLACE_BLOCK_FACES = ImmutableSet.of(BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP);
+    private static Set<BlockFace> AUTOPLACE_BLOCK_FACES = ImmutableSet.of(BlockFace.NORTH, BlockFace.EAST,
+            BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP);
 
     public InteractListener(BlockLockerPlugin plugin) {
         super(plugin);
     }
 
-    private boolean allowedByBlockPlaceEvent(Block placedBlock, BlockState replacedBlockState, Block placedAgainst, Player player) {
+    private boolean allowedByBlockPlaceEvent(Block placedBlock, BlockState replacedBlockState, Block placedAgainst,
+            Player player) {
         Material originalMaterial = placedBlock.getType();
 
         BlockPlaceEvent placeEvent = new BlockPlaceEvent(placedBlock, replacedBlockState, placedAgainst,
@@ -132,7 +134,8 @@ public final class InteractListener extends EventListener {
         }
     }
 
-    private void handleAllowed(PlayerInteractEvent event, Protection protection, boolean clickedSign) {
+    private void handleAllowed(PlayerInteractEvent event, Protection protection, boolean clickedSign,
+            boolean usedOffHand) {
         Block clickedBlock = event.getClickedBlock();
         Player player = event.getPlayer();
         PlayerProfile playerProfile = plugin.getProfileFactory().fromPlayer(player);
@@ -140,7 +143,7 @@ public final class InteractListener extends EventListener {
 
         // Select signs
         if (clickedSign) {
-            if (isOwner || player.hasPermission(Permissions.CAN_BYPASS)) {
+            if ((isOwner || player.hasPermission(Permissions.CAN_BYPASS)) && !usedOffHand) {
                 Sign sign = (Sign) clickedBlock.getState();
                 plugin.getSignSelector().setSelectedSign(player, sign);
                 plugin.getTranslator().sendMessage(player, Translation.PROTECTION_SELECTED_SIGN);
@@ -158,22 +161,35 @@ public final class InteractListener extends EventListener {
         if (protection.canBeOpened() && !isSneakPlacing(player)) {
             event.setCancelled(true);
 
-            if (protection.isOpen()) {
-                protection.setOpen(false, SoundCondition.AUTOMATIC);
-            } else {
-                protection.setOpen(true, SoundCondition.AUTOMATIC);
-            }
+            if (!usedOffHand) {
+                if (protection.isOpen()) {
+                    protection.setOpen(false, SoundCondition.AUTOMATIC);
+                } else {
+                    protection.setOpen(true, SoundCondition.AUTOMATIC);
+                }
 
-            // Schedule automatic close
-            scheduleClose(protection);
+                // Schedule automatic close
+                scheduleClose(protection);
+            }
         }
     }
 
-    private void handleDisallowed(Player player, Protection protection, boolean clickedSign) {
+    private void handleDisallowed(PlayerInteractEvent event, Protection protection, boolean clickedSign,
+            boolean usedOffHand) {
+        event.setCancelled(true);
+
+        if (!usedOffHand) {
+            // Don't send messages
+            return;
+        }
+
+        Player player = event.getPlayer();
         if (clickedSign) {
-            plugin.getTranslator().sendMessage(player, Translation.PROTECTION_IS_CLAIMED_BY, protection.getOwnerDisplayName());
+            plugin.getTranslator().sendMessage(player, Translation.PROTECTION_IS_CLAIMED_BY,
+                    protection.getOwnerDisplayName());
         } else {
-            plugin.getTranslator().sendMessage(player, Translation.PROTECTION_NO_ACCESS, protection.getOwnerDisplayName());
+            plugin.getTranslator().sendMessage(player, Translation.PROTECTION_NO_ACCESS,
+                    protection.getOwnerDisplayName());
         }
     }
 
@@ -184,7 +200,7 @@ public final class InteractListener extends EventListener {
     }
 
     private boolean isNullOrAir(ItemStack stack) {
-        return stack == null || stack.getType() == Material.AIR || stack.getAmount() == 0 ;
+        return stack == null || stack.getType() == Material.AIR || stack.getAmount() == 0;
     }
 
     private boolean isOfType(ItemStack stackOrNull, Material material) {
@@ -241,7 +257,11 @@ public final class InteractListener extends EventListener {
         Player player = event.getPlayer();
         Block block = event.getClickedBlock();
         boolean clickedSign = block.getType() == Material.SIGN_POST || block.getType() == Material.WALL_SIGN;
-        Optional<Protection> protection = plugin.getProtectionFinder().findProtection(block, SearchMode.NO_SUPPORTING_BLOCKS);
+        // When using the offhand check, access checks must still be performed,
+        // but no messages must be sent
+        boolean usedOffHand = event.getHand() == EquipmentSlot.OFF_HAND;
+        Optional<Protection> protection = plugin.getProtectionFinder().findProtection(block,
+                SearchMode.NO_SUPPORTING_BLOCKS);
 
         if (!protection.isPresent()) {
             if (tryPlaceSign(event.getPlayer(), block, event.getBlockFace(), SignType.PRIVATE)) {
@@ -256,10 +276,9 @@ public final class InteractListener extends EventListener {
 
         // Check if player is allowed
         if (checkAllowed(player, protection.get(), clickedSign)) {
-            handleAllowed(event, protection.get(), clickedSign);
+            handleAllowed(event, protection.get(), clickedSign, usedOffHand);
         } else {
-            handleDisallowed(player, protection.get(), clickedSign);
-            event.setCancelled(true);
+            handleDisallowed(event, protection.get(), clickedSign, usedOffHand);
         }
     }
 
@@ -341,7 +360,8 @@ public final class InteractListener extends EventListener {
         Sign sign = (Sign) signBlock.getState();
 
         // Place text on it
-        Profile profile = signType.isMainSign() ? plugin.getProfileFactory().fromPlayer(player) : plugin.getProfileFactory().fromEveryone();
+        Profile profile = signType.isMainSign() ? plugin.getProfileFactory().fromPlayer(player)
+                : plugin.getProfileFactory().fromEveryone();
         ProtectionSign protectionSign = plugin.getProtectionFinder().newProtectionSign(sign, signType, profile);
         plugin.getSignParser().saveSign(protectionSign);
 
