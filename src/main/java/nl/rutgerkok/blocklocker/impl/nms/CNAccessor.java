@@ -7,7 +7,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
 
 import com.google.common.base.Strings;
-import com.google.common.base.Throwables;
 
 /**
  * Server-specific calls for cn.nukkit.
@@ -37,7 +36,7 @@ public final class CNAccessor implements ServerSpecific {
                     return new JsonSign(sign.getLine(0), (JSONArray) JSONValue.parseWithException(data));
                 }
             } catch (Exception e) {
-                throw Throwables.propagate(e);
+                throw new RuntimeException(e);
             }
         }
         return JsonSign.EMPTY;
@@ -49,7 +48,7 @@ public final class CNAccessor implements ServerSpecific {
         try {
             sign.getClass().getMethod("setHiddenData", String.class).invoke(sign, jsonString);
         } catch (Exception e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 

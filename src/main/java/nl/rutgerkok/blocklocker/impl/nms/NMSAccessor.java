@@ -10,9 +10,7 @@ import org.bukkit.block.Sign;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
 
-import com.google.common.base.Objects;
 import com.google.common.base.Optional;
-import com.google.common.base.Throwables;
 
 /**
  * Implementation of methods required by
@@ -27,7 +25,7 @@ public final class NMSAccessor implements ServerSpecific {
         try {
             return method.invoke(on, parameters);
         } catch (Exception e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -36,7 +34,7 @@ public final class NMSAccessor implements ServerSpecific {
             Method valueOf = getMethod(Enum.class, "valueOf", Class.class, String.class);
             return invokeStatic(valueOf, enumClass, name);
         } catch (Exception e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -44,7 +42,7 @@ public final class NMSAccessor implements ServerSpecific {
         try {
             return clazz.getConstructor(paramTypes);
         } catch (Exception e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -52,7 +50,7 @@ public final class NMSAccessor implements ServerSpecific {
         try {
             return clazz.getField(name);
         } catch (Exception e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -60,7 +58,7 @@ public final class NMSAccessor implements ServerSpecific {
         try {
             return clazz.getMethod(name, parameterTypes);
         } catch (Exception e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -86,7 +84,7 @@ public final class NMSAccessor implements ServerSpecific {
         try {
             return constructor.newInstance(params);
         } catch (Exception e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -94,7 +92,7 @@ public final class NMSAccessor implements ServerSpecific {
         try {
             return field.get(on);
         } catch (Exception e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -174,7 +172,7 @@ public final class NMSAccessor implements ServerSpecific {
                 lastException = e;
             }
         }
-        throw Throwables.propagate(lastException);
+        throw new RuntimeException(lastException);
     }
 
     Object getBlockPosition(int x, int y, int z) {
@@ -211,7 +209,7 @@ public final class NMSAccessor implements ServerSpecific {
         try {
             return Class.forName(nmsPrefix + name);
         } catch (ClassNotFoundException e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -229,7 +227,7 @@ public final class NMSAccessor implements ServerSpecific {
         try {
             return Class.forName(obcPrefix + name);
         } catch (Exception e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -264,7 +262,10 @@ public final class NMSAccessor implements ServerSpecific {
 
     private void setSecretData(Object tileEntitySign, String data) {
         Object line = ((Object[]) retrieve(tileEntitySign, TileEntitySign_lines))[0];
-        Object modifier = Objects.firstNonNull(call(line, IChatBaseComponent_getChatModifier), newInstance(ChatModifier_new));
+        Object modifier = call(line, IChatBaseComponent_getChatModifier);
+        if (modifier == null) {
+            modifier = newInstance(ChatModifier_new);
+        }
         Object chatComponentText = newInstance(ChatComponentText_new, data);
         Object hoverable = newInstance(ChatHoverable_new, EnumHoverAction_SHOW_TEXT, chatComponentText);
         call(modifier, ChatModifier_setChatHoverable, hoverable);

@@ -5,7 +5,6 @@ import nl.rutgerkok.blocklocker.group.GroupSystem;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.google.common.base.Throwables;
 import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.exceptions.NotRegisteredException;
 import com.palmergames.bukkit.towny.object.Nation;
@@ -21,7 +20,7 @@ public final class TownyGroupSystem extends GroupSystem {
 
     /**
      * Tests if the Towny plugin is installed.
-     * 
+     *
      * @return True if the factions plugin is installed, false otherwise.
      */
     public static boolean isAvailable() {
@@ -30,31 +29,6 @@ public final class TownyGroupSystem extends GroupSystem {
             return true;
         } catch (NoClassDefFoundError e) {
             return false;
-        }
-    }
-
-    @Override
-    public boolean isInGroup(Player player, String groupName) {
-        try {
-            Resident resident = TownyUniverse.getDataSource().getResident(player.getName());
-            Town town = resident.getTown();
-            if (town.getName().equalsIgnoreCase(groupName)) {
-                return true;
-            }
-
-            Nation nation = town.getNation();
-            if (nation.getName().equalsIgnoreCase(groupName)) {
-                return true;
-            }
-
-            return false;
-        } catch (Exception e) {
-            // Cannot use catch (NotRegisteredException e) because the class
-            // cannot be loaded then when Towny isn't present
-            if (e instanceof NotRegisteredException) {
-                return false;
-            }
-            throw Throwables.propagate(e);
         }
     }
 
@@ -83,7 +57,32 @@ public final class TownyGroupSystem extends GroupSystem {
             if (e instanceof NotRegisteredException) {
                 return false;
             }
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public boolean isInGroup(Player player, String groupName) {
+        try {
+            Resident resident = TownyUniverse.getDataSource().getResident(player.getName());
+            Town town = resident.getTown();
+            if (town.getName().equalsIgnoreCase(groupName)) {
+                return true;
+            }
+
+            Nation nation = town.getNation();
+            if (nation.getName().equalsIgnoreCase(groupName)) {
+                return true;
+            }
+
+            return false;
+        } catch (Exception e) {
+            // Cannot use catch (NotRegisteredException e) because the class
+            // cannot be loaded then when Towny isn't present
+            if (e instanceof NotRegisteredException) {
+                return false;
+            }
+            throw new RuntimeException(e);
         }
     }
 
