@@ -2,19 +2,6 @@ package nl.rutgerkok.blocklocker.impl.event;
 
 import java.util.Set;
 
-import nl.rutgerkok.blocklocker.BlockData;
-import nl.rutgerkok.blocklocker.BlockLockerPlugin;
-import nl.rutgerkok.blocklocker.Permissions;
-import nl.rutgerkok.blocklocker.ProtectionSign;
-import nl.rutgerkok.blocklocker.ProtectionType;
-import nl.rutgerkok.blocklocker.SearchMode;
-import nl.rutgerkok.blocklocker.SignType;
-import nl.rutgerkok.blocklocker.Translator.Translation;
-import nl.rutgerkok.blocklocker.profile.PlayerProfile;
-import nl.rutgerkok.blocklocker.profile.Profile;
-import nl.rutgerkok.blocklocker.protection.Protection;
-import nl.rutgerkok.blocklocker.protection.Protection.SoundCondition;
-
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -38,6 +25,19 @@ import org.bukkit.material.MaterialData;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
+
+import nl.rutgerkok.blocklocker.BlockData;
+import nl.rutgerkok.blocklocker.BlockLockerPlugin;
+import nl.rutgerkok.blocklocker.Permissions;
+import nl.rutgerkok.blocklocker.ProtectionSign;
+import nl.rutgerkok.blocklocker.ProtectionType;
+import nl.rutgerkok.blocklocker.SearchMode;
+import nl.rutgerkok.blocklocker.SignType;
+import nl.rutgerkok.blocklocker.Translator.Translation;
+import nl.rutgerkok.blocklocker.profile.PlayerProfile;
+import nl.rutgerkok.blocklocker.profile.Profile;
+import nl.rutgerkok.blocklocker.protection.Protection;
+import nl.rutgerkok.blocklocker.protection.Protection.SoundCondition;
 
 public final class InteractListener extends EventListener {
 
@@ -178,7 +178,7 @@ public final class InteractListener extends EventListener {
             boolean usedOffHand) {
         event.setCancelled(true);
 
-        if (!usedOffHand) {
+        if (usedOffHand) {
             // Don't send messages
             return;
         }
