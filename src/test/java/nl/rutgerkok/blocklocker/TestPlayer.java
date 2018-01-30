@@ -2,13 +2,11 @@ package nl.rutgerkok.blocklocker;
 
 import java.net.InetSocketAddress;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.bukkit.Achievement;
 import org.bukkit.Effect;
 import org.bukkit.EntityEffect;
 import org.bukkit.GameMode;
@@ -19,12 +17,16 @@ import org.bukkit.Note;
 import org.bukkit.Particle;
 import org.bukkit.Server;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.Statistic;
 import org.bukkit.WeatherType;
 import org.bukkit.World;
+import org.bukkit.advancement.Advancement;
+import org.bukkit.advancement.AdvancementProgress;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
+import org.bukkit.block.PistonMoveReaction;
 import org.bukkit.conversations.Conversation;
 import org.bukkit.conversations.ConversationAbandonedEvent;
 import org.bukkit.entity.Entity;
@@ -40,6 +42,7 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.InventoryView.Property;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MainHand;
+import org.bukkit.inventory.Merchant;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.map.MapView;
 import org.bukkit.metadata.MetadataValue;
@@ -90,51 +93,6 @@ public class TestPlayer implements Player {
     }
 
     @Override
-    public void _INVALID_damage(int amount) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void _INVALID_damage(int amount, Entity source) {
-        throw new UnsupportedOperationException();
-
-    }
-
-    @Override
-    public int _INVALID_getHealth() {
-        throw new UnsupportedOperationException();
-
-    }
-
-    @Override
-    public int _INVALID_getLastDamage() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public int _INVALID_getMaxHealth() {
-        throw new UnsupportedOperationException();
-
-    }
-
-    @Override
-    public void _INVALID_setHealth(int health) {
-        throw new UnsupportedOperationException();
-
-    }
-
-    @Override
-    public void _INVALID_setLastDamage(int damage) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void _INVALID_setMaxHealth(int health) {
-        throw new UnsupportedOperationException();
-
-    }
-
-    @Override
     public void abandonConversation(Conversation conversation) {
         throw new UnsupportedOperationException();
 
@@ -177,6 +135,12 @@ public class TestPlayer implements Player {
     }
 
     @Override
+    public boolean addPassenger(Entity arg0) {
+        throw new UnsupportedOperationException();
+
+    }
+
+    @Override
     public boolean addPotionEffect(PotionEffect effect) {
         throw new UnsupportedOperationException();
     }
@@ -194,7 +158,14 @@ public class TestPlayer implements Player {
     }
 
     @Override
-    public void awardAchievement(Achievement achievement) {
+    public boolean addScoreboardTag(String arg0) {
+        throw new UnsupportedOperationException();
+
+    }
+
+    @Override
+    @Deprecated
+    public void awardAchievement(org.bukkit.Achievement achievement) {
         throw new UnsupportedOperationException();
 
     }
@@ -307,6 +278,12 @@ public class TestPlayer implements Player {
     }
 
     @Override
+    public AdvancementProgress getAdvancementProgress(Advancement arg0) {
+        throw new UnsupportedOperationException();
+
+    }
+
+    @Override
     public boolean getAllowFlight() {
         throw new UnsupportedOperationException();
 
@@ -331,6 +308,12 @@ public class TestPlayer implements Player {
 
     @Override
     public Location getCompassTarget() {
+        throw new UnsupportedOperationException();
+
+    }
+
+    @Override
+    public int getCooldown(Material arg0) {
         throw new UnsupportedOperationException();
 
     }
@@ -448,6 +431,12 @@ public class TestPlayer implements Player {
     }
 
     @Override
+    public double getHeight() {
+        throw new UnsupportedOperationException();
+
+    }
+
+    @Override
     public PlayerInventory getInventory() {
         throw new UnsupportedOperationException();
     }
@@ -485,11 +474,6 @@ public class TestPlayer implements Player {
     }
 
     @Override
-    public List<Block> getLastTwoTargetBlocks(HashSet<Byte> transparent, int maxDistance) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public List<Block> getLastTwoTargetBlocks(Set<Material> arg0, int arg1) {
         throw new UnsupportedOperationException();
     }
@@ -507,17 +491,18 @@ public class TestPlayer implements Player {
     }
 
     @Override
-    public List<Block> getLineOfSight(HashSet<Byte> transparent, int maxDistance) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public List<Block> getLineOfSight(Set<Material> arg0, int arg1) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public Set<String> getListeningPluginChannels() {
+        throw new UnsupportedOperationException();
+
+    }
+
+    @Override
+    public String getLocale() {
         throw new UnsupportedOperationException();
 
     }
@@ -595,6 +580,18 @@ public class TestPlayer implements Player {
     }
 
     @Override
+    public List<Entity> getPassengers() {
+        throw new UnsupportedOperationException();
+
+    }
+
+    @Override
+    public PistonMoveReaction getPistonMoveReaction() {
+        throw new UnsupportedOperationException();
+
+    }
+
+    @Override
     public Player getPlayer() {
         throw new UnsupportedOperationException();
 
@@ -625,6 +622,18 @@ public class TestPlayer implements Player {
     }
 
     @Override
+    public int getPortalCooldown() {
+        throw new UnsupportedOperationException();
+
+    }
+
+    @Override
+    public PotionEffect getPotionEffect(PotionEffectType arg0) {
+        throw new UnsupportedOperationException();
+
+    }
+
+    @Override
     public int getRemainingAir() {
         throw new UnsupportedOperationException();
     }
@@ -648,7 +657,25 @@ public class TestPlayer implements Player {
     }
 
     @Override
+    public Set<String> getScoreboardTags() {
+        throw new UnsupportedOperationException();
+
+    }
+
+    @Override
     public Server getServer() {
+        throw new UnsupportedOperationException();
+
+    }
+
+    @Override
+    public Entity getShoulderEntityLeft() {
+        throw new UnsupportedOperationException();
+
+    }
+
+    @Override
+    public Entity getShoulderEntityRight() {
         throw new UnsupportedOperationException();
 
     }
@@ -679,11 +706,6 @@ public class TestPlayer implements Player {
     public int getStatistic(Statistic statistic, Material material) throws IllegalArgumentException {
         throw new UnsupportedOperationException();
 
-    }
-
-    @Override
-    public Block getTargetBlock(HashSet<Byte> transparent, int maxDistance) {
-        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -733,6 +755,12 @@ public class TestPlayer implements Player {
     }
 
     @Override
+    public double getWidth() {
+        throw new UnsupportedOperationException();
+
+    }
+
+    @Override
     public World getWorld() {
         throw new UnsupportedOperationException();
 
@@ -751,13 +779,27 @@ public class TestPlayer implements Player {
     }
 
     @Override
-    public boolean hasAchievement(Achievement achievement) {
+    @Deprecated
+    public boolean hasAchievement(org.bukkit.Achievement achievement) {
         throw new UnsupportedOperationException();
 
     }
 
+    @Override
     public boolean hasAI() {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean hasCooldown(Material arg0) {
+        throw new UnsupportedOperationException();
+
+    }
+
+    @Override
+    public boolean hasGravity() {
+        throw new UnsupportedOperationException();
+
     }
 
     @Override
@@ -808,6 +850,12 @@ public class TestPlayer implements Player {
     }
 
     @Override
+    public void hidePlayer(Plugin arg0, Player arg1) {
+        throw new UnsupportedOperationException();
+        
+    }
+
+    @Override
     public void incrementStatistic(Statistic statistic) throws IllegalArgumentException {
         throw new UnsupportedOperationException();
 
@@ -854,6 +902,7 @@ public class TestPlayer implements Player {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public boolean isCollidable() {
         throw new UnsupportedOperationException();
     }
@@ -899,6 +948,12 @@ public class TestPlayer implements Player {
     }
 
     @Override
+    public boolean isHandRaised() {
+        throw new UnsupportedOperationException();
+
+    }
+
+    @Override
     public boolean isHealthScaled() {
         throw new UnsupportedOperationException();
 
@@ -910,6 +965,7 @@ public class TestPlayer implements Player {
 
     }
 
+    @Override
     public boolean isInvulnerable() {
         throw new UnsupportedOperationException();
     }
@@ -952,6 +1008,12 @@ public class TestPlayer implements Player {
 
     @Override
     public boolean isPlayerTimeRelative() {
+        throw new UnsupportedOperationException();
+
+    }
+
+    @Override
+    public boolean isSilent() {
         throw new UnsupportedOperationException();
 
     }
@@ -1037,6 +1099,12 @@ public class TestPlayer implements Player {
     }
 
     @Override
+    public InventoryView openMerchant(Merchant arg0, boolean arg1) {
+        throw new UnsupportedOperationException();
+
+    }
+
+    @Override
     public InventoryView openMerchant(Villager trader, boolean force) {
         throw new UnsupportedOperationException();
     }
@@ -1089,9 +1157,21 @@ public class TestPlayer implements Player {
     }
 
     @Override
+    public void playSound(Location arg0, Sound arg1, SoundCategory arg2, float arg3, float arg4) {
+        throw new UnsupportedOperationException();
+        
+    }
+
+    @Override
     public void playSound(Location location, String sound, float volume, float pitch) {
         throw new UnsupportedOperationException();
 
+    }
+
+    @Override
+    public void playSound(Location arg0, String arg1, SoundCategory arg2, float arg3, float arg4) {
+        throw new UnsupportedOperationException();
+        
     }
 
     @Override
@@ -1107,7 +1187,8 @@ public class TestPlayer implements Player {
     }
 
     @Override
-    public void removeAchievement(Achievement achievement) {
+    @Deprecated
+    public void removeAchievement(org.bukkit.Achievement achievement) {
         throw new UnsupportedOperationException();
 
     }
@@ -1125,7 +1206,19 @@ public class TestPlayer implements Player {
     }
 
     @Override
+    public boolean removePassenger(Entity arg0) {
+        throw new UnsupportedOperationException();
+
+    }
+
+    @Override
     public void removePotionEffect(PotionEffectType type) {
+        throw new UnsupportedOperationException();
+
+    }
+
+    @Override
+    public boolean removeScoreboardTag(String arg0) {
         throw new UnsupportedOperationException();
 
     }
@@ -1219,6 +1312,12 @@ public class TestPlayer implements Player {
     }
 
     @Override
+    public void sendTitle(String arg0, String arg1, int arg2, int arg3, int arg4) {
+        throw new UnsupportedOperationException();
+        
+    }
+
+    @Override
     public Map<String, Object> serialize() {
         throw new UnsupportedOperationException();
 
@@ -1228,18 +1327,13 @@ public class TestPlayer implements Player {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public void setAI(boolean ai) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public void setAllowFlight(boolean flight) {
-        throw new UnsupportedOperationException();
-
-    }
-
-    @Override
-    public void setBanned(boolean banned) {
         throw new UnsupportedOperationException();
 
     }
@@ -1262,6 +1356,7 @@ public class TestPlayer implements Player {
 
     }
 
+    @Override
     public void setCollidable(boolean collidable) {
         throw new UnsupportedOperationException();
     }
@@ -1270,6 +1365,12 @@ public class TestPlayer implements Player {
     public void setCompassTarget(Location loc) {
         throw new UnsupportedOperationException();
 
+    }
+
+    @Override
+    public void setCooldown(Material arg0, int arg1) {
+        throw new UnsupportedOperationException();
+        
     }
 
     @Override
@@ -1348,6 +1449,12 @@ public class TestPlayer implements Player {
     }
 
     @Override
+    public void setGravity(boolean arg0) {
+        throw new UnsupportedOperationException();
+        
+    }
+
+    @Override
     public void setHealth(double health) {
         throw new UnsupportedOperationException();
 
@@ -1365,6 +1472,7 @@ public class TestPlayer implements Player {
 
     }
 
+    @Override
     public void setInvulnerable(boolean invulnerable) {
         throw new UnsupportedOperationException();
     }
@@ -1460,6 +1568,12 @@ public class TestPlayer implements Player {
     }
 
     @Override
+    public void setPortalCooldown(int arg0) {
+        throw new UnsupportedOperationException();
+        
+    }
+
+    @Override
     public void setRemainingAir(int ticks) {
         throw new UnsupportedOperationException();
     }
@@ -1477,6 +1591,12 @@ public class TestPlayer implements Player {
     }
 
     @Override
+    public void setResourcePack(String arg0, byte[] arg1) {
+        throw new UnsupportedOperationException();
+        
+    }
+
+    @Override
     public void setSaturation(float value) {
         throw new UnsupportedOperationException();
 
@@ -1486,6 +1606,24 @@ public class TestPlayer implements Player {
     public void setScoreboard(Scoreboard scoreboard) throws IllegalArgumentException, IllegalStateException {
         throw new UnsupportedOperationException();
 
+    }
+
+    @Override
+    public void setShoulderEntityLeft(Entity arg0) {
+        throw new UnsupportedOperationException();
+        
+    }
+
+    @Override
+    public void setShoulderEntityRight(Entity arg0) {
+        throw new UnsupportedOperationException();
+        
+    }
+
+    @Override
+    public void setSilent(boolean arg0) {
+        throw new UnsupportedOperationException();
+        
     }
 
     @Override
@@ -1577,6 +1715,12 @@ public class TestPlayer implements Player {
     }
 
     @Override
+    public void showPlayer(Plugin arg0, Player arg1) {
+        throw new UnsupportedOperationException();
+
+    }
+
+    @Override
     public void spawnParticle(Particle particle, double x, double y, double z, int count) {
         throw new UnsupportedOperationException();
     }
@@ -1647,6 +1791,30 @@ public class TestPlayer implements Player {
     @Override
     public Spigot spigot() {
         return new Player.Spigot();
+    }
+
+    @Override
+    public void stopSound(Sound arg0) {
+        throw new UnsupportedOperationException();
+
+    }
+
+    @Override
+    public void stopSound(Sound arg0, SoundCategory arg1) {
+        throw new UnsupportedOperationException();
+
+    }
+
+    @Override
+    public void stopSound(String arg0) {
+        throw new UnsupportedOperationException();
+
+    }
+
+    @Override
+    public void stopSound(String arg0, SoundCategory arg1) {
+        throw new UnsupportedOperationException();
+
     }
 
     @Override
