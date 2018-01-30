@@ -13,7 +13,6 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import com.google.common.base.Charsets;
-import com.google.common.io.Closeables;
 
 /**
  * Checks whether an update is available.
@@ -42,9 +41,7 @@ final class UpdateChecker {
         connection.setRequestProperty("Content-Type", "application/json");
         UserAgent.setFor(plugin, connection);
 
-        InputStream stream = null;
-        try {
-            stream = connection.getInputStream();
+        try (InputStream stream = connection.getInputStream()) {
             Object object = jsonParser.parse(new InputStreamReader(stream, Charsets.UTF_8));
             return new UpdateCheckResult((JSONObject) object);
         } catch (IOException e) {
@@ -54,8 +51,6 @@ final class UpdateChecker {
             throw new IOException("Invalid JSON", e);
         } catch (Exception e) {
             throw new IOException(e);
-        } finally {
-            Closeables.closeQuietly(stream);
         }
     }
 }

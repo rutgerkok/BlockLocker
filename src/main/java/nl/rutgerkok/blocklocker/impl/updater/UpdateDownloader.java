@@ -26,7 +26,7 @@ import com.google.common.io.Closeables;
  */
 final class UpdateDownloader {
 
-    private static final Set<String> ALLOWED_HOSTS = ImmutableSet.of("github.com");
+    private static final Set<String> ALLOWED_HOSTS = ImmutableSet.of("dl.dropboxusercontent.com");
 
     private final Plugin plugin;
     private final URL url;
@@ -43,13 +43,6 @@ final class UpdateDownloader {
         this.desiredMD5 = result.getFileMD5().or("(no md5 given)");
     }
 
-    private void checkHost() throws IOException {
-        String host = url.getHost();
-       if(!ALLOWED_HOSTS.contains(host)) {
-           throw new IOException("Can only download from " + ALLOWED_HOSTS + ", " + host + " is not allowed");
-       }
-    }
-
     private void checkMd5() throws IOException {
         String md5 = getMd5Checksum(downloadTo);
         if (!md5.equalsIgnoreCase(desiredMD5)) {
@@ -57,6 +50,16 @@ final class UpdateDownloader {
                 downloadTo.deleteOnExit();
             }
             throw new IOException("MD5 of file " + md5 + " does not match expected md5 of " + desiredMD5);
+        }
+    }
+
+    private void checkUrl() throws IOException {
+        String host = url.getHost();
+        if (!ALLOWED_HOSTS.contains(host)) {
+            throw new IOException("Can only download from " + ALLOWED_HOSTS + ", " + host + " is not allowed");
+        }
+        if (!url.getProtocol().equals("https")) {
+            throw new IOException("Can only download using https, so " + url.getProtocol() + " is not allowed");
         }
     }
 
@@ -68,7 +71,7 @@ final class UpdateDownloader {
      *             If an IO error occurs.
      */
     void downloadSync() throws IOException {
-        checkHost();
+        checkUrl();
 
         downloadTo.getParentFile().mkdirs();
 
