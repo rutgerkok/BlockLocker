@@ -10,13 +10,12 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.bukkit.plugin.Plugin;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 
@@ -26,12 +25,14 @@ import com.google.common.io.Closeables;
  */
 final class UpdateDownloader {
 
-    private static final Set<String> ALLOWED_HOSTS = ImmutableSet.of("dl.dropboxusercontent.com");
+    private static final String EXPECTED_URL = "https://dl.dropboxusercontent.com/s/0v7euy3bp7jwcah/blocklocker-VERSION.jar?dl=0";
+    private static final Pattern EXPECTED_VERSION_PATTERN = Pattern.compile("^[1-2]\\.[0-9]+\\.[0-9]+$");
 
     private final Plugin plugin;
     private final URL url;
     private final File downloadTo;
     private final String desiredMD5;
+    private final String newVersion;
 
     UpdateDownloader(Plugin plugin, UpdateCheckResult result, File downloadTo) {
         Optional<URL> url = result.getDownloadUrl();
@@ -41,6 +42,7 @@ final class UpdateDownloader {
         this.url = url.get();
         this.downloadTo = Preconditions.checkNotNull(downloadTo);
         this.desiredMD5 = result.getFileMD5().or("(no md5 given)");
+        this.newVersion = result.getLatestVersion().or("(no version given)");
     }
 
     private void checkMd5() throws IOException {
@@ -54,12 +56,14 @@ final class UpdateDownloader {
     }
 
     private void checkUrl() throws IOException {
-        String host = url.getHost();
-        if (!ALLOWED_HOSTS.contains(host)) {
-            throw new IOException("Can only download from " + ALLOWED_HOSTS + ", " + host + " is not allowed");
+        if (!EXPECTED_VERSION_PATTERN.matcher(this.newVersion).matches()) {
+            throw new IOException("Invalid version number to update to: " + this.newVersion);
         }
-        if (!url.getProtocol().equals("https")) {
-            throw new IOException("Can only download using https, so " + url.getProtocol() + " is not allowed");
+        String expectedUrl = EXPECTED_URL.replace("VERSION", this.newVersion);
+        if (!expectedUrl.equals(this.url.toString())) {
+            throw new IOException(
+                    "Updated file resides at unexpected location. Expected download from " + expectedUrl + ", found "
+                            + this.url + ". Refusing to download.");
         }
     }
 
