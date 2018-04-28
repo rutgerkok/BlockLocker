@@ -12,9 +12,11 @@ languageFile: translations-en.yml
 #
 # Before installing an update, the plugin checks that
 # a) the new file is compatible with your Minecraft version
-# b) the file is hosted on spigotmc.org
+# b) the file is hosted at https://dl.dropboxusercontent.com/s/0v7euy3bp7jwcah
+#    /blocklocker-VERSION.jar?dl=0 with VERSION the new version number, which
+#    may only consist of digits and dots.
 # c) it is safe to install this file automatically. When the file is flagged
-#    as needing a manual installation by the author, the file won't be
+#    as needing a manual installation by the plugin author, the file won't be
 #    installed automatically
 updater: AUTO_INSTALL
 
