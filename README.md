@@ -1,24 +1,32 @@
 BlockLocker
 ===========
 
-[View on spigotmc.org](http://www.spigotmc.org/resources/blocklocker.3268/)
+[![Build Status](https://travis-ci.com/rutgerkok/BlockLocker.svg?branch=master)](https://travis-ci.com/rutgerkok/BlockLocker) [![Download at SpigotMC.org](https://img.shields.io/badge/download-SpigotMC.org-orange.svg)](http://www.spigotmc.org/resources/blocklocker.3268/)
+![Latest release](https://img.shields.io/github/release/rutgerkok/BlockLocker.svg)
+![Commits since latest release](https://img.shields.io/github/commits-since/rutgerkok/BlockLocker/latest.svg)
 
-Lockette/Deadbolt clone that supports UUIDs (and the new doors), written from scratch.
+Lockette/Deadbolt clone that properly supports UUIDs (and the new doors), written from scratch.
 
 Current features:
 
 * Locks chests, furnaces, doors and a few other containers using the familiar `[Private]` and `[More Users]` signs.
-* You can change which block types can be protected.
-* UUIDs are saved to hidden hover text data on the sign, never visible for users.
-* Automatically looks up UUIDs for signs from Lockette and Deadbolt when they are read.
-* All messages can be translated.
-* Group support: adding `[MyGroup]` to the sign will allow anyone with the permission node `blocklocker.group.mygroup` (grant the lowercase node) and anyone in a scoreboard team or in a faction of MassiveCraft Factions called `MyGroup` (case insensitive).
-* Double door support: protecting one half protects the other half, opening one half opens the other half.
-* The owner of a protection can change the signs after creating them using the `/blocklocker <line number> <name>` command.
-* Only the owner of a protection can destroy a protection.
 * Signs placed against a container are automatically filled with `[Private]` and the name of the player.
+* Only the owner of a protection can destroy a protection.
 * Admins can still open protected doors and containers.
-* Automatically closing doors.
+* UUID support
+  * UUIDs are saved to hidden hover text data on the sign, never visible for users.
+  * Automatically looks up UUIDs for signs from Lockette and Deadbolt when they are read.
+* Fully configurable
+  * All messages can be translated.
+  * You can change which block types can be protected. Even more complex blocks like levers work correctly.
+* Group support: adding `[MyGroup]` to the sign will allow anyone with the permission node `blocklocker.group.mygroup` (grant the lowercase node) and anyone in a scoreboard team or in a faction of MassiveCraft Factions called `MyGroup` (case insensitive).
+* Correctly handles complex blocks:
+  * Double door support: protecting one half also protects the other half, opening one half opens the other half.
+  * Doors can be set to close automatically. BlockLocker does not just toggle the open state, it will actually close the door.
+  * Double chest support: protecting one half also proects the other half.
+  * Trapdoor support: the sign can be attached to either the "hinge"-block or the trapdoor itself.
+  * Fence gate support: the sign can be attached to either the the fence gate block or the block below.
+* The owner of a protection can change the signs after creating them using the `/blocklocker <line number> <name>` command.
 * Auto-updater, so that you are notified when there is a new version available.
 
 Compilation
