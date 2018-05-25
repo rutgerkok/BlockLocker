@@ -18,7 +18,8 @@ public enum ProtectionType {
      */
     DOOR,
     /**
-     * A trap door, represented by {@link AttachedProtection}.
+     * A block where signs can also be attached to the block it is
+     * hanging/standing on. Represented {@link AttachedProtection}.
      */
-    TRAP_DOOR;
+    ATTACHABLE;
 }

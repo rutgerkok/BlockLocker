@@ -24,10 +24,8 @@ updater: AUTO_INSTALL
 # All material names can be found here:
 # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
 protectableContainers:
-- ACACIA_FENCE_GATE
 - ANVIL
 - BEACON
-- BIRCH_FENCE_GATE
 - BLACK_SHULKER_BOX
 - BLUE_SHULKER_BOX
 - BREWING_STAND
@@ -35,17 +33,14 @@ protectableContainers:
 - BURNING_FURNACE
 - CHEST
 - CYAN_SHULKER_BOX
-- DARK_OAK_FENCE_GATE
 - DISPENSER
 - DROPPER
 - ENCHANTMENT_TABLE
-- FENCE_GATE
 - FURNACE
 - GRAY_SHULKER_BOX
 - GREEN_SHULKER_BOX
 - HOPPER
 - JUKEBOX
-- JUNGLE_FENCE_GATE
 - LIGHT_BLUE_SHULKER_BOX
 - LIME_SHULKER_BOX
 - MAGENTA_SHULKER_BOX
@@ -54,7 +49,6 @@ protectableContainers:
 - PURPLE_SHULKER_BOX
 - RED_SHULKER_BOX
 - SILVER_SHULKER_BOX
-- SPRUCE_FENCE_GATE
 - TRAPPED_CHEST
 - WHITE_SHULKER_BOX
 - WORKBENCH
@@ -78,11 +72,24 @@ protectableDoors:
 - ACACIA_DOOR
 - DARK_OAK_DOOR
 
-# All types of trap doors that can be protected. These blocks must be
-# be recognized by the Bukkit API as a trap door.
-protectableTrapDoors:
-- TRAP_DOOR
+# All protections (except doors) that consist not only of the block listed here,
+# but also of a supporting block. This is normally the block directly below.
+# For example, for fence gates both the gate and the block below are protected,
+# and signs can be attached to both.
+# Note that for some blocks (like trapdoors, but also levers if you would add
+# them here) the supporting block is not the block below, but the block it is
+# attached on.
+protectableAttachables:
+- ACACIA_FENCE_GATE
+- BIRCH_FENCE_GATE
+- DARK_OAK_FENCE_GATE
+- FENCE_GATE
 - IRON_TRAPDOOR
+- JUNGLE_FENCE_GATE
+- SPRUCE_FENCE_GATE
+- TRAP_DOOR
+
+
 
 # The default amount of seconds a door stays open before closing automatically.
 # Players can override this value by putting a [Timer:X] tag on the sign, where

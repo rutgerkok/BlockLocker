@@ -1,6 +1,12 @@
 package nl.rutgerkok.blocklocker.impl.protection;
 
+import java.util.Arrays;
 import java.util.Collection;
+
+import org.bukkit.Sound;
+import org.bukkit.block.Block;
+import org.bukkit.material.MaterialData;
+import org.bukkit.material.Openable;
 
 import nl.rutgerkok.blocklocker.BlockData;
 import nl.rutgerkok.blocklocker.OpenBlockSound;
@@ -8,11 +14,6 @@ import nl.rutgerkok.blocklocker.ProtectionSign;
 import nl.rutgerkok.blocklocker.impl.blockfinder.BlockFinder;
 import nl.rutgerkok.blocklocker.protection.AttachedProtection;
 import nl.rutgerkok.blocklocker.protection.Protection;
-
-import org.bukkit.Sound;
-import org.bukkit.block.Block;
-import org.bukkit.material.MaterialData;
-import org.bukkit.material.Openable;
 
 /**
  * Implementation of {@link AttachedProtection}.
@@ -53,34 +54,34 @@ public final class AttachedProtectionImpl extends AbstractProtection implements 
     }
 
     private final BlockFinder blockFinder;
-    private final Block protecionBlock;
+    private final Block protectionBlock;
 
     private AttachedProtectionImpl(Collection<ProtectionSign> signs, BlockFinder blockFinder, Block trapDoor) {
         super(signs);
-        this.protecionBlock = trapDoor;
+        this.protectionBlock = trapDoor;
         this.blockFinder = blockFinder;
     }
 
     private AttachedProtectionImpl(ProtectionSign sign, BlockFinder blockFinder, Block trapDoor) {
         super(sign);
-        this.protecionBlock = trapDoor;
+        this.protectionBlock = trapDoor;
         this.blockFinder = blockFinder;
     }
 
     @Override
     public boolean canBeOpened() {
-        return Openable.class.isAssignableFrom(protecionBlock.getType().getData());
+        return Openable.class.isAssignableFrom(protectionBlock.getType().getData());
     }
 
     @Override
     protected Collection<ProtectionSign> fetchSigns() {
-        Block supportingBlock = blockFinder.findSupportingBlock(protecionBlock);
-        return blockFinder.findAttachedSigns(supportingBlock);
+        Block supportingBlock = blockFinder.findSupportingBlock(protectionBlock);
+        return blockFinder.findAttachedSigns(Arrays.asList(protectionBlock, supportingBlock));
     }
 
     @Override
     public boolean isOpen() {
-        MaterialData materialData = BlockData.get(protecionBlock);
+        MaterialData materialData = BlockData.get(protectionBlock);
         if (materialData instanceof Openable) {
             return ((Openable) materialData).isOpen();
         }
@@ -94,7 +95,7 @@ public final class AttachedProtectionImpl extends AbstractProtection implements 
 
     @Override
     public void setOpen(boolean open, SoundCondition playSound) {
-        MaterialData materialData = BlockData.get(protecionBlock);
+        MaterialData materialData = BlockData.get(protectionBlock);
         if (!(materialData instanceof Openable)) {
             return;
         }
@@ -106,11 +107,11 @@ public final class AttachedProtectionImpl extends AbstractProtection implements 
         }
 
         openable.setOpen(open);
-        BlockData.set(protecionBlock, materialData);
+        BlockData.set(protectionBlock, materialData);
 
         if (playSound == SoundCondition.ALWAYS) {
             Sound sound = OpenBlockSound.get(materialData.getItemType(), open);
-            protecionBlock.getWorld().playSound(protecionBlock.getLocation(), sound, 1f, 0.7f);
+            protectionBlock.getWorld().playSound(protectionBlock.getLocation(), sound, 1f, 0.7f);
         }
     }
 

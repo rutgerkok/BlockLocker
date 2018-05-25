@@ -1,10 +1,18 @@
 package nl.rutgerkok.blocklocker.impl;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.List;
-import java.util.Set;
+
+import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
+
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Sign;
 
 import nl.rutgerkok.blocklocker.ChestSettings;
 import nl.rutgerkok.blocklocker.ProtectionFinder;
@@ -19,15 +27,6 @@ import nl.rutgerkok.blocklocker.impl.protection.DoorProtectionImpl;
 import nl.rutgerkok.blocklocker.profile.Profile;
 import nl.rutgerkok.blocklocker.protection.Protection;
 
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.Sign;
-
-import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
-
 /**
  * Finds a protection.
  *
@@ -37,8 +36,6 @@ import com.google.common.base.Preconditions;
 class ProtectionFinderImpl implements ProtectionFinder {
     private final BlockFinder blockFinder;
     private final ChestSettings settings;
-
-    private final Set<ProtectionType> anyDoor = EnumSet.of(ProtectionType.DOOR, ProtectionType.TRAP_DOOR);
 
     ProtectionFinderImpl(BlockFinder lookup, ChestSettings settings) {
         blockFinder = lookup;
@@ -70,7 +67,7 @@ class ProtectionFinderImpl implements ProtectionFinder {
      */
     private Optional<Block> findProtectableForSign(Block sign) {
         Block attachedBlock = blockFinder.findSupportingBlock(sign);
-        if (settings.canProtect(ProtectionType.CONTAINER, attachedBlock.getType())) {
+        if (settings.canProtect(attachedBlock.getType())) {
             return Optional.of(attachedBlock);
         }
 
@@ -85,19 +82,26 @@ class ProtectionFinderImpl implements ProtectionFinder {
      * @return The protection block, if any.
      */
     private Optional<Block> findProtectableForSupportingBlock(Block supportingBlock) {
-        // Search above and below that block for doors
+        // Search above and below that block for doors and attachables
         for (BlockFace doorFace : BlockFinder.VERTICAL_FACES) {
-            Block maybeNormalDoor = supportingBlock.getRelative(doorFace);
-            if (settings.canProtect(ProtectionType.DOOR, maybeNormalDoor.getType())) {
-                return Optional.of(maybeNormalDoor);
+            Block blockUpDown = supportingBlock.getRelative(doorFace);
+            if (settings.canProtect(ProtectionType.DOOR, blockUpDown.getType())) {
+                return Optional.of(blockUpDown);
+            }
+            if (settings.canProtect(ProtectionType.ATTACHABLE, blockUpDown.getType())) {
+                if (this.blockFinder.findSupportingBlock(blockUpDown).equals(supportingBlock)) {
+                    return Optional.of(blockUpDown);
+                }
             }
         }
 
-        // Search around for trap doors
+        // Search around for attachables
         for (BlockFace trapDoorFace : BlockFinder.CARDINAL_FACES) {
-            Block maybeAnyDoor = supportingBlock.getRelative(trapDoorFace);
-            if (settings.canProtect(anyDoor, maybeAnyDoor.getType())) {
-                return Optional.of(maybeAnyDoor);
+            Block blockNext = supportingBlock.getRelative(trapDoorFace);
+            if (settings.canProtect(ProtectionType.ATTACHABLE, blockNext.getType())) {
+                if (this.blockFinder.findSupportingBlock(blockNext).equals(supportingBlock)) {
+                    return Optional.of(blockNext);
+                }
             }
         }
 
@@ -143,7 +147,7 @@ class ProtectionFinderImpl implements ProtectionFinder {
         // Try as supporting block
         if (searchMode.searchForSupportingBlocks()) {
             Optional<Block> protectionBlock = findProtectableForSupportingBlock(block);
-            if (protectionBlock.isPresent() && settings.canProtect(protectionBlock.get().getType())) {
+            if (protectionBlock.isPresent()) {
                 return findProtectionForProtectionBlock(protectionBlock.get());
             }
         }
@@ -194,9 +198,9 @@ class ProtectionFinderImpl implements ProtectionFinder {
                 }
                 return Optional.of(DoorProtectionImpl.fromDoorWithSigns(
                         doorSigns, blockFinder, door));
-            case TRAP_DOOR:
+            case ATTACHABLE:
                 Collection<ProtectionSign> trapDoorSigns = blockFinder.findAttachedSigns(
-                        blockFinder.findSupportingBlock(protectionBlock));
+                        Arrays.asList(protectionBlock, blockFinder.findSupportingBlock(protectionBlock)));
                 if (trapDoorSigns.isEmpty()) {
                     return Optional.absent();
                 }
@@ -235,7 +239,7 @@ class ProtectionFinderImpl implements ProtectionFinder {
             case DOOR:
                 CompleteDoor door = new CompleteDoor(protectionBlock);
                 return Optional.of(DoorProtectionImpl.fromDoorWithSign(sign, blockFinder, door));
-            case TRAP_DOOR:
+            case ATTACHABLE:
                 return Optional.of(AttachedProtectionImpl.fromBlockWithSign(sign, blockFinder, protectionBlock));
             default:
                 throw new UnsupportedOperationException("Don't know how to handle protection type " + protectionType.get());
@@ -243,7 +247,7 @@ class ProtectionFinderImpl implements ProtectionFinder {
     }
 
     @Override
-    public boolean isSignNearbyProtection(Block signBlock) {
+    public boolean isSignNearbyProtectable(Block signBlock) {
         BlockState blockState = signBlock.getState();
         if (blockState instanceof Sign) {
             return findProtectableForSign(signBlock).isPresent();

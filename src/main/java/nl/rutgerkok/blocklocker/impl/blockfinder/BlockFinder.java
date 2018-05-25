@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import nl.rutgerkok.blocklocker.BlockData;
-import nl.rutgerkok.blocklocker.ProtectionSign;
-import nl.rutgerkok.blocklocker.SignParser;
+import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -14,9 +14,9 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.material.Attachable;
 import org.bukkit.material.MaterialData;
 
-import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSet;
+import nl.rutgerkok.blocklocker.BlockData;
+import nl.rutgerkok.blocklocker.ProtectionSign;
+import nl.rutgerkok.blocklocker.SignParser;
 
 /**
  * Finds blocks that logically belong together, like the other half of a chest,
@@ -125,7 +125,7 @@ public abstract class BlockFinder {
         if (data instanceof Attachable) {
             return block.getRelative(((Attachable) data).getAttachedFace());
         }
-        return block;
+        return block.getRelative(BlockFace.DOWN);
     }
 
     /**

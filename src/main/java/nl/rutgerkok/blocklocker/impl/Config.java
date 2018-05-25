@@ -8,14 +8,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import nl.rutgerkok.blocklocker.AttackType;
-import nl.rutgerkok.blocklocker.ProtectionType;
-import nl.rutgerkok.blocklocker.impl.updater.UpdatePreference;
+import com.google.common.base.Optional;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 
-import com.google.common.base.Optional;
+import nl.rutgerkok.blocklocker.AttackType;
+import nl.rutgerkok.blocklocker.ProtectionType;
+import nl.rutgerkok.blocklocker.impl.updater.UpdatePreference;
 
 final class Config {
     private final static class Key {
@@ -23,6 +23,7 @@ final class Config {
                 PROTECTABLE_CONTAINERS = "protectableContainers",
                 PROTECTABLE_DOORS = "protectableDoors",
                 PROTECTABLE_TRAP_DOORS = "protectableTrapDoors",
+                PROTECTABLE_ATTACHABLES = "protectableAttachables",
                 DEFAULT_DOOR_OPEN_SECONDS = "defaultDoorOpenSeconds",
                 UPDATER = "updater",
                 CONNECT_CONTAINERS = "connectContainers",
@@ -59,7 +60,10 @@ final class Config {
         protectableMaterialsMap = new EnumMap<ProtectionType, Set<Material>>(ProtectionType.class);
         protectableMaterialsMap.put(ProtectionType.CONTAINER, readMaterialSet(config.getStringList(Key.PROTECTABLE_CONTAINERS)));
         protectableMaterialsMap.put(ProtectionType.DOOR, readMaterialSet(config.getStringList(Key.PROTECTABLE_DOORS)));
-        protectableMaterialsMap.put(ProtectionType.TRAP_DOOR, readMaterialSet(config.getStringList(Key.PROTECTABLE_TRAP_DOORS)));
+        List<String> attachables = config.getStringList(Key.PROTECTABLE_ATTACHABLES);
+        // Still support old name:
+        attachables.addAll(config.getStringList(Key.PROTECTABLE_TRAP_DOORS));
+        protectableMaterialsMap.put(ProtectionType.ATTACHABLE, readMaterialSet(attachables));
 
         // Create combined set
         protectableMaterialsSet = EnumSet.noneOf(Material.class);
