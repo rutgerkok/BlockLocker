@@ -5,10 +5,9 @@ import java.util.Collection;
 
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
-import org.bukkit.material.MaterialData;
-import org.bukkit.material.Openable;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Openable;
 
-import nl.rutgerkok.blocklocker.BlockData;
 import nl.rutgerkok.blocklocker.OpenBlockSound;
 import nl.rutgerkok.blocklocker.ProtectionSign;
 import nl.rutgerkok.blocklocker.impl.blockfinder.BlockFinder;
@@ -31,7 +30,7 @@ public final class AttachedProtectionImpl extends AbstractProtection implements 
      *            The block finder.
      * @param protectionBlock
      *            The door.
-     * 
+     *
      * @return The door protection object.
      */
     public static Protection fromBlockWithSign(ProtectionSign sign, BlockFinder blockFinder, Block protectionBlock) {
@@ -70,7 +69,7 @@ public final class AttachedProtectionImpl extends AbstractProtection implements 
 
     @Override
     public boolean canBeOpened() {
-        return Openable.class.isAssignableFrom(protectionBlock.getType().getData());
+        return protectionBlock.getBlockData() instanceof Openable;
     }
 
     @Override
@@ -81,7 +80,7 @@ public final class AttachedProtectionImpl extends AbstractProtection implements 
 
     @Override
     public boolean isOpen() {
-        MaterialData materialData = BlockData.get(protectionBlock);
+        BlockData materialData = protectionBlock.getBlockData();
         if (materialData instanceof Openable) {
             return ((Openable) materialData).isOpen();
         }
@@ -95,7 +94,7 @@ public final class AttachedProtectionImpl extends AbstractProtection implements 
 
     @Override
     public void setOpen(boolean open, SoundCondition playSound) {
-        MaterialData materialData = BlockData.get(protectionBlock);
+        BlockData materialData = protectionBlock.getBlockData();
         if (!(materialData instanceof Openable)) {
             return;
         }
@@ -107,10 +106,10 @@ public final class AttachedProtectionImpl extends AbstractProtection implements 
         }
 
         openable.setOpen(open);
-        BlockData.set(protectionBlock, materialData);
+        protectionBlock.setBlockData(materialData);
 
         if (playSound == SoundCondition.ALWAYS) {
-            Sound sound = OpenBlockSound.get(materialData.getItemType(), open);
+            Sound sound = OpenBlockSound.get(materialData.getMaterial(), open);
             protectionBlock.getWorld().playSound(protectionBlock.getLocation(), sound, 1f, 0.7f);
         }
     }

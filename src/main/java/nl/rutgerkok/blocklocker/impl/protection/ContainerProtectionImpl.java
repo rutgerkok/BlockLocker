@@ -3,17 +3,16 @@ package nl.rutgerkok.blocklocker.impl.protection;
 import java.util.Collection;
 import java.util.List;
 
-import nl.rutgerkok.blocklocker.BlockData;
+import org.bukkit.Sound;
+import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Openable;
+
 import nl.rutgerkok.blocklocker.OpenBlockSound;
 import nl.rutgerkok.blocklocker.ProtectionSign;
 import nl.rutgerkok.blocklocker.impl.blockfinder.BlockFinder;
 import nl.rutgerkok.blocklocker.protection.ContainerProtection;
 import nl.rutgerkok.blocklocker.protection.Protection;
-
-import org.bukkit.Sound;
-import org.bukkit.block.Block;
-import org.bukkit.material.MaterialData;
-import org.bukkit.material.Openable;
 
 public final class ContainerProtectionImpl extends AbstractProtection implements ContainerProtection {
 
@@ -21,7 +20,7 @@ public final class ContainerProtectionImpl extends AbstractProtection implements
      * Creates a new protection for the protection block. Calling this method
      * might make for a faster {@link #getOwner()}, as it can read the owner
      * from the sign if it is a main sign.
-     * 
+     *
      * @param sign
      *            The sign. If it is a main sign it is used for
      *            {@link #getOwner()}.
@@ -41,7 +40,7 @@ public final class ContainerProtectionImpl extends AbstractProtection implements
     /**
      * Creates a new protection for the protection block. Calling this method
      * will make for a faster {@link #getAllowed()} and {@link #getOwner()}
-     * 
+     *
      * @param signs
      *            All signs in the protection. Collection may not be empty.
      * @param blocks
@@ -75,7 +74,7 @@ public final class ContainerProtectionImpl extends AbstractProtection implements
     @Override
     public boolean canBeOpened() {
         for (Block block : blocks) {
-            if (Openable.class.isAssignableFrom(block.getType().getData())) {
+            if (block.getBlockData() instanceof Openable) {
                 return true;
             }
             // Only try first block, as all blocks should be of the same type
@@ -92,7 +91,7 @@ public final class ContainerProtectionImpl extends AbstractProtection implements
     @Override
     public boolean isOpen() {
         for (Block block : blocks) {
-            MaterialData materialData = BlockData.get(block);
+            BlockData materialData = block.getBlockData();
             if (materialData instanceof Openable) {
                 return ((Openable) materialData).isOpen();
             }
@@ -101,7 +100,7 @@ public final class ContainerProtectionImpl extends AbstractProtection implements
     }
 
     private boolean setBlockOpen(Block block, boolean open) {
-        MaterialData materialData = BlockData.get(block);
+        BlockData materialData = block.getBlockData();
         if (!(materialData instanceof Openable)) {
             return false;
         }
@@ -113,7 +112,7 @@ public final class ContainerProtectionImpl extends AbstractProtection implements
 
         // Change the state
         openable.setOpen(open);
-        BlockData.set(block, materialData);
+        block.setBlockData(materialData);
         return true;
     }
 

@@ -11,10 +11,11 @@ import com.google.common.collect.ImmutableSet;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.material.Attachable;
-import org.bukkit.material.MaterialData;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Directional;
+import org.bukkit.block.data.type.Gate;
+import org.bukkit.block.data.type.WallSign;
 
-import nl.rutgerkok.blocklocker.BlockData;
 import nl.rutgerkok.blocklocker.ProtectionSign;
 import nl.rutgerkok.blocklocker.SignParser;
 
@@ -33,7 +34,7 @@ public abstract class BlockFinder {
 
     /**
      * Creates a new block finder.
-     * 
+     *
      * @param parser
      *            The parser of signs.
      * @param connectContainers
@@ -66,7 +67,7 @@ public abstract class BlockFinder {
         for (BlockFace face : SIGN_ATTACHMENT_FACES) {
             Block atPosition = block.getRelative(face);
             Material material = atPosition.getType();
-            if (material != Material.WALL_SIGN && material != Material.SIGN_POST) {
+            if (material != Material.WALL_SIGN && material != Material.SIGN) {
                 continue;
             }
             if (!isAttachedSign(atPosition, block)) {
@@ -92,7 +93,7 @@ public abstract class BlockFinder {
             // Avoid creating a builder, iterator and extra set
             return findAttachedSigns(blocks.iterator().next());
         }
-    
+
         ImmutableSet.Builder<ProtectionSign> signs = ImmutableSet.builder();
         for (Block block : blocks) {
             signs.addAll(findAttachedSigns(block));
@@ -115,15 +116,18 @@ public abstract class BlockFinder {
      *
      * For blocks that are self-supporting (most blocks in Minecraft), the
      * method returns the block itself.
-     * 
+     *
      * @param block
      *            The block.
      * @return The block the given block is attached on.
      */
     public Block findSupportingBlock(Block block) {
-        MaterialData data = BlockData.get(block);
-        if (data instanceof Attachable) {
-            return block.getRelative(((Attachable) data).getAttachedFace());
+        BlockData data = block.getBlockData();
+        if (data instanceof Gate) {
+            return block.getRelative(BlockFace.DOWN);
+        }
+        if (data instanceof Directional) {
+            return block.getRelative(((Directional) data).getFacing().getOppositeFace());
         }
         return block.getRelative(BlockFace.DOWN);
     }
@@ -151,8 +155,11 @@ public abstract class BlockFinder {
      */
     private boolean isAttachedSign(Block signBlock, Block attachedTo) {
         BlockFace requiredFace = signBlock.getFace(attachedTo);
-        MaterialData materialData = BlockData.get(signBlock);
-        BlockFace actualFace = ((org.bukkit.material.Sign) materialData).getAttachedFace();
+        BlockData materialData = signBlock.getBlockData();
+        BlockFace actualFace = BlockFace.DOWN;
+        if (materialData instanceof WallSign) {
+            actualFace = ((WallSign) materialData).getFacing().getOppositeFace();
+        }
         return (actualFace == requiredFace);
     }
 

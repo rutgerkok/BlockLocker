@@ -27,18 +27,23 @@ public final class OpenBlockSound {
                 case DARK_OAK_FENCE_GATE:
                 case JUNGLE_FENCE_GATE:
                 case SPRUCE_FENCE_GATE:
-                case FENCE_GATE:
+                case OAK_FENCE_GATE:
                     return Sound.BLOCK_FENCE_GATE_OPEN;
-                case WOODEN_DOOR:
+                case OAK_DOOR:
                 case SPRUCE_DOOR:
                 case BIRCH_DOOR:
                 case JUNGLE_DOOR:
                 case ACACIA_DOOR:
                 case DARK_OAK_DOOR:
                     return Sound.BLOCK_WOODEN_DOOR_OPEN;
-                case IRON_DOOR_BLOCK:
+                case IRON_DOOR:
                     return Sound.BLOCK_IRON_DOOR_OPEN;
-                case TRAP_DOOR:
+                case OAK_TRAPDOOR:
+                case SPRUCE_TRAPDOOR:
+                case BIRCH_TRAPDOOR:
+                case JUNGLE_TRAPDOOR:
+                case ACACIA_TRAPDOOR:
+                case DARK_OAK_TRAPDOOR:
                     return Sound.BLOCK_WOODEN_TRAPDOOR_OPEN;
                 case IRON_TRAPDOOR:
                     return Sound.BLOCK_IRON_TRAPDOOR_OPEN;
@@ -52,18 +57,23 @@ public final class OpenBlockSound {
                 case DARK_OAK_FENCE_GATE:
                 case JUNGLE_FENCE_GATE:
                 case SPRUCE_FENCE_GATE:
-                case FENCE_GATE:
+                case OAK_FENCE_GATE:
                     return Sound.BLOCK_FENCE_GATE_CLOSE;
-                case WOODEN_DOOR:
+                case OAK_DOOR:
                 case SPRUCE_DOOR:
                 case BIRCH_DOOR:
                 case JUNGLE_DOOR:
                 case ACACIA_DOOR:
                 case DARK_OAK_DOOR:
                     return Sound.BLOCK_WOODEN_DOOR_CLOSE;
-                case IRON_DOOR_BLOCK:
+                case IRON_DOOR:
                     return Sound.BLOCK_IRON_DOOR_CLOSE;
-                case TRAP_DOOR:
+                case OAK_TRAPDOOR:
+                case SPRUCE_TRAPDOOR:
+                case BIRCH_TRAPDOOR:
+                case JUNGLE_TRAPDOOR:
+                case ACACIA_TRAPDOOR:
+                case DARK_OAK_TRAPDOOR:
                     return Sound.BLOCK_WOODEN_TRAPDOOR_CLOSE;
                 case IRON_TRAPDOOR:
                     return Sound.BLOCK_IRON_TRAPDOOR_CLOSE;

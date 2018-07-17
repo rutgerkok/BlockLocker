@@ -24,35 +24,34 @@ updater: AUTO_INSTALL
 # All material names can be found here:
 # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
 protectableContainers:
-- ANVIL
-- BEACON
-- BLACK_SHULKER_BOX
-- BLUE_SHULKER_BOX
-- BREWING_STAND
-- BROWN_SHULKER_BOX
-- BURNING_FURNACE
-- CHEST
-- CYAN_SHULKER_BOX
-- DISPENSER
-- DROPPER
-- ENCHANTMENT_TABLE
-- FURNACE
-- GRAY_SHULKER_BOX
-- GREEN_SHULKER_BOX
-- HOPPER
-- JUKEBOX
-- LIGHT_BLUE_SHULKER_BOX
-- LIME_SHULKER_BOX
-- MAGENTA_SHULKER_BOX
-- ORANGE_SHULKER_BOX
-- PINK_SHULKER_BOX
-- PURPLE_SHULKER_BOX
-- RED_SHULKER_BOX
-- SILVER_SHULKER_BOX
-- TRAPPED_CHEST
-- WHITE_SHULKER_BOX
-- WORKBENCH
-- YELLOW_SHULKER_BOX
+- anvil
+- beacon
+- black_shulker_box
+- blue_shulker_box
+- brewing_stand
+- brown_shulker_box
+- chest
+- cyan_shulker_box
+- crafting_table
+- dispenser
+- dropper
+- enchanting_table
+- furnace
+- gray_shulker_box
+- green_shulker_box
+- hopper
+- jukebox
+- light_blue_shulker_box
+- light_gray_shulker_box
+- lime_shulker_box
+- magenta_shulker_box
+- orange_shulker_box
+- pink_shulker_box
+- purple_shulker_box
+- red_shulker_box
+- trapped_chest
+- white_shulker_box
+- yellow_shulker_box
 
 # When set to true, one sign protects all connected nearby blocks of the same
 # type. When false, each container requires a separate sign.
@@ -64,13 +63,13 @@ connectContainers: false
 # value format as described here:
 # http://minecraft.gamepedia.com/Data_values#Door
 protectableDoors:
-- WOODEN_DOOR
-- IRON_DOOR_BLOCK
-- SPRUCE_DOOR
-- BIRCH_DOOR
-- JUNGLE_DOOR
-- ACACIA_DOOR
-- DARK_OAK_DOOR
+- acacia_door
+- birch_door
+- dark_oak_door
+- iron_door
+- jungle_door
+- oak_door
+- spruce_door
 
 # All protections (except doors) that consist not only of the block listed here,
 # but also of a supporting block. This is normally the block directly below.
@@ -80,14 +79,20 @@ protectableDoors:
 # them here) the supporting block is not the block below, but the block it is
 # attached on.
 protectableAttachables:
-- ACACIA_FENCE_GATE
-- BIRCH_FENCE_GATE
-- DARK_OAK_FENCE_GATE
-- FENCE_GATE
-- IRON_TRAPDOOR
-- JUNGLE_FENCE_GATE
-- SPRUCE_FENCE_GATE
-- TRAP_DOOR
+- acacia_fence_gate
+- acacia_trapdoor
+- birch_fence_gate
+- birch_trapdoor
+- dark_oak_fence_gate
+- dark_oak_trapdoor
+- iron_trapdoor
+- jungle_fence_gate
+- jungle_trapdoor
+- oak_fence_gate
+- oak_trapdoor
+- spruce_fence_gate
+- spruce_trapdoor
+
 
 
 

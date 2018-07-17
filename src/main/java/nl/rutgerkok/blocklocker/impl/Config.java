@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 
 import com.google.common.base.Optional;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -60,10 +61,14 @@ final class Config {
         protectableMaterialsMap = new EnumMap<ProtectionType, Set<Material>>(ProtectionType.class);
         protectableMaterialsMap.put(ProtectionType.CONTAINER, readMaterialSet(config.getStringList(Key.PROTECTABLE_CONTAINERS)));
         protectableMaterialsMap.put(ProtectionType.DOOR, readMaterialSet(config.getStringList(Key.PROTECTABLE_DOORS)));
-        List<String> attachables = config.getStringList(Key.PROTECTABLE_ATTACHABLES);
-        // Still support old name:
-        attachables.addAll(config.getStringList(Key.PROTECTABLE_TRAP_DOORS));
-        protectableMaterialsMap.put(ProtectionType.ATTACHABLE, readMaterialSet(attachables));
+        if (config.contains(Key.PROTECTABLE_TRAP_DOORS)) {
+            // Still support old name:
+            protectableMaterialsMap.put(ProtectionType.ATTACHABLE,
+                    readMaterialSet(config.getStringList(Key.PROTECTABLE_TRAP_DOORS)));
+        } else {
+            protectableMaterialsMap.put(ProtectionType.ATTACHABLE,
+                    readMaterialSet(config.getStringList(Key.PROTECTABLE_ATTACHABLES)));
+        }
 
         // Create combined set
         protectableMaterialsSet = EnumSet.noneOf(Material.class);
@@ -97,13 +102,13 @@ final class Config {
 
     /**
      * Gets whether the material can be protected by the given type.
-     * 
+     *
      * @param type
      *            Protection type that must be checked for being able to protect
      *            this type.
      * @param material
      *            Material to check.
-     * 
+     *
      * @return True if the material can be protected by the given type, false
      *         otherwise.
      */
@@ -118,7 +123,7 @@ final class Config {
     /**
      * Gets the amount of days that a chest owner has to be offline for a chest
      * to expire. 0 or negative means that chests never expire.
-     * 
+     *
      * @return The amount of days.
      */
     int getAutoExpireDays() {
@@ -138,7 +143,7 @@ final class Config {
      * Gets the default amount of ticks a door stays open before automatically
      * closing. 0 or negative values will make the door never close
      * automatically.
-     * 
+     *
      * @return The default amount of ticks.
      */
     int getDefaultDoorOpenSeconds() {
@@ -189,7 +194,12 @@ final class Config {
     private Set<Material> readMaterialSet(Collection<String> strings) {
         Set<Material> materials = EnumSet.noneOf(Material.class);
         for (String string : strings) {
-            Material material = Material.matchMaterial(string);
+            Material material = null;
+            try {
+                material = Bukkit.createBlockData(string).getMaterial();
+            } catch (IllegalArgumentException e) {
+                material = Material.matchMaterial(string, true);
+            }
             if (material == null) {
                 logger.warning("Cannot recognize material " + string + ", ignoring it");
                 continue;

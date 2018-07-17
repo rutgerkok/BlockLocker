@@ -120,7 +120,7 @@ class ProtectionFinderImpl implements ProtectionFinder {
 
         // Check for sign
         if (searchMode.searchForSigns() &&
-                (blockMaterial == Material.WALL_SIGN || blockMaterial == Material.SIGN_POST)) {
+                (blockMaterial == Material.WALL_SIGN || blockMaterial == Material.SIGN)) {
             return findProtectionForExistingSign(block);
         }
 

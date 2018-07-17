@@ -2,18 +2,18 @@ package nl.rutgerkok.blocklocker.impl;
 
 import java.util.Collection;
 
-import nl.rutgerkok.blocklocker.BlockData;
-import nl.rutgerkok.blocklocker.OpenBlockSound;
-import nl.rutgerkok.blocklocker.protection.Protection.SoundCondition;
+import com.google.common.collect.ImmutableList;
 
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.material.Door;
-import org.bukkit.material.MaterialData;
+import org.bukkit.block.data.Bisected.Half;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.type.Door;
 
-import com.google.common.collect.ImmutableList;
+import nl.rutgerkok.blocklocker.OpenBlockSound;
+import nl.rutgerkok.blocklocker.protection.Protection.SoundCondition;
 
 /**
  * Represents a single or double door. Used to find all blocks of a door, as
@@ -32,7 +32,7 @@ public final class CompleteDoor {
         if (nullableBlock == null) {
             return null;
         }
-        MaterialData materialData = BlockData.get(nullableBlock);
+        BlockData materialData = nullableBlock.getBlockData();
         if (materialData instanceof Door) {
             return (Door) materialData;
         }
@@ -66,7 +66,7 @@ public final class CompleteDoor {
     private static Hinge getHinge(Block topHalfDoorBlock) {
         Door door = asDoorMaterialOrNull(topHalfDoorBlock);
         if (door != null) {
-            return door.getHinge() == false ? Hinge.LEFT : Hinge.RIGHT;
+            return door.getHinge() == Door.Hinge.LEFT ? Hinge.LEFT : Hinge.RIGHT;
         }
         return Hinge.UNKNOWN;
     }
@@ -74,7 +74,7 @@ public final class CompleteDoor {
     private static boolean isTopHalf(Block doorBlock) {
         Door door = asDoorMaterialOrNull(doorBlock);
         if (door != null) {
-            return door.isTopHalf();
+            return door.getHalf() == Half.TOP;
         }
         return false;
     }
@@ -93,7 +93,7 @@ public final class CompleteDoor {
 
     /**
      * Creates a new door. The given block must be part of the door.
-     * 
+     *
      * @param doorBlock
      *            A block that is part of the door.
      */
@@ -211,16 +211,16 @@ public final class CompleteDoor {
     /**
      * Gets whether the door is currently open. The result is undefined if the
      * door is half-open, half-closed.
-     * 
+     *
      * @return True if the door is currently open, false otherwise.
      */
     public boolean isOpen() {
-        MaterialData materialData = null;
+        BlockData materialData = null;
         if (bottomRightBlock != null) {
-            materialData = BlockData.get(bottomRightBlock);
+            materialData = bottomRightBlock.getBlockData();
         }
         if (bottomLeftBlock != null) {
-            materialData = BlockData.get(bottomLeftBlock);
+            materialData = bottomLeftBlock.getBlockData();
         }
         return (materialData instanceof Door) && ((Door) materialData).isOpen();
     }
@@ -232,7 +232,7 @@ public final class CompleteDoor {
         if (open == isOpen()) {
             return;
         }
-        boolean ironDoor = bottomBlock.getType() == Material.IRON_DOOR_BLOCK;
+        boolean ironDoor = bottomBlock.getType() == Material.IRON_DOOR;
         if (condition == SoundCondition.AUTOMATIC && !ironDoor) {
             return;
         }
@@ -261,7 +261,7 @@ public final class CompleteDoor {
 
             // Door toggle
             leftDoor.setOpen(open);
-            BlockData.set(bottomLeftBlock, leftDoor);
+            bottomLeftBlock.setBlockData(leftDoor);
         }
 
         Door rightDoor = asDoorMaterialOrNull(bottomRightBlock);
@@ -271,7 +271,7 @@ public final class CompleteDoor {
 
             // Door toggle
             rightDoor.setOpen(open);
-            BlockData.set(bottomRightBlock, rightDoor);
+            bottomRightBlock.setBlockData(rightDoor);
         }
     }
 

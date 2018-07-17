@@ -3,13 +3,7 @@ package nl.rutgerkok.blocklocker.impl.event;
 import java.util.Iterator;
 import java.util.List;
 
-import nl.rutgerkok.blocklocker.AttackType;
-import nl.rutgerkok.blocklocker.BlockLockerPlugin;
-import nl.rutgerkok.blocklocker.Permissions;
-import nl.rutgerkok.blocklocker.ProtectionSign;
-import nl.rutgerkok.blocklocker.Translator.Translation;
-import nl.rutgerkok.blocklocker.profile.Profile;
-import nl.rutgerkok.blocklocker.protection.Protection;
+import com.google.common.base.Optional;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -32,7 +26,13 @@ import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 
-import com.google.common.base.Optional;
+import nl.rutgerkok.blocklocker.AttackType;
+import nl.rutgerkok.blocklocker.BlockLockerPlugin;
+import nl.rutgerkok.blocklocker.Permissions;
+import nl.rutgerkok.blocklocker.ProtectionSign;
+import nl.rutgerkok.blocklocker.Translator.Translation;
+import nl.rutgerkok.blocklocker.profile.Profile;
+import nl.rutgerkok.blocklocker.protection.Protection;
 
 public class BlockDestroyListener extends EventListener {
 
@@ -41,7 +41,7 @@ public class BlockDestroyListener extends EventListener {
     }
 
     private Optional<ProtectionSign> asMainSign(Block block) {
-        if (block.getType() != Material.WALL_SIGN && block.getType() != Material.SIGN_POST) {
+        if (block.getType() != Material.WALL_SIGN && block.getType() != Material.SIGN) {
             return Optional.absent();
         }
 

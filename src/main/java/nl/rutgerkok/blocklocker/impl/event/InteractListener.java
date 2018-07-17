@@ -2,6 +2,9 @@ package nl.rutgerkok.blocklocker.impl.event;
 
 import java.util.Set;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableSet;
+
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -10,6 +13,9 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.DoubleChest;
 import org.bukkit.block.Sign;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Rotatable;
+import org.bukkit.block.data.type.WallSign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
@@ -21,12 +27,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.material.MaterialData;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableSet;
-
-import nl.rutgerkok.blocklocker.BlockData;
 import nl.rutgerkok.blocklocker.BlockLockerPlugin;
 import nl.rutgerkok.blocklocker.Permissions;
 import nl.rutgerkok.blocklocker.ProtectionSign;
@@ -89,8 +90,8 @@ public final class InteractListener extends EventListener {
     }
 
     /**
-     * Gets the block the inventory is stored in, or null if the inventory is
-     * not stored in a block.
+     * Gets the block the inventory is stored in, or null if the inventory is not
+     * stored in a block.
      *
      * @param inventory
      *            The inventory.
@@ -110,26 +111,24 @@ public final class InteractListener extends EventListener {
         return null;
     }
 
-    private MaterialData getRotatedSignPost(Player player) {
+    private Rotatable getRotatedSignPost(Player player) {
         float rotation = player.getLocation().getYaw();
         if (rotation < 0) {
             rotation += 360.0f;
         }
-        int intRotation = Math.round((rotation / 360.0f) * 16.0f);
-        byte dataValue = (byte) ((intRotation + 8) % 16);
-        @SuppressWarnings("deprecation")
-        MaterialData materialData = new org.bukkit.material.Sign(Material.SIGN_POST, dataValue);
+        Rotatable materialData = (Rotatable) Material.SIGN.createBlockData();
+        materialData.setRotation(rotationToBlockFace(rotation));
         return materialData;
     }
 
-    private MaterialData getSignMaterial(BlockFace blockFace, Player player) {
+    private BlockData getSignMaterial(BlockFace blockFace, Player player) {
         if (blockFace == BlockFace.UP) {
             // Place standing sign in direction of player
             return getRotatedSignPost(player);
         } else {
             // Place attached sign
-            org.bukkit.material.Sign signMaterial = new org.bukkit.material.Sign(Material.WALL_SIGN);
-            signMaterial.setFacingDirection(blockFace);
+            WallSign signMaterial = (WallSign) Material.WALL_SIGN.createBlockData();
+            signMaterial.setFacing(blockFace);
             return signMaterial;
         }
     }
@@ -256,7 +255,7 @@ public final class InteractListener extends EventListener {
 
         Player player = event.getPlayer();
         Block block = event.getClickedBlock();
-        boolean clickedSign = block.getType() == Material.SIGN_POST || block.getType() == Material.WALL_SIGN;
+        boolean clickedSign = block.getType() == Material.SIGN || block.getType() == Material.WALL_SIGN;
         // When using the offhand check, access checks must still be performed,
         // but no messages must be sent
         boolean usedOffHand = event.getHand() == EquipmentSlot.OFF_HAND;
@@ -304,6 +303,46 @@ public final class InteractListener extends EventListener {
         }
     }
 
+    private BlockFace rotationToBlockFace(float rotation) {
+        int intRotation = Math.round((rotation / 360.0f) * 16.0f);
+        byte dataValue = (byte) ((intRotation + 8) % 16);
+        switch (dataValue) {
+            case 0x0:
+                return BlockFace.SOUTH;
+            case 0x1:
+                return BlockFace.SOUTH_SOUTH_WEST;
+            case 0x2:
+                return BlockFace.SOUTH_WEST;
+            case 0x3:
+                return BlockFace.WEST_SOUTH_WEST;
+            case 0x4:
+                return BlockFace.WEST;
+            case 0x5:
+                return BlockFace.WEST_NORTH_WEST;
+            case 0x6:
+                return BlockFace.NORTH_WEST;
+            case 0x7:
+                return BlockFace.NORTH_NORTH_WEST;
+            case 0x8:
+                return BlockFace.NORTH;
+            case 0x9:
+                return BlockFace.NORTH_NORTH_EAST;
+            case 0xA:
+                return BlockFace.NORTH_EAST;
+            case 0xB:
+                return BlockFace.EAST_NORTH_EAST;
+            case 0xC:
+                return BlockFace.EAST;
+            case 0xD:
+                return BlockFace.EAST_SOUTH_EAST;
+            case 0xE:
+                return BlockFace.SOUTH_EAST;
+            case 0xF:
+                return BlockFace.SOUTH_SOUTH_EAST;
+        }
+        throw new RuntimeException("Couldn't handle rotation " + rotation);
+    }
+
     private void scheduleClose(final Protection protection) {
         if (!protection.isOpen()) {
             return;
@@ -348,7 +387,7 @@ public final class InteractListener extends EventListener {
 
         // Create sign and fire event for the sign to be placed
         BlockState oldState = signBlock.getState();
-        BlockData.set(signBlock, getSignMaterial(clickedSide, player));
+        signBlock.setBlockData(getSignMaterial(clickedSide, player));
         if (!allowedByBlockPlaceEvent(signBlock, oldState, block, player)) {
             // Revert to old state
             oldState.update(true);

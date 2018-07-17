@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import com.google.common.base.Charsets;
+
 import org.bukkit.Effect;
 import org.bukkit.EntityEffect;
 import org.bukkit.GameMode;
@@ -27,6 +29,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
 import org.bukkit.block.PistonMoveReaction;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.conversations.Conversation;
 import org.bukkit.conversations.ConversationAbandonedEvent;
 import org.bukkit.entity.Entity;
@@ -55,8 +58,6 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.util.Vector;
 
-import com.google.common.base.Charsets;
-
 public class TestPlayer implements Player {
 
     private final String name;
@@ -71,7 +72,7 @@ public class TestPlayer implements Player {
 
     /**
      * Test player with an uuid based on the lowercase name.
-     * 
+     *
      * @param name
      *            The name.
      */
@@ -81,7 +82,7 @@ public class TestPlayer implements Player {
 
     /**
      * Test player with given name and id.
-     * 
+     *
      * @param name
      *            Name.
      * @param uuid
@@ -852,7 +853,7 @@ public class TestPlayer implements Player {
     @Override
     public void hidePlayer(Plugin arg0, Player arg1) {
         throw new UnsupportedOperationException();
-        
+
     }
 
     @Override
@@ -1042,6 +1043,11 @@ public class TestPlayer implements Player {
     }
 
     @Override
+    public boolean isSwimming() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public boolean isValid() {
         throw new UnsupportedOperationException();
 
@@ -1159,7 +1165,7 @@ public class TestPlayer implements Player {
     @Override
     public void playSound(Location arg0, Sound arg1, SoundCategory arg2, float arg3, float arg4) {
         throw new UnsupportedOperationException();
-        
+
     }
 
     @Override
@@ -1171,7 +1177,7 @@ public class TestPlayer implements Player {
     @Override
     public void playSound(Location arg0, String arg1, SoundCategory arg2, float arg3, float arg4) {
         throw new UnsupportedOperationException();
-        
+
     }
 
     @Override
@@ -1253,9 +1259,8 @@ public class TestPlayer implements Player {
     }
 
     @Override
-    public void sendBlockChange(Location loc, int material, byte data) {
+    public void sendBlockChange(Location loc, BlockData block) {
         throw new UnsupportedOperationException();
-
     }
 
     @Override
@@ -1314,7 +1319,7 @@ public class TestPlayer implements Player {
     @Override
     public void sendTitle(String arg0, String arg1, int arg2, int arg3, int arg4) {
         throw new UnsupportedOperationException();
-        
+
     }
 
     @Override
@@ -1370,7 +1375,7 @@ public class TestPlayer implements Player {
     @Override
     public void setCooldown(Material arg0, int arg1) {
         throw new UnsupportedOperationException();
-        
+
     }
 
     @Override
@@ -1451,7 +1456,7 @@ public class TestPlayer implements Player {
     @Override
     public void setGravity(boolean arg0) {
         throw new UnsupportedOperationException();
-        
+
     }
 
     @Override
@@ -1570,7 +1575,7 @@ public class TestPlayer implements Player {
     @Override
     public void setPortalCooldown(int arg0) {
         throw new UnsupportedOperationException();
-        
+
     }
 
     @Override
@@ -1593,7 +1598,7 @@ public class TestPlayer implements Player {
     @Override
     public void setResourcePack(String arg0, byte[] arg1) {
         throw new UnsupportedOperationException();
-        
+
     }
 
     @Override
@@ -1611,19 +1616,19 @@ public class TestPlayer implements Player {
     @Override
     public void setShoulderEntityLeft(Entity arg0) {
         throw new UnsupportedOperationException();
-        
+
     }
 
     @Override
     public void setShoulderEntityRight(Entity arg0) {
         throw new UnsupportedOperationException();
-        
+
     }
 
     @Override
     public void setSilent(boolean arg0) {
         throw new UnsupportedOperationException();
-        
+
     }
 
     @Override
@@ -1665,6 +1670,11 @@ public class TestPlayer implements Player {
     public void setStatistic(Statistic statistic, Material material, int newValue) throws IllegalArgumentException {
         throw new UnsupportedOperationException();
 
+    }
+
+    @Override
+    public void setSwimming(boolean swimming) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
