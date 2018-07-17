@@ -50,13 +50,13 @@ public final class CompleteDoor {
         }
 
         switch (door.getFacing()) {
-            case WEST:
-                return BlockFace.SOUTH;
-            case NORTH:
-                return BlockFace.WEST;
             case EAST:
-                return BlockFace.NORTH;
+                return BlockFace.SOUTH;
             case SOUTH:
+                return BlockFace.WEST;
+            case WEST:
+                return BlockFace.NORTH;
+            case NORTH:
                 return BlockFace.EAST;
             default:
                 throw new RuntimeException("Invalid facing for door: " + door);
