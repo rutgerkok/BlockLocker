@@ -13,8 +13,8 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.DoubleChest;
 import org.bukkit.block.Sign;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.Rotatable;
+import org.bukkit.block.data.Levelled;
+import org.bukkit.block.data.Waterlogged;
 import org.bukkit.block.data.type.WallSign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -111,17 +111,18 @@ public final class InteractListener extends EventListener {
         return null;
     }
 
-    private Rotatable getRotatedSignPost(Player player) {
+    private org.bukkit.block.data.type.Sign getRotatedSignPost(Player player) {
         float rotation = player.getLocation().getYaw();
         if (rotation < 0) {
             rotation += 360.0f;
         }
-        Rotatable materialData = (Rotatable) Material.SIGN.createBlockData();
+        org.bukkit.block.data.type.Sign materialData = (org.bukkit.block.data.type.Sign) Material.SIGN
+                .createBlockData();
         materialData.setRotation(rotationToBlockFace(rotation));
         return materialData;
     }
 
-    private BlockData getSignMaterial(BlockFace blockFace, Player player) {
+    private Waterlogged getSignMaterial(BlockFace blockFace, Player player) {
         if (blockFace == BlockFace.UP) {
             // Place standing sign in direction of player
             return getRotatedSignPost(player);
@@ -355,12 +356,7 @@ public final class InteractListener extends EventListener {
         if (openSeconds <= 0) {
             return;
         }
-        plugin.runLater(new Runnable() {
-            @Override
-            public void run() {
-                protection.setOpen(false, SoundCondition.ALWAYS);
-            }
-        }, openSeconds * 20);
+        plugin.runLater(() -> protection.setOpen(false, SoundCondition.ALWAYS), openSeconds * 20);
     }
 
     private boolean tryPlaceSign(Player player, Block block, BlockFace clickedSide, SignType signType) {
@@ -381,13 +377,19 @@ public final class InteractListener extends EventListener {
         }
 
         Block signBlock = block.getRelative(clickedSide);
+        boolean waterlogged = false;
         if (signBlock.getType() != Material.AIR) {
-            return false;
+            if (signBlock.getType() != Material.WATER) {
+                return false;
+            }
+            waterlogged = ((Levelled) signBlock.getBlockData()).getLevel() == 0;
         }
 
         // Create sign and fire event for the sign to be placed
         BlockState oldState = signBlock.getState();
-        signBlock.setBlockData(getSignMaterial(clickedSide, player));
+        Waterlogged newBlockData = getSignMaterial(clickedSide, player);
+        newBlockData.setWaterlogged(waterlogged);
+        signBlock.setBlockData(newBlockData);
         if (!allowedByBlockPlaceEvent(signBlock, oldState, block, player)) {
             // Revert to old state
             oldState.update(true);
