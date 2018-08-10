@@ -13,6 +13,8 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
+import org.bukkit.block.data.type.Chest;
+import org.bukkit.block.data.type.Chest.Type;
 import org.bukkit.block.data.type.Gate;
 import org.bukkit.block.data.type.WallSign;
 
@@ -63,7 +65,7 @@ public abstract class BlockFinder {
      * @return The signs.
      */
     public Collection<ProtectionSign> findAttachedSigns(Block block) {
-        Collection<ProtectionSign> signs = new ArrayList<ProtectionSign>();
+        Collection<ProtectionSign> signs = new ArrayList<>();
         for (BlockFace face : SIGN_ATTACHMENT_FACES) {
             Block atPosition = block.getRelative(face);
             Material material = atPosition.getType();
@@ -132,6 +134,20 @@ public abstract class BlockFinder {
         return block.getRelative(BlockFace.DOWN);
     }
 
+    protected BlockFace getChestNeighborFaceOrNull(Block block) {
+        BlockData blockData = block.getBlockData();
+        if (!(blockData instanceof Chest)) {
+            return null;
+        }
+    
+        Chest chest = (Chest) blockData;
+        if (chest.getType() == Type.SINGLE) {
+            return null;
+        }
+        BlockFace towardsLeft = this.turn90Degrees(chest.getFacing());
+        return chest.getType() == Type.LEFT ? towardsLeft : towardsLeft.getOppositeFace();
+    }
+
     /**
      * Gets the parser for signs.
      *
@@ -161,6 +177,21 @@ public abstract class BlockFinder {
             actualFace = ((WallSign) materialData).getFacing().getOppositeFace();
         }
         return (actualFace == requiredFace);
+    }
+
+    protected BlockFace turn90Degrees(BlockFace face) {
+        switch (face) {
+            case NORTH:
+                return BlockFace.EAST;
+            case EAST:
+                return BlockFace.SOUTH;
+            case SOUTH:
+                return BlockFace.WEST;
+            case WEST:
+                return BlockFace.NORTH;
+            default:
+                throw new IllegalArgumentException("Cannot handle " + face);
+        }
     }
 
 }

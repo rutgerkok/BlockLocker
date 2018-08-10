@@ -3,11 +3,11 @@ package nl.rutgerkok.blocklocker.impl.blockfinder;
 import java.util.ArrayList;
 import java.util.List;
 
-import nl.rutgerkok.blocklocker.SignParser;
-
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+
+import nl.rutgerkok.blocklocker.SignParser;
 
 final class ConnectedContainersBlockFinder extends BlockFinder {
     private static final int MAX_SEARCH_DISTANCE = 10;
@@ -19,7 +19,7 @@ final class ConnectedContainersBlockFinder extends BlockFinder {
     @Override
     public List<Block> findContainerNeighbors(Block block) {
         Material containerMaterial = block.getType();
-        List<Block> blocks = new ArrayList<Block>();
+        List<Block> blocks = new ArrayList<>();
         blocks.add(block);
 
         // Search above and below on the starting block
@@ -40,6 +40,25 @@ final class ConnectedContainersBlockFinder extends BlockFinder {
             }
         }
 
+        BlockFace chestNeighborFace = this.getChestNeighborFaceOrNull(block);
+        if (chestNeighborFace != null) {
+            // Double chest, also perform search for other chest block
+            Block chestNeighbor = block.getRelative(chestNeighborFace);
+            BlockFace[] searchDirections = { this.turn90Degrees(chestNeighborFace),
+                    this.turn90Degrees(chestNeighborFace).getOppositeFace() };
+            for (BlockFace face : searchDirections) {
+                int distance = 0;
+                Block atPosition = chestNeighbor.getRelative(face);
+                while (distance < MAX_SEARCH_DISTANCE && atPosition.getType() == containerMaterial) {
+                    blocks.add(atPosition);
+                    searchVertical(containerMaterial, atPosition, blocks);
+
+                    atPosition = atPosition.getRelative(face);
+                    distance++;
+                }
+            }
+        }
+
         return blocks;
     }
 
@@ -52,8 +71,8 @@ final class ConnectedContainersBlockFinder extends BlockFinder {
      * @param startingBlock
      *            The starting block.
      * @param blocks
-     *            All connected blocks above and below (so not the starting
-     *            block itself) of the same type will be added to this list.
+     *            All connected blocks above and below (so not the starting block
+     *            itself) of the same type will be added to this list.
      */
     private void searchVertical(Material containerMaterial, Block startingBlock, List<Block> blocks) {
         for (BlockFace face : VERTICAL_FACES) {
@@ -65,6 +84,33 @@ final class ConnectedContainersBlockFinder extends BlockFinder {
                 atPosition = atPosition.getRelative(face);
                 distance++;
             }
+        }
+    }
+
+    /**
+     * Adds a chest neighbor to the list of blocks, if any.
+     *
+     * @param addTo
+     *            The list to add the block to.
+     * @param searchingInFace
+     *            The direction the search is going. As the search will reach blocks
+     *            in this direction, and has already reached blocks in the oppisite
+     *            direction, blocks in those two directions are not added to the
+     *            block list.
+     * @param block
+     *            The block to search neighbors for.
+     */
+    private void tryAddChestNeighbor(List<Block> addTo, BlockFace searchingInFace, Block block) {
+        if (searchingInFace == BlockFace.SELF) {
+            // Not yet searching in any direction, so all four directions will be searched for in the future
+            // So it is not useful to find neighbors already, as they will be found anyways
+            return;
+        }
+        BlockFace connectedChestFace = this.getChestNeighborFaceOrNull(block);
+        if (connectedChestFace != null
+                && connectedChestFace != searchingInFace
+                && connectedChestFace != searchingInFace.getOppositeFace()) {
+            addTo.add(block.getRelative(connectedChestFace));
         }
     }
 }
