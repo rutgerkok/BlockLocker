@@ -599,6 +599,16 @@ public class TestPlayer implements Player {
     }
 
     @Override
+    public String getPlayerListFooter() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String getPlayerListHeader() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public String getPlayerListName() {
         throw new UnsupportedOperationException();
 
@@ -1008,9 +1018,19 @@ public class TestPlayer implements Player {
     }
 
     @Override
+    public boolean isPersistent() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public boolean isPlayerTimeRelative() {
         throw new UnsupportedOperationException();
 
+    }
+
+    @Override
+    public boolean isRiptiding() {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -1552,6 +1572,26 @@ public class TestPlayer implements Player {
     public boolean setPassenger(Entity passenger) {
         throw new UnsupportedOperationException();
 
+    }
+
+    @Override
+    public void setPersistent(boolean arg0) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setPlayerListFooter(String arg0) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setPlayerListHeader(String arg0) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setPlayerListHeaderFooter(String arg0, String arg1) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
