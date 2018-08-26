@@ -1892,6 +1892,11 @@ public class TestPlayer implements Player {
     }
 
     @Override
+    public void updateCommands() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void updateInventory() {
         throw new UnsupportedOperationException();
     }
