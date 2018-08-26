@@ -86,31 +86,4 @@ final class ConnectedContainersBlockFinder extends BlockFinder {
             }
         }
     }
-
-    /**
-     * Adds a chest neighbor to the list of blocks, if any.
-     *
-     * @param addTo
-     *            The list to add the block to.
-     * @param searchingInFace
-     *            The direction the search is going. As the search will reach blocks
-     *            in this direction, and has already reached blocks in the oppisite
-     *            direction, blocks in those two directions are not added to the
-     *            block list.
-     * @param block
-     *            The block to search neighbors for.
-     */
-    private void tryAddChestNeighbor(List<Block> addTo, BlockFace searchingInFace, Block block) {
-        if (searchingInFace == BlockFace.SELF) {
-            // Not yet searching in any direction, so all four directions will be searched for in the future
-            // So it is not useful to find neighbors already, as they will be found anyways
-            return;
-        }
-        BlockFace connectedChestFace = this.getChestNeighborFaceOrNull(block);
-        if (connectedChestFace != null
-                && connectedChestFace != searchingInFace
-                && connectedChestFace != searchingInFace.getOppositeFace()) {
-            addTo.add(block.getRelative(connectedChestFace));
-        }
-    }
 }
