@@ -1,10 +1,5 @@
 package nl.rutgerkok.blocklocker.impl.event;
 
-import nl.rutgerkok.blocklocker.BlockLockerPlugin;
-import nl.rutgerkok.blocklocker.Permissions;
-import nl.rutgerkok.blocklocker.Translator.Translation;
-import nl.rutgerkok.blocklocker.impl.blockfinder.BlockFinder;
-
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -13,10 +8,25 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockPlaceEvent;
 
+import nl.rutgerkok.blocklocker.BlockLockerPlugin;
+import nl.rutgerkok.blocklocker.Permissions;
+import nl.rutgerkok.blocklocker.Translator.Translation;
+import nl.rutgerkok.blocklocker.impl.blockfinder.BlockFinder;
+import nl.rutgerkok.blocklocker.location.IllegalLocationException;
+
 public final class BlockPlaceListener extends EventListener {
 
     public BlockPlaceListener(BlockLockerPlugin plugin) {
         super(plugin);
+    }
+
+    private boolean isExistingChestNearby(Block chestBlock) {
+        for (BlockFace blockFace : BlockFinder.CARDINAL_FACES) {
+            if (chestBlock.getRelative(blockFace).getType() == Material.CHEST) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -41,19 +51,16 @@ public final class BlockPlaceListener extends EventListener {
             return;
         }
 
+        try {
+            plugin.getLocationCheckers().checkLocation(player, event.getBlockPlaced());
+        } catch (IllegalLocationException e) {
+            return; // Cannot place protection here, so don't show hint
+        }
+
         String message = plugin.getTranslator().get(Translation.PROTECTION_CHEST_HINT);
         if (!message.isEmpty()) {
             player.sendMessage(message);
         }
-    }
-
-    private boolean isExistingChestNearby(Block chestBlock) {
-        for (BlockFace blockFace : BlockFinder.CARDINAL_FACES) {
-            if (chestBlock.getRelative(blockFace).getType() == Material.CHEST) {
-                return true;
-            }
-        }
-        return false;
     }
 
 }

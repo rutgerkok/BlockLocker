@@ -8,6 +8,15 @@ import java.io.Reader;
 import java.util.Collection;
 import java.util.logging.Level;
 
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.Configuration;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import com.google.common.base.Charsets;
+import com.google.common.base.Preconditions;
+
 import nl.rutgerkok.blocklocker.BlockLockerPlugin;
 import nl.rutgerkok.blocklocker.ChestSettings;
 import nl.rutgerkok.blocklocker.ProfileFactory;
@@ -29,23 +38,17 @@ import nl.rutgerkok.blocklocker.impl.group.FactionsGroupSystem;
 import nl.rutgerkok.blocklocker.impl.group.PermissionsGroupSystem;
 import nl.rutgerkok.blocklocker.impl.group.ScoreboardGroupSystem;
 import nl.rutgerkok.blocklocker.impl.group.TownyGroupSystem;
+import nl.rutgerkok.blocklocker.impl.location.TownyLocationChecker;
 import nl.rutgerkok.blocklocker.impl.nms.CNAccessor;
 import nl.rutgerkok.blocklocker.impl.nms.NMSAccessor;
 import nl.rutgerkok.blocklocker.impl.nms.ServerSpecific;
 import nl.rutgerkok.blocklocker.impl.profile.ProfileFactoryImpl;
 import nl.rutgerkok.blocklocker.impl.updater.Updater;
-
-import org.bukkit.Bukkit;
-import org.bukkit.configuration.Configuration;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.plugin.PluginManager;
-import org.bukkit.plugin.java.JavaPlugin;
-
-import com.google.common.base.Charsets;
-import com.google.common.base.Preconditions;
+import nl.rutgerkok.blocklocker.location.CombinedLocationChecker;
+import nl.rutgerkok.blocklocker.location.LocationChecker;
 
 public class BlockLockerPluginImpl extends JavaPlugin implements
-        BlockLockerPlugin {
+BlockLockerPlugin {
     private ChestSettings chestSettings;
     private CombinedGroupSystem combinedGroupSystem;
     private Config config;
@@ -56,6 +59,7 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
     private SignParser signParser;
     private SignSelector signSelector;
     private Translator translator;
+    private CombinedLocationChecker combinedLocationChecker;
 
     @Override
     public ChestSettings getChestSettings() {
@@ -89,6 +93,12 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
             getLogger().log(Level.SEVERE, "Failed to close stream", e);
         }
         return config;
+    }
+
+    @Override
+    public CombinedLocationChecker getLocationCheckers() {
+        Preconditions.checkState(this.combinedLocationChecker != null);
+        return this.combinedLocationChecker;
     }
 
     @Override
@@ -134,13 +144,21 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
         }
     }
 
+    private void loadLocationCheckers() {
+        this.combinedLocationChecker = new CombinedLocationChecker();
+        if (TownyLocationChecker.isAvailable()) {
+            this.combinedLocationChecker.addChecker(new TownyLocationChecker());
+        }
+    }
+
     private void loadServices() {
         // Configuration
         saveDefaultConfig();
         config = new Config(getLogger(), getConfig());
 
-        // Group systems
+        // Connections with external systems
         loadGroupSystems();
+        loadLocationCheckers();
 
         // Translation
         translator = loadTranslations(config.getLanguageFileName());
@@ -212,13 +230,15 @@ public class BlockLockerPluginImpl extends JavaPlugin implements
 
     @Override
     public void reload() {
-        Collection<GroupSystem> reloadSurvivors = this.combinedGroupSystem.getReloadSurvivors();
+        Collection<GroupSystem> keepGroupSystems = this.combinedGroupSystem.getReloadSurvivors();
+        Collection<LocationChecker> keepLocationCheckers = this.combinedLocationChecker.getReloadSurvivors();
 
         reloadConfig();
         loadServices();
 
-        // Add back group systems from before the reload
-        this.combinedGroupSystem.addSystems(reloadSurvivors);
+        // Add back external systems from before the reload
+        keepGroupSystems.forEach(this.combinedGroupSystem::addSystem);
+        keepLocationCheckers.forEach(this.combinedLocationChecker::addChecker);
     }
 
     @Override

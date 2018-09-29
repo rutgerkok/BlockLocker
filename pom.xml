@@ -4,7 +4,7 @@
 
 	<groupId>nl.rutgerkok</groupId>
 	<artifactId>blocklocker</artifactId>
-	<version>1.4.1</version>
+	<version>1.5-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>BlockLocker</name>
@@ -37,7 +37,7 @@
 		<dependency>
 			<groupId>com.palmergames</groupId>
 			<artifactId>towny</artifactId>
-			<version>0.89.0.0</version>
+			<version>0.93.0.0</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

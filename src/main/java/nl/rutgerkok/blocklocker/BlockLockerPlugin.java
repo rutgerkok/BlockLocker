@@ -4,6 +4,7 @@ import java.util.logging.Logger;
 
 import nl.rutgerkok.blocklocker.group.CombinedGroupSystem;
 import nl.rutgerkok.blocklocker.group.GroupSystem;
+import nl.rutgerkok.blocklocker.location.CombinedLocationChecker;
 
 /**
  * Main entry point of the plugin.
@@ -16,7 +17,7 @@ public interface BlockLockerPlugin {
     /**
      * Gets the {@link ChestSettings} object, containing all customizable
      * aspects of the plugin.
-     * 
+     *
      * @return The settings object.
      */
     ChestSettings getChestSettings();
@@ -31,8 +32,14 @@ public interface BlockLockerPlugin {
     CombinedGroupSystem getGroupSystems();
 
     /**
+     * Gets the location checkers, which are used to prevent players from placing chests in the wilderness.
+     * @return A location checker.
+     */
+    CombinedLocationChecker getLocationCheckers();
+
+    /**
      * Gets the logger of the plugin.
-     * 
+     *
      * @return The logger.
      */
     Logger getLogger();
@@ -54,14 +61,14 @@ public interface BlockLockerPlugin {
     /**
      * Gets the protection updater, used to mark protections as needing an
      * update, for example for fixing missing UUIDs.
-     * 
+     *
      * @return The protection updater.
      */
     ProtectionUpdater getProtectionUpdater();
 
     /**
      * Gets the {@link SignParser} object.
-     * 
+     *
      * @return The sign parser.
      */
     SignParser getSignParser();
@@ -69,7 +76,7 @@ public interface BlockLockerPlugin {
     /**
      * Gets the sign selector, that holds the currently selected signs of all
      * players.
-     * 
+     *
      * @return The sign selector.
      */
     SignSelector getSignSelector();

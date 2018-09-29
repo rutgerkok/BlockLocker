@@ -24,27 +24,7 @@ public final class CombinedGroupSystem extends GroupSystem {
      * @see #addSystem(GroupSystem)
      */
     public CombinedGroupSystem() {
-        this.systems = new ArrayList<GroupSystem>();
-    }
-
-    @Override
-    public boolean isInGroup(Player player, String groupName) {
-        for (GroupSystem system : systems) {
-            if (system.isInGroup(player, groupName)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean isGroupLeader(Player player, String groupName) {
-        for (GroupSystem system : systems) {
-            if (system.isGroupLeader(player, groupName)) {
-                return true;
-            }
-        }
-        return false;
+        this.systems = new ArrayList<>();
     }
 
     /**
@@ -61,12 +41,10 @@ public final class CombinedGroupSystem extends GroupSystem {
     }
 
     /**
-     * Adds all group systems in the given collection. The collection may not
-     * contain null elements.
-     * 
-     * @param systems
-     *            The systems to add.
+     * @deprecated Just use {@link #addSystem(GroupSystem)}
+     * @param systems The systems to add.
      */
+    @Deprecated
     public void addSystems(Iterable<GroupSystem> systems) {
         for (GroupSystem system : systems) {
             addSystem(system);
@@ -79,13 +57,33 @@ public final class CombinedGroupSystem extends GroupSystem {
      * @return All groups that must be kept.
      */
     public Collection<GroupSystem> getReloadSurvivors() {
-        Collection<GroupSystem> reloadSurvivors = new ArrayList<GroupSystem>();
+        Collection<GroupSystem> reloadSurvivors = new ArrayList<>();
         for (GroupSystem system : this.systems) {
             if (system.keepOnReload()) {
                 reloadSurvivors.add(system);
             }
         }
         return reloadSurvivors;
+    }
+
+    @Override
+    public boolean isGroupLeader(Player player, String groupName) {
+        for (GroupSystem system : systems) {
+            if (system.isGroupLeader(player, groupName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isInGroup(Player player, String groupName) {
+        for (GroupSystem system : systems) {
+            if (system.isInGroup(player, groupName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

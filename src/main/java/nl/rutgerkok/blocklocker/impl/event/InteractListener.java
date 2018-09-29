@@ -2,9 +2,6 @@ package nl.rutgerkok.blocklocker.impl.event;
 
 import java.util.Set;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableSet;
-
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -28,6 +25,9 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableSet;
+
 import nl.rutgerkok.blocklocker.BlockLockerPlugin;
 import nl.rutgerkok.blocklocker.Permissions;
 import nl.rutgerkok.blocklocker.ProtectionSign;
@@ -35,6 +35,7 @@ import nl.rutgerkok.blocklocker.ProtectionType;
 import nl.rutgerkok.blocklocker.SearchMode;
 import nl.rutgerkok.blocklocker.SignType;
 import nl.rutgerkok.blocklocker.Translator.Translation;
+import nl.rutgerkok.blocklocker.location.IllegalLocationException;
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;
 import nl.rutgerkok.blocklocker.profile.Profile;
 import nl.rutgerkok.blocklocker.protection.Protection;
@@ -375,6 +376,11 @@ public final class InteractListener extends EventListener {
         if (!AUTOPLACE_BLOCK_FACES.contains(clickedSide)) {
             return false;
         }
+        try {
+            plugin.getLocationCheckers().checkLocation(player, block);
+        } catch (IllegalLocationException e) {
+            return false;
+        }
 
         Block signBlock = block.getRelative(clickedSide);
         boolean waterlogged = false;
@@ -382,6 +388,7 @@ public final class InteractListener extends EventListener {
             if (signBlock.getType() != Material.WATER) {
                 return false;
             }
+            // So block is a water block - check its water level
             waterlogged = ((Levelled) signBlock.getBlockData()).getLevel() == 0;
         }
 

@@ -26,6 +26,7 @@ public abstract class Translator {
         PROTECTION_CLAIMED_CONTAINER,
         PROTECTION_CLAIMED_MANUALLY,
         PROTECTION_EXPIRED,
+        PROTECTION_IN_WILDERNESS,
         PROTECTION_IS_CLAIMED_BY,
         PROTECTION_NO_ACCESS,
         PROTECTION_NO_PERMISSION_FOR_CLAIM,
@@ -72,7 +73,7 @@ public abstract class Translator {
 
     /**
      * Sends the specified message translated to the given player.
-     * 
+     *
      * @param player
      *            The player (or console) to the send the message to.
      * @param translation

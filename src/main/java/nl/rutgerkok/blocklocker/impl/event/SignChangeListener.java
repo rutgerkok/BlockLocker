@@ -1,12 +1,5 @@
 package nl.rutgerkok.blocklocker.impl.event;
 
-import nl.rutgerkok.blocklocker.BlockLockerPlugin;
-import nl.rutgerkok.blocklocker.Permissions;
-import nl.rutgerkok.blocklocker.SignType;
-import nl.rutgerkok.blocklocker.Translator.Translation;
-import nl.rutgerkok.blocklocker.profile.Profile;
-import nl.rutgerkok.blocklocker.protection.Protection;
-
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
@@ -15,6 +8,14 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.SignChangeEvent;
 
 import com.google.common.base.Optional;
+
+import nl.rutgerkok.blocklocker.BlockLockerPlugin;
+import nl.rutgerkok.blocklocker.Permissions;
+import nl.rutgerkok.blocklocker.SignType;
+import nl.rutgerkok.blocklocker.Translator.Translation;
+import nl.rutgerkok.blocklocker.location.IllegalLocationException;
+import nl.rutgerkok.blocklocker.profile.Profile;
+import nl.rutgerkok.blocklocker.protection.Protection;
 
 public class SignChangeListener extends EventListener {
 
@@ -76,6 +77,16 @@ public class SignChangeListener extends EventListener {
 
         if (!player.hasPermission(Permissions.CAN_PROTECT)) {
             plugin.getTranslator().sendMessage(player, Translation.PROTECTION_NO_PERMISSION_FOR_CLAIM);
+            block.breakNaturally();
+            event.setCancelled(true);
+            return;
+        }
+
+        // Don't allow placing signs in the wilderness
+        try {
+            plugin.getLocationCheckers().checkLocation(player, block);
+        } catch (IllegalLocationException e) {
+            player.sendMessage(e.getTranslatedMessage(plugin.getTranslator()));
             block.breakNaturally();
             event.setCancelled(true);
             return;

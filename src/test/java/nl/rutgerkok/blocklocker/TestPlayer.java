@@ -7,8 +7,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import com.google.common.base.Charsets;
-
 import org.bukkit.Effect;
 import org.bukkit.EntityEffect;
 import org.bukkit.GameMode;
@@ -28,6 +26,7 @@ import org.bukkit.advancement.AdvancementProgress;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.PistonMoveReaction;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.conversations.Conversation;
@@ -57,6 +56,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.util.Vector;
+
+import com.google.common.base.Charsets;
 
 public class TestPlayer implements Player {
 
@@ -381,6 +382,11 @@ public class TestPlayer implements Player {
 
     @Override
     public Location getEyeLocation() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public BlockFace getFacing() {
         throw new UnsupportedOperationException();
     }
 
