@@ -7,26 +7,12 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 import java.util.Collection;
 
-import nl.rutgerkok.blocklocker.TestPlayer;
-
 import org.bukkit.entity.Player;
 import org.junit.Test;
 
+import nl.rutgerkok.blocklocker.TestPlayer;
+
 public class CombinedGroupSystemTest {
-
-    private class ReturnsTrueGroupSystem extends GroupSystem {
-
-        @Override
-        public boolean isInGroup(Player player, String groupName) {
-            return true;
-        }
-
-        @Override
-        public boolean keepOnReload() {
-            return true;
-        }
-
-    }
 
     private class ReturnsFalseGroupSystem extends GroupSystem {
 
@@ -42,28 +28,50 @@ public class CombinedGroupSystemTest {
 
     }
 
-    @Test
-    public void testEmptyGroupSystem() {
-        assertFalse(new CombinedGroupSystem().isInGroup(new TestPlayer(), "GroupName"));
+    private class ReturnsTrueGroupSystem extends GroupSystem {
+
+        @Override
+        public boolean isInGroup(Player player, String groupName) {
+            return true;
+        }
+
+        @Override
+        public boolean keepOnReload() {
+            return true;
+        }
+
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testAddNullSystem() {
+        // Null systems are not allowed
+        new CombinedGroupSystem().addSystem(null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    @Deprecated
+    public void testAddNullSystems() {
+        // Collections containing null systems are not allowed
+        Collection<GroupSystem> containingNull = Arrays.asList(
+                new ReturnsFalseGroupSystem(),
+                new ReturnsTrueGroupSystem(),
+                null);
+        new CombinedGroupSystem().addSystems(containingNull);
     }
 
     @Test
     public void testCombined() {
         CombinedGroupSystem combinedGroupSystem = new CombinedGroupSystem();
-        combinedGroupSystem.addSystems(Arrays.asList(
-                new ReturnsFalseGroupSystem(),
-                new ReturnsTrueGroupSystem()));
+        combinedGroupSystem.addSystem(new ReturnsFalseGroupSystem());
+        combinedGroupSystem.addSystem(new ReturnsTrueGroupSystem());
 
         // Must return true, because ReturnsTrueGroupSystem returns true
         assertTrue(combinedGroupSystem.isInGroup(new TestPlayer(), "GroupName"));
     }
 
     @Test
-    public void testSingleReturnsFalse() {
-        CombinedGroupSystem combinedGroupSystem = new CombinedGroupSystem();
-        combinedGroupSystem.addSystem(new ReturnsFalseGroupSystem());
-
-        assertFalse(combinedGroupSystem.isInGroup(new TestPlayer(), "GroupName"));
+    public void testEmptyGroupSystem() {
+        assertFalse(new CombinedGroupSystem().isInGroup(new TestPlayer(), "GroupName"));
     }
 
     @Test
@@ -84,19 +92,11 @@ public class CombinedGroupSystemTest {
         assertEquals(keptOnReload, survivors.iterator().next());
     }
 
-    @Test(expected = NullPointerException.class)
-    public void testAddNullSystems() {
-        // Collections containing null systems are not allowed
-        Collection<GroupSystem> containingNull = Arrays.asList(
-                new ReturnsFalseGroupSystem(),
-                new ReturnsTrueGroupSystem(),
-                null);
-        new CombinedGroupSystem().addSystems(containingNull);
-    }
+    @Test
+    public void testSingleReturnsFalse() {
+        CombinedGroupSystem combinedGroupSystem = new CombinedGroupSystem();
+        combinedGroupSystem.addSystem(new ReturnsFalseGroupSystem());
 
-    @Test(expected = NullPointerException.class)
-    public void testAddNullSystem() {
-        // Null systems are not allowed
-        new CombinedGroupSystem().addSystem(null);
+        assertFalse(combinedGroupSystem.isInGroup(new TestPlayer(), "GroupName"));
     }
 }
