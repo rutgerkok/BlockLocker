@@ -2,13 +2,6 @@ package nl.rutgerkok.blocklocker.impl.profile;
 
 import java.util.UUID;
 
-import nl.rutgerkok.blocklocker.ProfileFactory;
-import nl.rutgerkok.blocklocker.Translator;
-import nl.rutgerkok.blocklocker.Translator.Translation;
-import nl.rutgerkok.blocklocker.group.GroupSystem;
-import nl.rutgerkok.blocklocker.profile.PlayerProfile;
-import nl.rutgerkok.blocklocker.profile.Profile;
-
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
@@ -16,6 +9,13 @@ import org.json.simple.JSONObject;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+
+import nl.rutgerkok.blocklocker.ProfileFactory;
+import nl.rutgerkok.blocklocker.Translator;
+import nl.rutgerkok.blocklocker.Translator.Translation;
+import nl.rutgerkok.blocklocker.group.GroupSystem;
+import nl.rutgerkok.blocklocker.profile.PlayerProfile;
+import nl.rutgerkok.blocklocker.profile.Profile;
 
 public final class ProfileFactoryImpl implements ProfileFactory {
     private final Profile everyoneProfile;
@@ -38,8 +38,8 @@ public final class ProfileFactoryImpl implements ProfileFactory {
     }
 
     /**
-     * Parses a profile from the text displayed on a sign. Used for newly
-     * created signs and for signs created by Lockette/Deadbolt.
+     * Parses a profile from the text displayed on a sign. Used for newly created
+     * signs and for signs created by Lockette/Deadbolt.
      *
      * @param text
      *            The text on a single line.
@@ -73,9 +73,22 @@ public final class ProfileFactoryImpl implements ProfileFactory {
             if (text.startsWith("+") && text.endsWith("+")) {
                 return new GroupLeaderProfileImpl(groupSystem, text.substring(1, text.length() - 1));
             }
+
+            // DisplayName#UUID (format of LockettePro)
+            int hashCharIndex = text.indexOf('#');
+            if (hashCharIndex > 0) {
+                String name = text.substring(0, hashCharIndex);
+                try {
+                    UUID uuid = UUID.fromString(text.substring(hashCharIndex + 1));
+                    return new PlayerProfileImpl(name, Optional.of(uuid));
+                } catch (IllegalArgumentException e) {
+                    // Ignore, not in name#uuid format. Someone probably added
+                    // a # for some other reason
+                }
+            }
         }
 
-        return new PlayerProfileImpl(text, Optional.<UUID> absent());
+        return new PlayerProfileImpl(text, Optional.<UUID>absent());
     }
 
     @Override
@@ -133,7 +146,8 @@ public final class ProfileFactoryImpl implements ProfileFactory {
         // Timer
         Optional<Number> secondsOpen = getValue(json, TimerProfileImpl.TIME_KEY, Number.class);
         if (secondsOpen.isPresent()) {
-            Profile profile = new TimerProfileImpl(translator.getWithoutColor(Translation.TAG_TIMER), secondsOpen.get().intValue());
+            Profile profile = new TimerProfileImpl(translator.getWithoutColor(Translation.TAG_TIMER),
+                    secondsOpen.get().intValue());
             return Optional.of(profile);
         }
 
