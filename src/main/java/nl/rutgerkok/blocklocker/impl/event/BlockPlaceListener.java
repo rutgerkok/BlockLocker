@@ -52,7 +52,7 @@ public final class BlockPlaceListener extends EventListener {
         }
 
         try {
-            plugin.getLocationCheckers().checkLocation(player, event.getBlockPlaced());
+            plugin.getLocationCheckers().checkLocationAndPermission(player, event.getBlockPlaced());
         } catch (IllegalLocationException e) {
             return; // Cannot place protection here, so don't show hint
         }

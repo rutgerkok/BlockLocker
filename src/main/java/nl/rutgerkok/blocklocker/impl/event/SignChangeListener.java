@@ -84,7 +84,7 @@ public class SignChangeListener extends EventListener {
 
         // Don't allow placing signs in the wilderness
         try {
-            plugin.getLocationCheckers().checkLocation(player, block);
+            plugin.getLocationCheckers().checkLocationAndPermission(player, block);
         } catch (IllegalLocationException e) {
             player.sendMessage(e.getTranslatedMessage(plugin.getTranslator()));
             block.breakNaturally();

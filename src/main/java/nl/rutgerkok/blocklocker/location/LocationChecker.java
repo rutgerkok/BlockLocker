@@ -3,6 +3,8 @@ package nl.rutgerkok.blocklocker.location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
+import nl.rutgerkok.blocklocker.Permissions;
+
 /**
  * Used to check if protections can be created at the given location.
  *
@@ -21,6 +23,25 @@ public interface LocationChecker {
      *             should include a message why.
      */
     void checkLocation(Player player, Block block) throws IllegalLocationException;
+
+    /**
+     * Checks whether people can protect chests here. For players that have the
+     * {@link Permissions#CAN_WILDERNESS} permission node, this is always the case.
+     *
+     * @param player
+     *            The player placing the chest.
+     * @param block
+     *            The location.
+     * @throws IllegalLocationException
+     *             If the player is not allowed to place a chest here. The exception
+     *             should include a message why.
+     */
+    default void checkLocationAndPermission(Player player, Block block) throws IllegalLocationException {
+        if (player.hasPermission(Permissions.CAN_WILDERNESS)) {
+            return;
+        }
+        checkLocation(player, block);
+    }
 
     /**
      * Gets whether this location checker must be kept when the plugin is reloaded

@@ -377,7 +377,7 @@ public final class InteractListener extends EventListener {
             return false;
         }
         try {
-            plugin.getLocationCheckers().checkLocation(player, block);
+            plugin.getLocationCheckers().checkLocationAndPermission(player, block);
         } catch (IllegalLocationException e) {
             return false;
         }
