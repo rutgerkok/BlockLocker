@@ -13,6 +13,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Instrument;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Note;
 import org.bukkit.Particle;
 import org.bukkit.Server;
@@ -239,6 +240,18 @@ public class TestPlayer implements Player {
 
     @Override
     public void decrementStatistic(Statistic statistic, Material material, int amount) throws IllegalArgumentException {
+        throw new UnsupportedOperationException();
+
+    }
+
+    @Override
+    public boolean discoverRecipe(NamespacedKey arg0) {
+        throw new UnsupportedOperationException();
+
+    }
+
+    @Override
+    public int discoverRecipes(Collection<NamespacedKey> arg0) {
         throw new UnsupportedOperationException();
 
     }
@@ -1893,6 +1906,18 @@ public class TestPlayer implements Player {
 
     @Override
     public boolean teleport(Location location, TeleportCause cause) {
+        throw new UnsupportedOperationException();
+
+    }
+
+    @Override
+    public boolean undiscoverRecipe(NamespacedKey arg0) {
+        throw new UnsupportedOperationException();
+
+    }
+
+    @Override
+    public int undiscoverRecipes(Collection<NamespacedKey> arg0) {
         throw new UnsupportedOperationException();
 
     }
