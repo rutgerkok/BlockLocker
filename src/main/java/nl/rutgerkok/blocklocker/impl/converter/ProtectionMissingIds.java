@@ -3,12 +3,12 @@ package nl.rutgerkok.blocklocker.impl.converter;
 import java.util.Set;
 import java.util.UUID;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableSet;
+
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;
 import nl.rutgerkok.blocklocker.profile.Profile;
 import nl.rutgerkok.blocklocker.protection.Protection;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableSet;
 
 /**
  * Represents a {@link Protection} missing one or more {@link UUID}s.
@@ -21,12 +21,10 @@ final class ProtectionMissingIds {
      *
      * @param protection
      *            The protection.
-     * @param lookupPastNames
-     *            Whether past names need to be looked up. False for new signs.
      * @return The {@link ProtectionMissingIds}, or absent if the protection is
      *         not missing ids.
      */
-    static Optional<ProtectionMissingIds> of(Protection protection, boolean lookupPastNames) {
+    static Optional<ProtectionMissingIds> of(Protection protection) {
         ImmutableSet.Builder<String> namesMissingUniqueIds = ImmutableSet.builder();
         boolean missingIds = false;
 
@@ -44,7 +42,7 @@ final class ProtectionMissingIds {
         }
 
         if (missingIds) {
-            return Optional.of(new ProtectionMissingIds(protection, namesMissingUniqueIds, lookupPastNames));
+            return Optional.of(new ProtectionMissingIds(protection, namesMissingUniqueIds));
         } else {
             return Optional.absent();
         }
@@ -52,7 +50,6 @@ final class ProtectionMissingIds {
 
     private final Set<String> namesMissingUniqueIds;
     private final Protection protection;
-    private final boolean lookupPastNames;
 
     /**
      * Builds the list of UUIDs to fetch. Must be called on the server thread.
@@ -61,13 +58,10 @@ final class ProtectionMissingIds {
      *            The protection to fetch the UUIDs for.
      * @param namesMissingUniqueIds
      *            The names that need to be looked up.
-     * @param lookupPastNames
-     *            Whether the names may be outdated.
      */
-    private ProtectionMissingIds(Protection protection, ImmutableSet.Builder<String> namesMissingUniqueIds, boolean lookupPastNames) {
+    private ProtectionMissingIds(Protection protection, ImmutableSet.Builder<String> namesMissingUniqueIds) {
         this.protection = protection;
         this.namesMissingUniqueIds = namesMissingUniqueIds.build();
-        this.lookupPastNames = lookupPastNames;
     }
 
     @Override
@@ -111,13 +105,4 @@ final class ProtectionMissingIds {
         return protection.hashCode();
     }
 
-    /**
-     * Gets whether past names from before name changes were allowed must be
-     * looked up. This value should be false for new protections.
-     * 
-     * @return True if past names must be looked up, false otherwise.
-     */
-    public boolean mustLookupPastNames() {
-        return lookupPastNames;
-    }
 }

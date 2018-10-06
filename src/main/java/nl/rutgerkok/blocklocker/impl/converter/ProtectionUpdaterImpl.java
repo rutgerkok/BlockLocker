@@ -7,15 +7,15 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import nl.rutgerkok.blocklocker.BlockLockerPlugin;
-import nl.rutgerkok.blocklocker.ProtectionUpdater;
-import nl.rutgerkok.blocklocker.protection.Protection;
-
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+
+import nl.rutgerkok.blocklocker.BlockLockerPlugin;
+import nl.rutgerkok.blocklocker.ProtectionUpdater;
+import nl.rutgerkok.blocklocker.protection.Protection;
 
 /**
  * Converts signs without UUIDs to signs with UUIDs.
@@ -30,7 +30,7 @@ public class ProtectionUpdaterImpl implements ProtectionUpdater {
     public ProtectionUpdaterImpl(BlockLockerPlugin plugin) {
         this.plugin = plugin;
         this.uuidHandler = new UUIDHandler(plugin.getLogger());
-        missingUniqueIds = new ConcurrentLinkedQueue<ProtectionMissingIds>();
+        missingUniqueIds = new ConcurrentLinkedQueue<>();
         nameUpdater = new ProtectionNameUpdater(plugin.getSignParser(), plugin.getProfileFactory());
 
         Bukkit.getScheduler().runTaskTimer(
@@ -44,16 +44,12 @@ public class ProtectionUpdaterImpl implements ProtectionUpdater {
 
     private void processMissingUniqueIdsQueue() {
         // Collect the names
-        Set<String> names = new HashSet<String>();
-        final Collection<Protection> protectionsToFix = new ArrayList<Protection>();
+        Set<String> names = new HashSet<>();
+        final Collection<Protection> protectionsToFix = new ArrayList<>();
 
         ProtectionMissingIds protection;
-        boolean lookupPastNames = false;
         while ((protection = missingUniqueIds.poll()) != null) {
             protectionsToFix.add(protection.getProtection());
-            if (protection.mustLookupPastNames()) {
-                lookupPastNames = true;
-            }
             names.addAll(protection.getNamesMissingUniqueIds());
         }
 
@@ -63,23 +59,21 @@ public class ProtectionUpdaterImpl implements ProtectionUpdater {
         }
 
         // Fetch them
-        uuidHandler.fetchUniqueIds(names, new ProtectionUUIDSetter(plugin, protectionsToFix), lookupPastNames);
+        uuidHandler.fetchUniqueIds(names, new ProtectionUUIDSetter(plugin, protectionsToFix));
     }
 
     @Override
     public void update(Protection protection, boolean newProtection) {
         Preconditions.checkNotNull(protection, "protection");
 
-        boolean lookupPastNames = !newProtection;
-
         if (uuidHandler.isOnlineMode()) {
             nameUpdater.updateNames(protection);
-            updateForMissingIds(protection, lookupPastNames);
+            updateForMissingIds(protection);
         }
     }
 
-    private void updateForMissingIds(Protection protection, boolean lookupPastNames) {
-        Optional<ProtectionMissingIds> missingIds = ProtectionMissingIds.of(protection, lookupPastNames);
+    private void updateForMissingIds(Protection protection) {
+        Optional<ProtectionMissingIds> missingIds = ProtectionMissingIds.of(protection);
 
         // Check if there is something that needs to be converted
         if (!missingIds.isPresent()) {

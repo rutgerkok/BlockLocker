@@ -4,14 +4,11 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
@@ -57,9 +54,9 @@ final class UUIDHandler {
         };
 
         /**
-         * Converts the name (which may be missing a character at the end,
-         * because of Minecraft's sign limitations) to a {@link Result} that
-         * only contains the name, with an absent UUID.
+         * Converts the name (which may be missing a character at the end, because of
+         * Minecraft's sign limitations) to a {@link Result} that only contains the
+         * name, with an absent UUID.
          */
         private static Function<String, Result> OFFLINE_MODE_LOOKUP = new Function<String, Result>() {
             @Override
@@ -70,11 +67,11 @@ final class UUIDHandler {
         };
 
         /**
-         * Gets a placeholder result for the given name, will only be used if no
-         * UUID exists for this name. In other words: some feedback is needed
-         * for the player that the name was invalid, and the UUID will need to
-         * set to {@code new UUID(0, 0)} so that the plugin doesn't constantly
-         * tries to look it up.
+         * Gets a placeholder result for the given name, will only be used if no UUID
+         * exists for this name. In other words: some feedback is needed for the player
+         * that the name was invalid, and the UUID will need to set to
+         * {@code new UUID(0, 0)} so that the plugin doesn't constantly tries to look it
+         * up.
          */
         private static Function<String, Result> ONLINE_MODE_PLACEHOLDERS = new Function<String, Result>() {
             @Override
@@ -106,7 +103,7 @@ final class UUIDHandler {
         }
 
         Map<String, Result> uuidLookup(List<String> names) throws Exception {
-            Map<String, Result> results = new HashMap<String, Result>();
+            Map<String, Result> results = new HashMap<>();
             int requests = (int) Math.ceil(names.size() / PROFILES_PER_BULK_REQUEST);
             for (int i = 0; i < requests; i++) {
                 HttpURLConnection connection = createConnectionForBulkLookup();
@@ -124,31 +121,6 @@ final class UUIDHandler {
                 }
             }
             return results;
-        }
-
-        /*
-         * Very expensive - no bulk lookup available!
-         */
-        Map<String, Result> uuidLookupInPast(List<String> names, Date timestamp) throws Exception {
-            Map<String, Result> uuidMap = new HashMap<String, Result>();
-            long epochSeconds = timestamp.getTime() / 1000;
-
-            for (String name : names) {
-                String urlString = PAST_PROFILE_URL + '/' + name + "?at=" + epochSeconds;
-                URL url = new URL(urlString);
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                if (connection.getResponseCode() == 200) {
-                    JSONObject object = (JSONObject) jsonParser
-                            .parse(new InputStreamReader(connection.getInputStream()));
-                    String newName = (String) object.get("name");
-                    UUID uuid = parseMojangUniqueId((String) object.get("id"));
-                    uuidMap.put(name, new Result(newName, uuid));
-                }
-
-                Thread.sleep(100L);
-            }
-
-            return uuidMap;
         }
     }
 
@@ -171,9 +143,9 @@ final class UUIDHandler {
         }
 
         /**
-         * Gets the name of the player. If a lookup was successfull (the player
-         * is online, or Mojang's API responded) this name will be the
-         * correct-cased, full name of the player.
+         * Gets the name of the player. If a lookup was successfull (the player is
+         * online, or Mojang's API responded) this name will be the correct-cased, full
+         * name of the player.
          *
          * @return The name.
          */
@@ -182,10 +154,9 @@ final class UUIDHandler {
         }
 
         /**
-         * Gets the uuid of the player with the name {@link #getName()}. If the
-         * server is in offline mode, this method returns an empty optional. If
-         * the uuid could not be looked up, this method returns an empty
-         * optional too.
+         * Gets the uuid of the player with the name {@link #getName()}. If the server
+         * is in offline mode, this method returns an empty optional. If the uuid could
+         * not be looked up, this method returns an empty optional too.
          *
          * @return The unique id, if found.
          */
@@ -194,8 +165,8 @@ final class UUIDHandler {
         }
 
         /**
-         * Gets whether a valid uuid has been specified. The zero uuid is not
-         * considered valid, as that indicates no player exists with that name.
+         * Gets whether a valid uuid has been specified. The zero uuid is not considered
+         * valid, as that indicates no player exists with that name.
          *
          * @return Whether a valid uuid has been specified.
          */
@@ -221,9 +192,9 @@ final class UUIDHandler {
          * Creates a new {@link ResultConsumer}.
          *
          * @param resultsOnServerThread
-         *            If set to true, {@link #accept(Map)} will be called on the
-         *            server thread, otherwise {@link #accept(Map)} can be
-         *            called on any thread, including the server thread.
+         *            If set to true, {@link #accept(Map)} will be called on the server
+         *            thread, otherwise {@link #accept(Map)} can be called on any
+         *            thread, including the server thread.
          */
         public ResultConsumer(boolean resultsOnServerThread) {
             this.resultsOnServerThread = resultsOnServerThread;
@@ -231,26 +202,22 @@ final class UUIDHandler {
 
         /**
          * This method is called once for each call to
-         * {@link UUIDHandler#fetchUniqueIds(Collection, ResultConsumer, boolean)}
-         * . If the constructor of {@link ResultConsumer} was called with the
-         * parameter set to true, this method will be called from the server
-         * thread, otherwise it can be called from any thread (including the
-         * server thread).
+         * {@link UUIDHandler#fetchUniqueIds(Collection, ResultConsumer, boolean)} . If
+         * the constructor of {@link ResultConsumer} was called with the parameter set
+         * to true, this method will be called from the server thread, otherwise it can
+         * be called from any thread (including the server thread).
          *
          * @param results
-         *            The results. The keys of the map will be the lowercased,
-         *            but otherwise unaltered, names that were passed to the
-         *            fetch method.
+         *            The results. The keys of the map will be the lowercased, but
+         *            otherwise unaltered, names that were passed to the fetch method.
          */
         public abstract void accept(Map<String, Result> results);
     }
 
-    private static final Date BEFORE_NAME_CHANGES;
-
     /**
      * Normally, the first entry of this array is added before each line with an
-     * invalid name. When the line already starts with such a character, this
-     * prefix isn't added.
+     * invalid name. When the line already starts with such a character, this prefix
+     * isn't added.
      */
     private static final char[] invalidNamePrefixes = { '~', '=', '+', '-', '#', '/', '\\', '{', ':', '.', '<' };
 
@@ -262,18 +229,11 @@ final class UUIDHandler {
     private static final Pattern validUserPattern = Pattern.compile("^[a-zA-Z0-9_]{2,16}$");
     private static final UUID ZERO_UUID = new UUID(0, 0);
 
-    static {
-        Calendar beforeNameChanges = Calendar.getInstance(Locale.ENGLISH);
-        beforeNameChanges.set(2015, Calendar.FEBRUARY, 3);
-        BEFORE_NAME_CHANGES = beforeNameChanges.getTime();
-    }
-
     private static Player getPlayerFromNameOnSign(String name) {
         if (name.length() == MAX_SIGN_LINE_LENGTH) {
             // This assumes Bukkit.getPlayer still does name matching
             return Bukkit.getPlayer(name);
-        }
-        else {
+        } else {
             return Bukkit.getPlayerExact(name);
         }
     }
@@ -297,8 +257,8 @@ final class UUIDHandler {
 
     /**
      * Creates a mutable hash map from the given player names and function that
-     * returns a value for each key. The player names will be put as lowercase
-     * keys in the map.
+     * returns a value for each key. The player names will be put as lowercase keys
+     * in the map.
      *
      * @param <V>
      *            Type of the values.
@@ -318,8 +278,8 @@ final class UUIDHandler {
 
     private static UUID parseMojangUniqueId(String withourDashes) {
         return UUID.fromString(withourDashes.substring(0, 8) + "-" + withourDashes.substring(8, 12)
-                + "-" + withourDashes.substring(12, 16) + "-" + withourDashes.substring(16, 20) + "-"
-                + withourDashes.substring(20, 32));
+        + "-" + withourDashes.substring(12, 16) + "-" + withourDashes.substring(16, 20) + "-"
+        + withourDashes.substring(20, 32));
     }
 
     /**
@@ -329,7 +289,7 @@ final class UUIDHandler {
      *            The object from mojang.com.
      * @return The result.
      */
-    private static final Result toResult(JSONObject mojangObject) {
+    private static Result toResult(JSONObject mojangObject) {
         String id = (String) mojangObject.get("id");
         String name = (String) mojangObject.get("name");
         UUID uuid = parseMojangUniqueId(id);
@@ -359,9 +319,9 @@ final class UUIDHandler {
     }
 
     /**
-     * Called on another thread than the server thread. Calls the consumer
-     * directly, or if the consumer requires that, goes back to the server
-     * thread and then calls the consumer.
+     * Called on another thread than the server thread. Calls the consumer directly,
+     * or if the consumer requires that, goes back to the server thread and then
+     * calls the consumer.
      *
      * @param results
      *            The results of the UUID lookup.
@@ -383,8 +343,8 @@ final class UUIDHandler {
     }
 
     /**
-     * Adds all results with {@link Result#hasValidId() a valid id} to the
-     * cache. Can be called from any thread.
+     * Adds all results with {@link Result#hasValidId() a valid id} to the cache.
+     * Can be called from any thread.
      *
      * @param results
      *            The results to add.
@@ -414,23 +374,20 @@ final class UUIDHandler {
     /**
      * Fetches the unique ids for the given names, and posts the results to the
      * provided {@link ResultConsumer}.
-     * 
+     *
      * @param names
      *            The names.
      * @param consumer
      *            The result consumer.
-     * @param lookupPastNames
-     *            Whether past names from before name changes were allowed
-     *            should be looked up. Unneeded for new signs.
      */
-    void fetchUniqueIds(Collection<String> names, ResultConsumer consumer, boolean lookupPastNames) {
+    void fetchUniqueIds(Collection<String> names, ResultConsumer consumer) {
         Preconditions.checkState(Bukkit.isPrimaryThread(), "Method must be called on primary thread");
 
         // Get safe names list
         List<String> namesList = Lists.newArrayList(names);
 
         if (this.onlineMode) {
-            fetchUniqueIdsOnlineMode(namesList, consumer, lookupPastNames);
+            fetchUniqueIdsOnlineMode(namesList, consumer);
         } else {
             consumer.accept(newPlayerNameMap(namesList, Functions.OFFLINE_MODE_LOOKUP));
         }
@@ -438,14 +395,13 @@ final class UUIDHandler {
     }
 
     /**
-     * Looks up the UUIDs belonging to the given name. Don't call this method on
-     * the server thread!
-     * 
+     * Looks up the UUIDs belonging to the given name. Don't call this method on the
+     * server thread!
+     *
      * @param names
      *            The names.
      * @param results
-     *            The results already found by looking at the online player
-     *            list.
+     *            The results already found by looking at the online player list.
      * @throws Exception
      *             When something goes wrong while contacting Mojang.
      */
@@ -464,29 +420,11 @@ final class UUIDHandler {
         results.putAll(newResults);
     }
 
-    /**
-     * Looks up the UUIDs belonging to the given name from before the name
-     * changes. Much more expensive to call than
-     * {@link #fetchUniqueIdsAtMojang(List, Map)}, as there exists no bulk
-     * lookup service. Don't call this method on the server thread!
-     *
-     * @param names
-     *            The names.
-     * @param results
-     *            The results already found by looking at the online player
-     *            list.
-     * @throws Exception
-     *             When something goes wrong while contacting Mojang.
-     */
-    private void fetchUniqueIdsFromPastNamesAtMojang(List<String> names, Map<String, Result> results) throws Exception {
-        results.putAll(mojangWeb.uuidLookupInPast(names, BEFORE_NAME_CHANGES));
-    }
-
     private void fetchUniqueIdsOnlineMode(final List<String> namesList,
-            final ResultConsumer consumer, final boolean lookupPastNames) {
+            final ResultConsumer consumer) {
         // Fill map with empty results, will be overwritten when we find
         // something
-        final Map<String, Result> results = newPlayerNameMap(namesList, Functions.ONLINE_MODE_PLACEHOLDERS);
+        Map<String, Result> results = newPlayerNameMap(namesList, Functions.ONLINE_MODE_PLACEHOLDERS);
 
         // Get as much results as possible without a web request
         for (ListIterator<String> it = namesList.listIterator(); it.hasNext();) {
@@ -530,22 +468,15 @@ final class UUIDHandler {
 
         // Fetch other names async using UUIDFetcher
         final Plugin plugin = JavaPlugin.getProvidingPlugin(getClass());
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    fetchUniqueIdsAtMojang(namesList, results);
-                    if (lookupPastNames && !namesList.isEmpty()) {
-                        // Still names that are missing uuids
-                        fetchUniqueIdsFromPastNamesAtMojang(namesList, results);
-                    }
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            try {
+                fetchUniqueIdsAtMojang(namesList, results);
 
-                    addToCache(results);
+                addToCache(results);
 
-                    acceptResultsAsync(results, consumer);
-                } catch (Exception e) {
-                    plugin.getLogger().log(Level.WARNING, "Error fetching UUIDs", e);
-                }
+                acceptResultsAsync(results, consumer);
+            } catch (Exception e) {
+                plugin.getLogger().log(Level.WARNING, "Error fetching UUIDs", e);
             }
         });
     }
@@ -553,7 +484,7 @@ final class UUIDHandler {
     /**
      * Gets whether this handler is in online mode. If the handler is in offline
      * mode, no UUIDs will be looked up.
-     * 
+     *
      * @return True for online mode, false of offline mode.
      */
     boolean isOnlineMode() {

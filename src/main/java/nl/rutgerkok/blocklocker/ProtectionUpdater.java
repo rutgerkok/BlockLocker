@@ -11,16 +11,16 @@ import nl.rutgerkok.blocklocker.protection.Protection;
 public interface ProtectionUpdater {
 
     /**
-     * Does generic cleaning for the signs on the protection at some point in
-     * the near future. Fixes the missing UUIDs in the given protection, by
-     * looking them up online.
+     * Does generic cleaning for the signs on the protection at some point in the
+     * near future. Fixes the missing UUIDs in the given protection, by looking them
+     * up online.
      *
      * @param protection
-     *            The protection to fix. If the protection was already queued
-     *            for an update, nothing happens.
+     *            The protection to fix. If the protection was already queued for an
+     *            update, nothing happens.
      * @param newProtection
-     *            True if this protection is new (lookups of past names are not
-     *            necessary then), false otherwise.
+     *            True if this protection is new, false otherwise. Currently has no
+     *            effect.
      */
     void update(Protection protection, boolean newProtection);
 
