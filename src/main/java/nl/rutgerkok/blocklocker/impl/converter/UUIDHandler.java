@@ -88,7 +88,6 @@ final class UUIDHandler {
     private static class MojangWeb {
         private static final String BULK_UUID_LOOKUP_URL = "https://api.mojang.com/profiles/minecraft";
         private static JSONParser jsonParser = new JSONParser();
-        private static final String PAST_PROFILE_URL = "https://api.mojang.com/users/profiles/minecraft";
         private static final double PROFILES_PER_BULK_REQUEST = 100;
 
         private static HttpURLConnection createConnectionForBulkLookup() throws Exception {
@@ -202,10 +201,10 @@ final class UUIDHandler {
 
         /**
          * This method is called once for each call to
-         * {@link UUIDHandler#fetchUniqueIds(Collection, ResultConsumer, boolean)} . If
-         * the constructor of {@link ResultConsumer} was called with the parameter set
-         * to true, this method will be called from the server thread, otherwise it can
-         * be called from any thread (including the server thread).
+         * {@link UUIDHandler#fetchUniqueIds(Collection, ResultConsumer)} . If the
+         * constructor of {@link ResultConsumer} was called with the parameter set to
+         * true, this method will be called from the server thread, otherwise it can be
+         * called from any thread (including the server thread).
          *
          * @param results
          *            The results. The keys of the map will be the lowercased, but
