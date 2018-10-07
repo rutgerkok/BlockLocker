@@ -1,10 +1,16 @@
 package nl.rutgerkok.blocklocker.impl.profile;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.UUID;
+
+import org.json.simple.JSONObject;
+import org.junit.jupiter.api.Test;
+
+import com.google.common.base.Optional;
 
 import nl.rutgerkok.blocklocker.ProfileFactory;
 import nl.rutgerkok.blocklocker.Translator.Translation;
@@ -12,14 +18,6 @@ import nl.rutgerkok.blocklocker.group.CombinedGroupSystem;
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;
 import nl.rutgerkok.blocklocker.profile.Profile;
 
-import org.json.simple.JSONObject;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-
-import com.google.common.base.Optional;
-
-@RunWith(JUnit4.class)
 public class TestPlayerProfile {
 
     private ProfileFactoryImpl getProfileFactory() {
@@ -38,13 +36,12 @@ public class TestPlayerProfile {
         Profile janeWithoutId = factory.fromDisplayText("jane");
         Profile everyone = factory.fromDisplayText(everyoneTag);
 
-        assertTrue("Same id", bob.includes(bobRenamed));
-        assertTrue("Same id", bobRenamed.includes(bob));
-        assertFalse("Known id, not present in other",
-                jane.includes(janeWithoutId));
-        assertTrue("Unknown id, same name", janeWithoutId.includes(jane));
-        assertFalse("Different id and name", bob.includes(jane));
-        assertFalse("Different id and name", bob.includes(janeWithoutId));
+        assertTrue(bob.includes(bobRenamed), "Same id");
+        assertTrue(bobRenamed.includes(bob), "Same id");
+        assertFalse(jane.includes(janeWithoutId), "Known id, not present in other");
+        assertTrue(janeWithoutId.includes(jane), "Unknown id, same name");
+        assertFalse(bob.includes(jane), "Different id and name");
+        assertFalse(bob.includes(janeWithoutId), "Different id and name");
 
         // Everyone includes everyone, but is never included
         assertTrue(everyone.includes(bob));
