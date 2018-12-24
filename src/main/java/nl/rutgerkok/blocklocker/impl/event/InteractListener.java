@@ -31,8 +31,6 @@ import com.google.common.collect.ImmutableSet;
 import nl.rutgerkok.blocklocker.BlockLockerPlugin;
 import nl.rutgerkok.blocklocker.Permissions;
 import nl.rutgerkok.blocklocker.ProtectionSign;
-import nl.rutgerkok.blocklocker.ProtectionType;
-import nl.rutgerkok.blocklocker.SearchMode;
 import nl.rutgerkok.blocklocker.SignType;
 import nl.rutgerkok.blocklocker.Translator.Translation;
 import nl.rutgerkok.blocklocker.location.IllegalLocationException;
@@ -159,7 +157,8 @@ public final class InteractListener extends EventListener {
         }
 
         // Open (double/trap/fence) doors manually
-        if (protection.canBeOpened() && !isSneakPlacing(player)) {
+        boolean clickedMainBlock = plugin.getChestSettings().canProtect(clickedBlock.getType());
+        if (protection.canBeOpened() && !isSneakPlacing(player) && clickedMainBlock) {
             event.setCancelled(true);
 
             if (!usedOffHand) {
@@ -261,8 +260,7 @@ public final class InteractListener extends EventListener {
         // When using the offhand check, access checks must still be performed,
         // but no messages must be sent
         boolean usedOffHand = event.getHand() == EquipmentSlot.OFF_HAND;
-        Optional<Protection> protection = plugin.getProtectionFinder().findProtection(block,
-                SearchMode.NO_SUPPORTING_BLOCKS);
+        Optional<Protection> protection = plugin.getProtectionFinder().findProtection(block);
 
         if (!protection.isPresent()) {
             if (tryPlaceSign(event.getPlayer(), block, event.getBlockFace(), SignType.PRIVATE)) {
@@ -275,7 +273,7 @@ public final class InteractListener extends EventListener {
         // Check if protection needs update
         plugin.getProtectionUpdater().update(protection.get(), false);
 
-        // Check if player is allowed
+        // Check if player is allowed, open door
         if (checkAllowed(player, protection.get(), clickedSign)) {
             handleAllowed(event, protection.get(), clickedSign, usedOffHand);
         } else {
@@ -364,13 +362,14 @@ public final class InteractListener extends EventListener {
         if (player.isSneaking()) {
             return false;
         }
-        if (!plugin.getChestSettings().canProtect(ProtectionType.CONTAINER, block.getType())) {
+        if (!hasSignInHand(player)) {
+            return false;
+        }
+
+        if (!plugin.getProtectionFinder().isProtectable(block)) {
             return false;
         }
         if (!player.hasPermission(Permissions.CAN_PROTECT)) {
-            return false;
-        }
-        if (!hasSignInHand(player)) {
             return false;
         }
         if (!AUTOPLACE_BLOCK_FACES.contains(clickedSide)) {

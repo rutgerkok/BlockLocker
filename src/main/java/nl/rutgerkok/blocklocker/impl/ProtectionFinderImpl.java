@@ -5,14 +5,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
-
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
+
+import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 
 import nl.rutgerkok.blocklocker.ChestSettings;
 import nl.rutgerkok.blocklocker.ProtectionFinder;
@@ -57,6 +57,14 @@ class ProtectionFinderImpl implements ProtectionFinder {
         return findProtectionForBlock(protectionBlock.get(), SearchMode.NO_SUPPORTING_BLOCKS);
     }
 
+    private Optional<Block> findProtectableForNonSignBlock(Block attachedBlock) {
+        if (settings.canProtect(attachedBlock.getType())) {
+            return Optional.of(attachedBlock);
+        }
+
+        return findProtectableForSupportingBlock(attachedBlock);
+    }
+
     /**
      * Gets the protection block the sign protects.
      *
@@ -67,11 +75,7 @@ class ProtectionFinderImpl implements ProtectionFinder {
      */
     private Optional<Block> findProtectableForSign(Block sign) {
         Block attachedBlock = blockFinder.findSupportingBlock(sign);
-        if (settings.canProtect(attachedBlock.getType())) {
-            return Optional.of(attachedBlock);
-        }
-
-        return findProtectableForSupportingBlock(attachedBlock);
+        return findProtectableForNonSignBlock(attachedBlock);
     }
 
     /**
@@ -244,6 +248,11 @@ class ProtectionFinderImpl implements ProtectionFinder {
             default:
                 throw new UnsupportedOperationException("Don't know how to handle protection type " + protectionType.get());
         }
+    }
+
+    @Override
+    public boolean isProtectable(Block block) {
+        return this.findProtectableForNonSignBlock(block).isPresent();
     }
 
     @Override
