@@ -8,11 +8,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import com.google.common.base.Optional;
-
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
+
+import com.google.common.base.Optional;
 
 import nl.rutgerkok.blocklocker.AttackType;
 import nl.rutgerkok.blocklocker.ProtectionType;
@@ -58,7 +57,7 @@ final class Config {
         allowDestroyBy = readAttackTypeSet(config.getStringList(Key.ALLOW_DESTROY_BY));
 
         // Materials
-        protectableMaterialsMap = new EnumMap<ProtectionType, Set<Material>>(ProtectionType.class);
+        protectableMaterialsMap = new EnumMap<>(ProtectionType.class);
         protectableMaterialsMap.put(ProtectionType.CONTAINER, readMaterialSet(config.getStringList(Key.PROTECTABLE_CONTAINERS)));
         protectableMaterialsMap.put(ProtectionType.DOOR, readMaterialSet(config.getStringList(Key.PROTECTABLE_DOORS)));
         if (config.contains(Key.PROTECTABLE_TRAP_DOORS)) {
@@ -194,10 +193,8 @@ final class Config {
     private Set<Material> readMaterialSet(Collection<String> strings) {
         Set<Material> materials = EnumSet.noneOf(Material.class);
         for (String string : strings) {
-            Material material = null;
-            try {
-                material = Bukkit.createBlockData(string).getMaterial();
-            } catch (IllegalArgumentException e) {
+            Material material = Material.matchMaterial(string);
+            if (material == null) {
                 material = Material.matchMaterial(string, true);
             }
             if (material == null) {

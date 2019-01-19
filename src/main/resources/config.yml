@@ -31,8 +31,10 @@ protectableContainers:
 - brewing_stand
 - brown_shulker_box
 - chest
+- chipped_anvil
 - cyan_shulker_box
 - crafting_table
+- damaged_anvil
 - dispenser
 - dropper
 - enchanting_table
