@@ -4,11 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSet;
-
 import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
@@ -17,6 +14,10 @@ import org.bukkit.block.data.type.Chest;
 import org.bukkit.block.data.type.Chest.Type;
 import org.bukkit.block.data.type.Gate;
 import org.bukkit.block.data.type.WallSign;
+
+import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
 
 import nl.rutgerkok.blocklocker.ProtectionSign;
 import nl.rutgerkok.blocklocker.SignParser;
@@ -69,7 +70,7 @@ public abstract class BlockFinder {
         for (BlockFace face : SIGN_ATTACHMENT_FACES) {
             Block atPosition = block.getRelative(face);
             Material material = atPosition.getType();
-            if (material != Material.WALL_SIGN && material != Material.SIGN) {
+            if (!Tag.WALL_SIGNS.isTagged(material) && !Tag.STANDING_SIGNS.isTagged(material)) {
                 continue;
             }
             if (!isAttachedSign(atPosition, block)) {

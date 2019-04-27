@@ -3,9 +3,8 @@ package nl.rutgerkok.blocklocker.impl.event;
 import java.util.Iterator;
 import java.util.List;
 
-import com.google.common.base.Optional;
-
 import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Creeper;
@@ -26,6 +25,8 @@ import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 
+import com.google.common.base.Optional;
+
 import nl.rutgerkok.blocklocker.AttackType;
 import nl.rutgerkok.blocklocker.BlockLockerPlugin;
 import nl.rutgerkok.blocklocker.Permissions;
@@ -41,7 +42,8 @@ public class BlockDestroyListener extends EventListener {
     }
 
     private Optional<ProtectionSign> asMainSign(Block block) {
-        if (block.getType() != Material.WALL_SIGN && block.getType() != Material.SIGN) {
+        Material material = block.getType();
+        if (!Tag.WALL_SIGNS.isTagged(material) && !Tag.STANDING_SIGNS.isTagged(material)) {
             return Optional.absent();
         }
 

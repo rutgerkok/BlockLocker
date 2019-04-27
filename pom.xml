@@ -31,7 +31,7 @@
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
-			<version>1.13.1-R0.1-SNAPSHOT</version>
+			<version>1.14-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 			<exclusions>
 				<exclusion> <!-- Don't pull in an outdated version of JUnit -->
@@ -39,6 +39,14 @@
 					<artifactId>junit</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		
+		<!-- Extra dependency, should be replaced by GSON at some point -->
+		<!-- For now, this library is still included in CraftBukkit. -->
+		<dependency>
+		    <groupId>com.googlecode.json-simple</groupId>
+		    <artifactId>json-simple</artifactId>
+		    <version>1.1.1</version>
 		</dependency>
 
 		<!-- Third party plugins -->

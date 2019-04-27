@@ -5,6 +5,7 @@ import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -110,27 +111,40 @@ public final class InteractListener extends EventListener {
         return null;
     }
 
-    private org.bukkit.block.data.type.Sign getRotatedSignPost(Player player) {
+    private org.bukkit.block.data.type.Sign getRotatedSignPost(Player player, Material signMaterial) {
         float rotation = player.getLocation().getYaw();
         if (rotation < 0) {
             rotation += 360.0f;
         }
-        org.bukkit.block.data.type.Sign materialData = (org.bukkit.block.data.type.Sign) Material.SIGN
+        org.bukkit.block.data.type.Sign materialData = (org.bukkit.block.data.type.Sign) signMaterial
                 .createBlockData();
         materialData.setRotation(rotationToBlockFace(rotation));
         return materialData;
     }
 
-    private Waterlogged getSignMaterial(BlockFace blockFace, Player player) {
+    private Waterlogged getSignBlockData(BlockFace blockFace, Player player, Material signMaterial) {
         if (blockFace == BlockFace.UP) {
             // Place standing sign in direction of player
-            return getRotatedSignPost(player);
+            return getRotatedSignPost(player, signMaterial);
         } else {
             // Place attached sign
-            WallSign signMaterial = (WallSign) Material.WALL_SIGN.createBlockData();
-            signMaterial.setFacing(blockFace);
-            return signMaterial;
+            WallSign wallSignData = (WallSign) toWallSign(signMaterial).createBlockData();
+            wallSignData.setFacing(blockFace);
+            return wallSignData;
         }
+    }
+
+    private Optional<Material> getSignInHand(Player player) {
+        PlayerInventory inventory = player.getInventory();
+        ItemStack mainHand = inventory.getItemInMainHand();
+        if (isOfType(mainHand, Tag.SIGNS)) {
+            return Optional.of(mainHand.getType());
+        }
+        ItemStack offHand = inventory.getItemInOffHand();
+        if (isOfType(offHand, Tag.SIGNS)) {
+            return Optional.of(offHand.getType());
+        }
+        return Optional.absent();
     }
 
     private void handleAllowed(PlayerInteractEvent event, Protection protection, boolean clickedSign,
@@ -193,21 +207,15 @@ public final class InteractListener extends EventListener {
         }
     }
 
-    private boolean hasSignInHand(Player player) {
-        PlayerInventory inventory = player.getInventory();
-        return isOfType(inventory.getItemInMainHand(), Material.SIGN)
-                || isOfType(inventory.getItemInOffHand(), Material.SIGN);
-    }
-
     private boolean isNullOrAir(ItemStack stack) {
         return stack == null || stack.getType() == Material.AIR || stack.getAmount() == 0;
     }
 
-    private boolean isOfType(ItemStack stackOrNull, Material material) {
+    private boolean isOfType(ItemStack stackOrNull, Tag<Material> tag) {
         if (stackOrNull == null) {
             return false;
         }
-        return stackOrNull.getType() == material;
+        return tag.isTagged(stackOrNull.getType());
     }
 
     private boolean isSneakPlacing(Player player) {
@@ -256,7 +264,8 @@ public final class InteractListener extends EventListener {
 
         Player player = event.getPlayer();
         Block block = event.getClickedBlock();
-        boolean clickedSign = block.getType() == Material.SIGN || block.getType() == Material.WALL_SIGN;
+        Material material = block.getType();
+        boolean clickedSign = Tag.STANDING_SIGNS.isTagged(material) || Tag.WALL_SIGNS.isTagged(material);
         // When using the offhand check, access checks must still be performed,
         // but no messages must be sent
         boolean usedOffHand = event.getHand() == EquipmentSlot.OFF_HAND;
@@ -295,10 +304,12 @@ public final class InteractListener extends EventListener {
             return;
         }
 
+        // Keep order (main, then off hand) the same as in getSignInHand - otherwise you
+        // might remove the wrong sign
         PlayerInventory inventory = player.getInventory();
-        if (isOfType(inventory.getItemInMainHand(), Material.SIGN)) {
+        if (isOfType(inventory.getItemInMainHand(), Tag.SIGNS)) {
             inventory.setItemInMainHand(removeOneItem(inventory.getItemInMainHand()));
-        } else if (isOfType(inventory.getItemInOffHand(), Material.SIGN)) {
+        } else if (isOfType(inventory.getItemInOffHand(), Tag.SIGNS)) {
             inventory.setItemInOffHand(removeOneItem(inventory.getItemInOffHand()));
         }
     }
@@ -358,13 +369,19 @@ public final class InteractListener extends EventListener {
         plugin.runLater(() -> protection.setOpen(false, SoundCondition.ALWAYS), openSeconds * 20);
     }
 
+    private Material toWallSign(Material signMaterial) {
+        return Material.valueOf(signMaterial.name().replace("_SIGN", "_WALL_SIGN"));
+    }
+
     private boolean tryPlaceSign(Player player, Block block, BlockFace clickedSide, SignType signType) {
         if (player.isSneaking()) {
             return false;
         }
-        if (!hasSignInHand(player)) {
+        Optional<Material> optionalSignMaterial = getSignInHand(player);
+        if (!optionalSignMaterial.isPresent()) {
             return false;
         }
+        Material signMaterial = optionalSignMaterial.get();
 
         if (!plugin.getProtectionFinder().isProtectable(block)) {
             return false;
@@ -393,7 +410,7 @@ public final class InteractListener extends EventListener {
 
         // Create sign and fire event for the sign to be placed
         BlockState oldState = signBlock.getState();
-        Waterlogged newBlockData = getSignMaterial(clickedSide, player);
+        Waterlogged newBlockData = getSignBlockData(clickedSide, player, signMaterial);
         newBlockData.setWaterlogged(waterlogged);
         signBlock.setBlockData(newBlockData);
         if (!allowedByBlockPlaceEvent(signBlock, oldState, block, player)) {

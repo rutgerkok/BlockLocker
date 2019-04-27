@@ -3,7 +3,7 @@ version: ${project.version}
 main: nl.rutgerkok.blocklocker.impl.BlockLockerPluginImpl
 author: Rutger Kok
 load: startup
-api-version: 1.13
+api-version: 1.14
 permissions:
   blocklocker.protect:
     description: "Protect containers and doors."

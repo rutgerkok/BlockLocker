@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -124,7 +125,7 @@ class ProtectionFinderImpl implements ProtectionFinder {
 
         // Check for sign
         if (searchMode.searchForSigns() &&
-                (blockMaterial == Material.WALL_SIGN || blockMaterial == Material.SIGN)) {
+                (Tag.WALL_SIGNS.isTagged(blockMaterial) || Tag.STANDING_SIGNS.isTagged(blockMaterial))) {
             return findProtectionForExistingSign(block);
         }
 
