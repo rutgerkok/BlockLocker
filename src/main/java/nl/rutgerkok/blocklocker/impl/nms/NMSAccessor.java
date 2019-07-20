@@ -108,7 +108,7 @@ public final class NMSAccessor implements ServerSpecific {
     final Method ChatHoverable_getChatComponent;
     final Constructor<?> ChatHoverable_new;
     final Class<?> ChatModifier;
-    final Method ChatModifier_getChatHoverable;
+    final Method ChatModifier_getGetHoverEvent;
     final Constructor<?> ChatModifier_new;
     final Class<?> CraftChatMessage;
     final Method CraftChatMessage_fromComponent;
@@ -146,7 +146,7 @@ public final class NMSAccessor implements ServerSpecific {
         WorldServer_getTileEntity = getMethod(WorldServer, "getTileEntity", BlockPosition);
         IChatBaseComponent_getChatModifier = getMethod(IChatBaseComponent, "getChatModifier");
         ChatModifier_setChatHoverable = getMethod(ChatModifier, "setChatHoverable", ChatHoverable);
-        ChatModifier_getChatHoverable = getMethod(ChatModifier, "i");
+        ChatModifier_getGetHoverEvent = getMethod(ChatModifier, "getHoverEvent");
         ChatHoverable_getChatComponent = getMethod(ChatHoverable, "b");
 
         ChatComponentText_new = getConstructor(ChatComponentText, String.class);
@@ -242,7 +242,7 @@ public final class NMSAccessor implements ServerSpecific {
             return Optional.absent();
         }
 
-        Object chatHoverable = call(chatModifier, ChatModifier_getChatHoverable);
+        Object chatHoverable = call(chatModifier, ChatModifier_getGetHoverEvent);
         if (chatHoverable == null) {
             return Optional.absent();
         }
