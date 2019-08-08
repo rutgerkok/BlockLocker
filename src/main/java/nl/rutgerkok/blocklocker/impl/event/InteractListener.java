@@ -374,7 +374,7 @@ public final class InteractListener extends EventListener {
     }
 
     private boolean tryPlaceSign(Player player, Block block, BlockFace clickedSide, SignType signType) {
-        if (player.isSneaking()) {
+        if (player.isSneaking() || player.getGameMode() == GameMode.SPECTATOR) {
             return false;
         }
         Optional<Material> optionalSignMaterial = getSignInHand(player);
