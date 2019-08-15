@@ -11,7 +11,7 @@ class EveryoneProfileImpl implements Profile {
 
     static final String EVERYONE_KEY = "e";
 
-    private final String tag;
+    private String tag;
 
     /**
      * Creates a new [Everyone]-profile.
@@ -22,6 +22,12 @@ class EveryoneProfileImpl implements Profile {
     EveryoneProfileImpl(String translation) {
         this.tag = translation;
     }
+    
+	@Override
+	public Profile changeTag(String tag) {
+		this.tag = tag;
+		return this;
+	}
 
     /**
      * All instances of this object are equal.

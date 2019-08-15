@@ -12,7 +12,7 @@ class TimerProfileImpl implements TimerProfile {
     static final String TIME_KEY = "t";
 
     private final int seconds;
-    private final String timerTag;
+    private String timerTag;
 
     TimerProfileImpl(String timerTag, int secondsOpen) {
         this.timerTag = timerTag;
@@ -55,5 +55,11 @@ class TimerProfileImpl implements TimerProfile {
         // These never expire
         return false;
     }
+
+	@Override
+	public Profile changeTag(String tag) {
+		this.timerTag = tag;
+		return this;
+	}
 
 }

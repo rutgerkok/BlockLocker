@@ -12,7 +12,7 @@ class RedstoneProfileImpl implements Profile {
 
     static final String REDSTONE_KEY = "r";
 
-    private final String tag;
+    private String tag;
 
     /**
      * Creates a new [Redstone]-profile.
@@ -75,5 +75,11 @@ class RedstoneProfileImpl implements Profile {
     public String toString() {
         return getClass().getSimpleName();
     }
+
+	@Override
+	public Profile changeTag(String tag) {
+		this.tag = tag;
+		return this;
+	}
 
 }

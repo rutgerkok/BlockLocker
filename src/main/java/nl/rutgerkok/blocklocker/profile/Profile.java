@@ -45,4 +45,13 @@ public interface Profile {
      * @return True if the profile is expired, false otherwise.
      */
     boolean isExpired(Date cutoffDate);
+    
+    /**
+     * Returns itself, but changes the tag
+     * 
+     * @param tag
+     * 			The new tag for this profile
+     * @return Itself
+     */
+    Profile changeTag(String tag);
 }

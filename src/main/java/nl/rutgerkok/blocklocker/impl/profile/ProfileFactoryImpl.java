@@ -1,5 +1,7 @@
 package nl.rutgerkok.blocklocker.impl.profile;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.ChatColor;
@@ -19,20 +21,25 @@ import nl.rutgerkok.blocklocker.profile.Profile;
 
 public final class ProfileFactoryImpl implements ProfileFactory {
     private final Profile everyoneProfile;
-    private final String everyoneTagString;
+    private final List<String> everyoneTagList;
     private final GroupSystem groupSystem;
     private final Profile redstoneProfile;
-    private final String redstoneTagString;
-    private final String timerTagStart;
+    private final List<String> redstoneTagList;
+    private final List<String> timerTagStart;
     private final Translator translator;
 
     public ProfileFactoryImpl(GroupSystem groupSystem, Translator translator) {
         this.groupSystem = Preconditions.checkNotNull(groupSystem);
         this.translator = Preconditions.checkNotNull(translator);
 
-        this.everyoneTagString = "[" + translator.getWithoutColor(Translation.TAG_EVERYONE) + "]";
-        this.redstoneTagString = "[" + translator.getWithoutColor(Translation.TAG_REDSTONE) + "]";
-        this.timerTagStart = "[" + translator.getWithoutColor(Translation.TAG_TIMER) + ":";
+        this.everyoneTagList = new ArrayList<String>();
+        this.redstoneTagList = new ArrayList<String>();
+        this.timerTagStart = new ArrayList<String>();
+        
+        translator.getAllWithoutColor(Translation.TAG_EVERYONE).forEach(value->this.everyoneTagList.add("[" + value + "]"));
+        translator.getAllWithoutColor(Translation.TAG_REDSTONE).forEach(value->this.redstoneTagList.add("[" + value + "]"));
+        translator.getAllWithoutColor(Translation.TAG_TIMER).forEach(value->this.timerTagStart.add("[" + value + ":"));
+
         this.everyoneProfile = new EveryoneProfileImpl(translator.get(Translation.TAG_EVERYONE));
         this.redstoneProfile = new RedstoneProfileImpl(translator.get(Translation.TAG_REDSTONE));
     }
@@ -46,40 +53,40 @@ public final class ProfileFactoryImpl implements ProfileFactory {
      * @return The profile.
      */
     public Profile fromDisplayText(String text) {
-        text = ChatColor.stripColor(text.trim());
+        final String stripped = ChatColor.stripColor(text.trim());
 
-        if (text.length() > 2) {
+        if (stripped.length() > 2) {
             // [Everyone]
-            if (text.equalsIgnoreCase(everyoneTagString)) {
-                return this.everyoneProfile;
+            if (everyoneTagList.stream().anyMatch(s -> s.equalsIgnoreCase(stripped))) {
+                return this.everyoneProfile.changeTag(stripped.substring(1, stripped.length() - 1));
             }
 
             // [Redstone]
-            if (text.equalsIgnoreCase(redstoneTagString)) {
-                return this.redstoneProfile;
+            if (redstoneTagList.stream().anyMatch(s -> s.equalsIgnoreCase(stripped))) {
+                return this.redstoneProfile.changeTag(stripped.substring(1, stripped.length() - 1));
             }
 
             // [Timer:X]
-            if (StringUtil.startsWithIgnoreCase(text, timerTagStart) && text.endsWith("]")) {
-                return readTimerProfile(text);
+            if (timerTagStart.stream().anyMatch(s -> StringUtil.startsWithIgnoreCase(stripped, s) && stripped.endsWith("]"))) {
+                return readTimerProfile(stripped);
             }
 
             // [GroupName]
-            if (text.startsWith("[") && text.endsWith("]")) {
-                return new GroupProfileImpl(groupSystem, text.substring(1, text.length() - 1));
+            if (stripped.startsWith("[") && stripped.endsWith("]")) {
+                return new GroupProfileImpl(groupSystem, stripped.substring(1, stripped.length() - 1));
             }
 
             // +GroupName+
-            if (text.startsWith("+") && text.endsWith("+")) {
-                return new GroupLeaderProfileImpl(groupSystem, text.substring(1, text.length() - 1));
+            if (stripped.startsWith("+") && stripped.endsWith("+")) {
+                return new GroupLeaderProfileImpl(groupSystem, stripped.substring(1, stripped.length() - 1));
             }
 
             // DisplayName#UUID (format of LockettePro)
-            int hashCharIndex = text.indexOf('#');
+            int hashCharIndex = stripped.indexOf('#');
             if (hashCharIndex > 0) {
-                String name = text.substring(0, hashCharIndex);
+                String name = stripped.substring(0, hashCharIndex);
                 try {
-                    UUID uuid = UUID.fromString(text.substring(hashCharIndex + 1));
+                    UUID uuid = UUID.fromString(stripped.substring(hashCharIndex + 1));
                     return new PlayerProfileImpl(name, Optional.of(uuid));
                 } catch (IllegalArgumentException e) {
                     // Ignore, not in name#uuid format. Someone probably added
@@ -88,7 +95,7 @@ public final class ProfileFactoryImpl implements ProfileFactory {
             }
         }
 
-        return new PlayerProfileImpl(text, Optional.<UUID>absent());
+        return new PlayerProfileImpl(stripped, Optional.<UUID>absent());
     }
 
     @Override
@@ -198,13 +205,16 @@ public final class ProfileFactoryImpl implements ProfileFactory {
     }
 
     private Profile readTimerProfile(String text) {
-        char digit = text.charAt(timerTagStart.length());
+    	// First decide which one to use
+    	String tagStart = timerTagStart.stream().filter(tag -> StringUtil.startsWithIgnoreCase(text, tag) && text.endsWith("]")).findFirst().orElse(null);
+    	
+        char digit = text.charAt(tagStart.length());
         if (digit == ' ') {
             // In format [Timer: X]
-            digit = text.charAt(timerTagStart.length() + 1);
+            digit = text.charAt(tagStart.length() + 1);
         }
         int seconds = readDigit(digit);
-        return new TimerProfileImpl(translator.getWithoutColor(Translation.TAG_TIMER), seconds);
+        return new TimerProfileImpl(tagStart.substring(1, tagStart.length() - 1), seconds);
     }
 
 }

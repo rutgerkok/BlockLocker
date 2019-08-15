@@ -2,16 +2,18 @@ package nl.rutgerkok.blocklocker.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import nl.rutgerkok.blocklocker.Translator;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+
+import nl.rutgerkok.blocklocker.Translator;
 
 /**
  * Provides translations from a configuration file.
@@ -39,6 +41,26 @@ class ConfigTranslator extends Translator {
             this.uncolored = ChatColor.stripColor(colored);
         }
     }
+    
+    /**
+     * Little class that contains multiple translated values.
+     * This class extends a translationValue which is the primary value,
+     * it contains a list with all the other possible values.
+     *
+     */
+    private static class MultiTranslationValue extends TranslationValue {
+    	private final List<TranslationValue> aliases;
+    	
+    	private MultiTranslationValue(List<String> values) {
+    		super(values.get(0));
+    		this.aliases = new ArrayList<TranslationValue>();
+    		
+    		for (String alias : values.subList(1, values.size())) {
+    			this.aliases.add(new TranslationValue(alias));
+    		}
+    		
+    	}
+    }
 
     ConfigTranslator(ConfigurationSection config) {
         translations = new EnumMap<Translation, TranslationValue>(Translation.class);
@@ -50,7 +72,25 @@ class ConfigTranslator extends Translator {
                 needsSave = true;
             }
 
+            //Check if there is a list as value
+            List<String> values = config.getStringList(key);
+            
+            if (values.size() > 0) {
+            	// Check the list for null values
+            	for (int i = 0; i < values.size(); i++) {
+            		if (values.get(i) == null) {
+            			// No default value was specified, strange
+                        values.set(i, "~~TODO translate " + key + "~~");
+            		}
+            	}
+            	
+            	translations.put(translation, new MultiTranslationValue(values));
+            	continue;
+            }
+            
+            // When there is no list, add a single value
             String value = config.getString(key);
+            
             if (value == null) {
                 // No default value was specified, strange
                 value = "~~TODO translate " + key + "~~";
@@ -90,7 +130,39 @@ class ConfigTranslator extends Translator {
     public String getWithoutColor(Translation key) {
         return translations.get(key).uncolored;
     }
+    
+	@Override
+	public List<String> getAll(Translation key) {
+		List<String> all = new ArrayList<String>();
+		all.add(translations.get(key).colored);
+		
+		if (!(translations.get(key) instanceof MultiTranslationValue)) {
+			return all;
+		}
+		
+		MultiTranslationValue values = (MultiTranslationValue) translations.get(key);
+		
+		values.aliases.forEach(value->all.add(value.colored));
+		
+		return all;
+	}
 
+	@Override
+	public List<String> getAllWithoutColor(Translation key) {
+		List<String> all = new ArrayList<String>();
+		all.add(translations.get(key).colored);
+		
+		if (!(translations.get(key) instanceof MultiTranslationValue)) {
+			return all;
+		}
+		
+		MultiTranslationValue values = (MultiTranslationValue) translations.get(key);
+		
+		values.aliases.forEach(value->all.add(value.colored));
+		
+		return all;
+	}
+	
     boolean needsSave() {
         return needsSave;
     }
