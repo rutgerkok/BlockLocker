@@ -77,9 +77,7 @@ class ChestSettingsImpl implements ChestSettings {
     @Override
     public String getFancyLocalizedHeader(SignType signType, String header) {
     	List<String> headers = translator.getAll(getTranslationKey(signType));
-    	
-    	System.out.println("Header: " + header);
-    	
+
     	for (String head : headers) {
     		if (head.equalsIgnoreCase(header)) {
     			return header;
