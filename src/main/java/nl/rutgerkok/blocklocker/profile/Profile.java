@@ -46,12 +46,4 @@ public interface Profile {
      */
     boolean isExpired(Date cutoffDate);
     
-    /**
-     * Returns itself, but changes the tag
-     * 
-     * @param tag
-     * 			The new tag for this profile
-     * @return Itself
-     */
-    Profile changeTag(String tag);
 }

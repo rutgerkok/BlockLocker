@@ -25,6 +25,12 @@ class TimerProfileImpl implements TimerProfile {
 
         this.seconds = secondsOpen;
     }
+    
+    @Override
+    public Profile fromTag(String tag) {
+    	this.timerTag = tag;
+    	return this;
+    }
 
     @Override
     public String getDisplayName() {
@@ -55,11 +61,5 @@ class TimerProfileImpl implements TimerProfile {
         // These never expire
         return false;
     }
-
-	@Override
-	public Profile changeTag(String tag) {
-		this.timerTag = tag;
-		return this;
-	}
 
 }

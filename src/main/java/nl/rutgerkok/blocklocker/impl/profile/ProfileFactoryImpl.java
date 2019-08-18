@@ -18,12 +18,13 @@ import nl.rutgerkok.blocklocker.Translator.Translation;
 import nl.rutgerkok.blocklocker.group.GroupSystem;
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;
 import nl.rutgerkok.blocklocker.profile.Profile;
+import nl.rutgerkok.blocklocker.profile.TagProfile;
 
 public final class ProfileFactoryImpl implements ProfileFactory {
-    private final Profile everyoneProfile;
+    private final TagProfile everyoneProfile;
     private final List<String> everyoneTagList;
     private final GroupSystem groupSystem;
-    private final Profile redstoneProfile;
+    private final TagProfile redstoneProfile;
     private final List<String> redstoneTagList;
     private final List<String> timerTagStart;
     private final Translator translator;
@@ -58,12 +59,12 @@ public final class ProfileFactoryImpl implements ProfileFactory {
         if (stripped.length() > 2) {
             // [Everyone]
             if (everyoneTagList.stream().anyMatch(s -> s.equalsIgnoreCase(stripped))) {
-                return this.everyoneProfile.changeTag(stripped.substring(1, stripped.length() - 1));
+                return this.everyoneProfile.fromTag(stripped.substring(1, stripped.length() - 1));
             }
 
             // [Redstone]
             if (redstoneTagList.stream().anyMatch(s -> s.equalsIgnoreCase(stripped))) {
-                return this.redstoneProfile.changeTag(stripped.substring(1, stripped.length() - 1));
+                return this.redstoneProfile.fromTag(stripped.substring(1, stripped.length() - 1));
             }
 
             // [Timer:X]

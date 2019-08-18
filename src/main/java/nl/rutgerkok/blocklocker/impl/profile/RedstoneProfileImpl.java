@@ -2,13 +2,14 @@ package nl.rutgerkok.blocklocker.impl.profile;
 
 import java.util.Date;
 
-import nl.rutgerkok.blocklocker.profile.Profile;
-
 import org.json.simple.JSONObject;
 
 import com.google.common.base.Preconditions;
 
-class RedstoneProfileImpl implements Profile {
+import nl.rutgerkok.blocklocker.profile.Profile;
+import nl.rutgerkok.blocklocker.profile.TagProfile;
+
+class RedstoneProfileImpl implements TagProfile {
 
     static final String REDSTONE_KEY = "r";
 
@@ -22,6 +23,12 @@ class RedstoneProfileImpl implements Profile {
      */
     RedstoneProfileImpl(String translation) {
         this.tag = translation;
+    }
+    
+    @Override
+    public Profile fromTag(String tag) {
+    	this.tag = tag;
+    	return this;
     }
 
     /**
@@ -75,11 +82,5 @@ class RedstoneProfileImpl implements Profile {
     public String toString() {
         return getClass().getSimpleName();
     }
-
-	@Override
-	public Profile changeTag(String tag) {
-		this.tag = tag;
-		return this;
-	}
 
 }

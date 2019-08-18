@@ -122,10 +122,4 @@ class PlayerProfileImpl implements PlayerProfile {
         return getClass().getSimpleName() + "[uuid=" + uuid.orNull() + ",name=" + displayName + "]";
     }
 
-	@Override
-	public Profile changeTag(String tag) {
-		this.displayName = tag;
-		return this;
-	}
-
 }

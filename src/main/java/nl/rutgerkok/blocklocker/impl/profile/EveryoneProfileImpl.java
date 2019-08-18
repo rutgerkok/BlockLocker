@@ -3,11 +3,12 @@ package nl.rutgerkok.blocklocker.impl.profile;
 import java.util.Date;
 
 import nl.rutgerkok.blocklocker.profile.Profile;
+import nl.rutgerkok.blocklocker.profile.TagProfile;
 
 import org.apache.commons.lang.Validate;
 import org.json.simple.JSONObject;
 
-class EveryoneProfileImpl implements Profile {
+class EveryoneProfileImpl implements TagProfile {
 
     static final String EVERYONE_KEY = "e";
 
@@ -23,8 +24,8 @@ class EveryoneProfileImpl implements Profile {
         this.tag = translation;
     }
     
-	@Override
-	public Profile changeTag(String tag) {
+    @Override
+	public Profile fromTag(String tag) {
 		this.tag = tag;
 		return this;
 	}

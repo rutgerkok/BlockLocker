@@ -5,7 +5,7 @@ package nl.rutgerkok.blocklocker.profile;
  * open.
  *
  */
-public interface TimerProfile extends Profile {
+public interface TimerProfile extends TagProfile {
 
     /**
      * Gets the amount of ticks the door can be open before it is closed again.

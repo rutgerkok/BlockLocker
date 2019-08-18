@@ -98,10 +98,4 @@ class GroupLeaderProfileImpl implements Profile {
         return getClass().getSimpleName() + "[name=" + groupName + "]";
     }
 
-	@Override
-	public Profile changeTag(String tag) {
-		this.groupName = tag;
-		return this;
-	}
-
 }
