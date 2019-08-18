@@ -52,7 +52,7 @@ public final class mcMMOGroupSystem extends GroupSystem {
 		String partyName = PartyAPI.getPartyName(player);
 
 		// Ignore case, mcMMO is not case sensitive
-		return (partyName.equalsIgnoreCase(groupName)) ? true : false;
+	    return partyName.equalsIgnoreCase(groupName);
 	}
 	
 	@Override

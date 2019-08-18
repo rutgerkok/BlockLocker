@@ -2,17 +2,16 @@ package nl.rutgerkok.blocklocker.impl.profile;
 
 import java.util.Date;
 
-import nl.rutgerkok.blocklocker.profile.Profile;
-import nl.rutgerkok.blocklocker.profile.TagProfile;
-
 import org.apache.commons.lang.Validate;
 import org.json.simple.JSONObject;
 
-class EveryoneProfileImpl implements TagProfile {
+import nl.rutgerkok.blocklocker.profile.Profile;
+
+class EveryoneProfileImpl implements Profile {
 
     static final String EVERYONE_KEY = "e";
 
-    private String tag;
+    private final String tag;
 
     /**
      * Creates a new [Everyone]-profile.
@@ -23,12 +22,6 @@ class EveryoneProfileImpl implements TagProfile {
     EveryoneProfileImpl(String translation) {
         this.tag = translation;
     }
-    
-    @Override
-	public Profile fromTag(String tag) {
-		this.tag = tag;
-		return this;
-	}
 
     /**
      * All instances of this object are equal.

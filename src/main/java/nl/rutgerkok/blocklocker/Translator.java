@@ -83,7 +83,7 @@ public abstract class Translator {
     public abstract List<String> getAll(Translation key);
 
     /**
-     * Same as {@link #get(Translation)}, but with
+     * Same as {@link #getAll(Translation)}, but with
      * {@link ChatColor#stripColor(String)} applied.
      * 
      * @param key

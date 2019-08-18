@@ -7,13 +7,12 @@ import org.json.simple.JSONObject;
 import com.google.common.base.Preconditions;
 
 import nl.rutgerkok.blocklocker.profile.Profile;
-import nl.rutgerkok.blocklocker.profile.TagProfile;
 
-class RedstoneProfileImpl implements TagProfile {
+class RedstoneProfileImpl implements Profile {
 
     static final String REDSTONE_KEY = "r";
 
-    private String tag;
+    private final String tag;
 
     /**
      * Creates a new [Redstone]-profile.
@@ -23,12 +22,6 @@ class RedstoneProfileImpl implements TagProfile {
      */
     RedstoneProfileImpl(String translation) {
         this.tag = translation;
-    }
-    
-    @Override
-    public Profile fromTag(String tag) {
-    	this.tag = tag;
-    	return this;
     }
 
     /**
