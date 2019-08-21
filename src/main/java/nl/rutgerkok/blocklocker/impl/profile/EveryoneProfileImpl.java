@@ -2,10 +2,10 @@ package nl.rutgerkok.blocklocker.impl.profile;
 
 import java.util.Date;
 
-import nl.rutgerkok.blocklocker.profile.Profile;
-
 import org.apache.commons.lang.Validate;
 import org.json.simple.JSONObject;
+
+import nl.rutgerkok.blocklocker.profile.Profile;
 
 class EveryoneProfileImpl implements Profile {
 

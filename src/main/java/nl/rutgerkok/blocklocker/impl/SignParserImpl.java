@@ -53,9 +53,9 @@ class SignParserImpl implements SignParser {
     }
 
     private SignType getSignTypeOrNull(String header) {
-        header = ChatColor.stripColor(header).trim();
+        final String trimmed = ChatColor.stripColor(header).trim();
         for (SignType type : SignType.values()) {
-            if (header.equalsIgnoreCase(chestSettings.getSimpleLocalizedHeader(type))) {
+            if (chestSettings.getSimpleLocalizedHeaders(type).stream().anyMatch(localizedHeader -> trimmed.equalsIgnoreCase(localizedHeader))) {
                 return type;
             }
         }
@@ -151,7 +151,8 @@ class SignParserImpl implements SignParser {
 
         // Update sign, both visual and using raw JSON
         Sign signState = (Sign) blockState;
-        signState.setLine(0, chestSettings.getFancyLocalizedHeader(sign.getType()));
+        
+        signState.setLine(0, chestSettings.getFancyLocalizedHeader(sign.getType(), signState.getLine(0)));
 
         JSONArray jsonArray = new JSONArray();
         int i = 1; // Start at 1 to avoid overwriting the header

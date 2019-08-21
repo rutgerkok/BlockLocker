@@ -2,6 +2,9 @@ package nl.rutgerkok.blocklocker.impl.profile;
 
 import nl.rutgerkok.blocklocker.Translator;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.bukkit.command.CommandSender;
 
 /**
@@ -24,5 +27,15 @@ public class NullTranslator extends Translator {
     public void sendMessage(CommandSender player, Translation translation) {
         player.sendMessage(get(translation));
     }
+
+	@Override
+	public List<String> getAll(Translation key) {
+		return Arrays.asList(key.toString());
+	}
+
+	@Override
+	public List<String> getAllWithoutColor(Translation key) {
+		return Arrays.asList(key.toString());
+	}
 
 }

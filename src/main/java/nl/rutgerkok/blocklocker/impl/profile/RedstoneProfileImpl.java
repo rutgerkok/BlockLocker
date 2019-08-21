@@ -2,11 +2,11 @@ package nl.rutgerkok.blocklocker.impl.profile;
 
 import java.util.Date;
 
-import nl.rutgerkok.blocklocker.profile.Profile;
-
 import org.json.simple.JSONObject;
 
 import com.google.common.base.Preconditions;
+
+import nl.rutgerkok.blocklocker.profile.Profile;
 
 class RedstoneProfileImpl implements Profile {
 

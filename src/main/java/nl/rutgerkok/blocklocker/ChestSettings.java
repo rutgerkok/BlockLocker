@@ -1,6 +1,7 @@
 package nl.rutgerkok.blocklocker;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import org.bukkit.Material;
@@ -81,9 +82,11 @@ public interface ChestSettings {
      *
      * @param signType
      *            The type of the sign.
+     * @param header
+     * 			  The first line of the sign, to see which header to return.
      * @return The header.
      */
-    String getFancyLocalizedHeader(SignType signType);
+    String getFancyLocalizedHeader(SignType signType, String header);
 
     /**
      * Gets the type of the protection.
@@ -95,12 +98,12 @@ public interface ChestSettings {
     Optional<ProtectionType> getProtectionType(Material material);
 
     /**
-     * Gets the localized header for the given sign type, without colors.
+     * Gets the localized headers for the given sign type, without colors.
      * 
      * @param signType
      *            The type of the sign.
-     * @return The header.
+     * @return All possible headers.
      */
-    String getSimpleLocalizedHeader(SignType signType);
+    List<String> getSimpleLocalizedHeaders(SignType signType);
 
 }

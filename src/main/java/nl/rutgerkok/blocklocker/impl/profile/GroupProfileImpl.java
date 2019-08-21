@@ -24,7 +24,7 @@ import com.google.common.base.Preconditions;
 class GroupProfileImpl implements GroupProfile {
 
     static final String GROUP_KEY = "g";
-    private final String groupName;
+    private String groupName;
     private final GroupSystem groupSystem;
 
     GroupProfileImpl(GroupSystem groupSystem, String groupName) {

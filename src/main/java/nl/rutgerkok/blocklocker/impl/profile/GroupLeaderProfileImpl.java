@@ -23,7 +23,7 @@ import com.google.common.base.Preconditions;
 class GroupLeaderProfileImpl implements Profile {
 
     static final String GROUP_LEADER_KEY = "l";
-    private final String groupName;
+    private String groupName;
     private final GroupSystem groupSystem;
 
     GroupLeaderProfileImpl(GroupSystem groupSystem, String groupName) {

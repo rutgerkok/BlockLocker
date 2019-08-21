@@ -2,6 +2,7 @@ package nl.rutgerkok.blocklocker.impl;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -74,7 +75,15 @@ class ChestSettingsImpl implements ChestSettings {
     }
 
     @Override
-    public String getFancyLocalizedHeader(SignType signType) {
+    public String getFancyLocalizedHeader(SignType signType, String header) {
+    	List<String> headers = translator.getAll(getTranslationKey(signType));
+
+    	for (String head : headers) {
+    		if (head.equalsIgnoreCase(header)) {
+    			return header;
+    		}
+    	}
+    	
         return translator.get(getTranslationKey(signType));
     }
 
@@ -89,8 +98,8 @@ class ChestSettingsImpl implements ChestSettings {
     }
 
     @Override
-    public String getSimpleLocalizedHeader(SignType signType) {
-        return translator.getWithoutColor(getTranslationKey(signType));
+    public List<String> getSimpleLocalizedHeaders(SignType signType) {
+        return translator.getAllWithoutColor(getTranslationKey(signType));
     }
 
     private Translation getTranslationKey(SignType signType) {

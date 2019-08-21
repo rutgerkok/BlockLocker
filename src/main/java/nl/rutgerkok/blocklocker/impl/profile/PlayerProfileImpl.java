@@ -16,7 +16,7 @@ class PlayerProfileImpl implements PlayerProfile {
 
     static final String NAME_KEY = "n";
     static final String UUID_KEY = "u";
-    private final String displayName;
+    private String displayName;
     private final Optional<UUID> uuid;
 
     PlayerProfileImpl(String displayName, Optional<UUID> uuid) {

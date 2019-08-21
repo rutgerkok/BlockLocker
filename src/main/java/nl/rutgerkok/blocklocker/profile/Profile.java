@@ -45,4 +45,5 @@ public interface Profile {
      * @return True if the profile is expired, false otherwise.
      */
     boolean isExpired(Date cutoffDate);
+    
 }
