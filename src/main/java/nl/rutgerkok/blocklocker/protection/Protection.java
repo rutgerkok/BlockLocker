@@ -2,11 +2,10 @@ package nl.rutgerkok.blocklocker.protection;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.Optional;
 
 import nl.rutgerkok.blocklocker.ProtectionSign;
 import nl.rutgerkok.blocklocker.profile.Profile;
-
-import com.google.common.base.Optional;
 
 /**
  * Represents a generic protection container with its attached signs.

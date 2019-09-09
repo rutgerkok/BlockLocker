@@ -1,8 +1,7 @@
 package nl.rutgerkok.blocklocker.impl;
 
 import java.util.List;
-
-import nl.rutgerkok.blocklocker.SignSelector;
+import java.util.Optional;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -16,7 +15,7 @@ import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.BlockVector;
 
-import com.google.common.base.Optional;
+import nl.rutgerkok.blocklocker.SignSelector;
 
 /**
  * Selected signs are stored as metadata on a player. The values won't get
@@ -54,20 +53,20 @@ final class SignSelectorImpl implements SignSelector {
         List<MetadataValue> signTime = player.getMetadata(SIGN_TIME);
 
         if (signVector.isEmpty() || signWorld.isEmpty() || signTime.isEmpty()) {
-            return Optional.absent();
+            return Optional.empty();
         }
 
         BlockVector vector = (BlockVector) signVector.get(0).value();
         World world = Bukkit.getWorld(signWorld.get(0).asString());
         if (world == null) {
-            return Optional.absent();
+            return Optional.empty();
         }
 
         // Check for expiration
         long createdMillis = signTime.get(0).asLong();
         if (isExpired(createdMillis)) {
             clearValues(player);
-            return Optional.absent();
+            return Optional.empty();
         }
 
         Location signLocation = vector.toLocation(world);
@@ -77,7 +76,7 @@ final class SignSelectorImpl implements SignSelector {
             return Optional.of((Sign) signState);
         }
 
-        return Optional.absent();
+        return Optional.empty();
     }
 
     private boolean isExpired(long time) {

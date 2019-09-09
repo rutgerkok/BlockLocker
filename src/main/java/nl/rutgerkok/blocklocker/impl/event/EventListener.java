@@ -2,17 +2,16 @@ package nl.rutgerkok.blocklocker.impl.event;
 
 import java.util.Collection;
 import java.util.Date;
-
-import nl.rutgerkok.blocklocker.BlockLockerPlugin;
-import nl.rutgerkok.blocklocker.SearchMode;
-import nl.rutgerkok.blocklocker.profile.Profile;
-import nl.rutgerkok.blocklocker.protection.Protection;
+import java.util.Optional;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.block.Block;
 import org.bukkit.event.Listener;
 
-import com.google.common.base.Optional;
+import nl.rutgerkok.blocklocker.BlockLockerPlugin;
+import nl.rutgerkok.blocklocker.SearchMode;
+import nl.rutgerkok.blocklocker.profile.Profile;
+import nl.rutgerkok.blocklocker.protection.Protection;
 
 abstract class EventListener implements Listener {
 

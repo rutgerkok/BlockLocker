@@ -2,15 +2,7 @@ package nl.rutgerkok.blocklocker.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import nl.rutgerkok.blocklocker.ChestSettings;
-import nl.rutgerkok.blocklocker.ProtectionSign;
-import nl.rutgerkok.blocklocker.SignParser;
-import nl.rutgerkok.blocklocker.SignType;
-import nl.rutgerkok.blocklocker.impl.nms.ServerSpecific;
-import nl.rutgerkok.blocklocker.impl.nms.ServerSpecific.JsonSign;
-import nl.rutgerkok.blocklocker.impl.profile.ProfileFactoryImpl;
-import nl.rutgerkok.blocklocker.profile.Profile;
+import java.util.Optional;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -21,7 +13,14 @@ import org.bukkit.event.block.SignChangeEvent;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import com.google.common.base.Optional;
+import nl.rutgerkok.blocklocker.ChestSettings;
+import nl.rutgerkok.blocklocker.ProtectionSign;
+import nl.rutgerkok.blocklocker.SignParser;
+import nl.rutgerkok.blocklocker.SignType;
+import nl.rutgerkok.blocklocker.impl.nms.ServerSpecific;
+import nl.rutgerkok.blocklocker.impl.nms.ServerSpecific.JsonSign;
+import nl.rutgerkok.blocklocker.impl.profile.ProfileFactoryImpl;
+import nl.rutgerkok.blocklocker.profile.Profile;
 
 /**
  * Reads a single sign for profiles. Doesn't verify the sign header, the first
@@ -44,12 +43,12 @@ class SignParserImpl implements SignParser {
     @Override
     public Optional<SignType> getSignType(Sign sign) {
         String header = sign.getLine(0);
-        return Optional.fromNullable(getSignTypeOrNull(header));
+        return Optional.ofNullable(getSignTypeOrNull(header));
     }
 
     @Override
     public Optional<SignType> getSignType(SignChangeEvent event) {
-        return Optional.fromNullable(getSignTypeOrNull(event.getLine(0)));
+        return Optional.ofNullable(getSignTypeOrNull(event.getLine(0)));
     }
 
     private SignType getSignTypeOrNull(String header) {
@@ -81,7 +80,7 @@ class SignParserImpl implements SignParser {
     private Optional<ProtectionSign> parseAdvancedSign(Location location, String header, Iterable<JSONObject> list) {
         SignType signType = getSignTypeOrNull(header);
         if (signType == null) {
-            return Optional.absent();
+            return Optional.empty();
         }
 
         List<Profile> profiles = new ArrayList<Profile>();
@@ -124,7 +123,7 @@ class SignParserImpl implements SignParser {
     private Optional<ProtectionSign> parseSimpleSign(Location location, String[] lines) {
         SignType signType = getSignTypeOrNull(lines[0]);
         if (signType == null) {
-            return Optional.absent();
+            return Optional.empty();
         }
 
         List<Profile> profiles = new ArrayList<Profile>();

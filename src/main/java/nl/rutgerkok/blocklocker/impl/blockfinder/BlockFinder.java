@@ -3,6 +3,7 @@ package nl.rutgerkok.blocklocker.impl.blockfinder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import org.bukkit.Material;
 import org.bukkit.Tag;
@@ -15,7 +16,6 @@ import org.bukkit.block.data.type.Chest.Type;
 import org.bukkit.block.data.type.Gate;
 import org.bukkit.block.data.type.WallSign;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 
