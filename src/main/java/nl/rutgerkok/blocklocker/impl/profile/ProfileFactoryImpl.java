@@ -132,7 +132,7 @@ public final class ProfileFactoryImpl implements ProfileFactory {
      */
     public Optional<Profile> fromSavedObject(JsonObject json) {
         // Player
-        Optional<String> name = getValue(json, PlayerProfileImpl.NAME_KEY, String.class);
+        Optional<String> name = getString(json, PlayerProfileImpl.NAME_KEY);
         if (name.isPresent()) {
             Optional<UUID> uuid = getUniqueId(json, PlayerProfileImpl.UUID_KEY);
             Profile profile = new PlayerProfileImpl(name.get(), uuid);
@@ -140,19 +140,19 @@ public final class ProfileFactoryImpl implements ProfileFactory {
         }
 
         // [Everyone]
-        Optional<Boolean> isEveryone = getValue(json, EveryoneProfileImpl.EVERYONE_KEY, Boolean.class);
+        Optional<Boolean> isEveryone = getBoolean(json, EveryoneProfileImpl.EVERYONE_KEY);
         if (isEveryone.isPresent()) {
             return Optional.of(this.everyoneProfile);
         }
 
         // [Redstone]
-        Optional<Boolean> isRedstone = getValue(json, RedstoneProfileImpl.REDSTONE_KEY, Boolean.class);
+        Optional<Boolean> isRedstone = getBoolean(json, RedstoneProfileImpl.REDSTONE_KEY);
         if (isRedstone.isPresent()) {
             return Optional.of(this.redstoneProfile);
         }
 
         // Timer
-        Optional<Number> secondsOpen = getValue(json, TimerProfileImpl.TIME_KEY, Number.class);
+        Optional<Number> secondsOpen = getNumber(json, TimerProfileImpl.TIME_KEY);
         if (secondsOpen.isPresent()) {
             Profile profile = new TimerProfileImpl(translator.getWithoutColor(Translation.TAG_TIMER),
                     secondsOpen.get().intValue());
@@ -160,14 +160,14 @@ public final class ProfileFactoryImpl implements ProfileFactory {
         }
 
         // Groups
-        Optional<String> groupName = getValue(json, GroupProfileImpl.GROUP_KEY, String.class);
+        Optional<String> groupName = getString(json, GroupProfileImpl.GROUP_KEY);
         if (groupName.isPresent()) {
             Profile profile = new GroupProfileImpl(groupSystem, groupName.get());
             return Optional.of(profile);
         }
 
         // Group leaders
-        groupName = getValue(json, GroupLeaderProfileImpl.GROUP_LEADER_KEY, String.class);
+        groupName = getString(json, GroupLeaderProfileImpl.GROUP_LEADER_KEY);
         if (groupName.isPresent()) {
             Profile profile = new GroupLeaderProfileImpl(groupSystem, groupName.get());
             return Optional.of(profile);
@@ -188,13 +188,22 @@ public final class ProfileFactoryImpl implements ProfileFactory {
             return Optional.absent();
         }
     }
+    
+    // With Gson, there is sadly no generic implementation possible
+    
+    private Optional<String> getString(JsonObject object, String key) {
+    	if (object.has(key)) return Optional.absent();
+        return Optional.of(object.get(key).getAsString());
+    }
 
-    private <T> Optional<T> getValue(JsonObject object, String key, Class<T> type) {
-        Object value = object.get(key);
-        if (type.isInstance(value)) {
-            return Optional.of(type.cast(value));
-        }
-        return Optional.absent();
+    private Optional<Number> getNumber(JsonObject object, String key) {
+    	if (object.has(key)) return Optional.absent();
+        return Optional.of(object.get(key).getAsNumber());
+    }
+
+    private Optional<Boolean> getBoolean(JsonObject object, String key) {
+    	if (object.has(key)) return Optional.absent();
+        return Optional.of(object.get(key).getAsBoolean());
     }
 
     private int readDigit(char digit) {
