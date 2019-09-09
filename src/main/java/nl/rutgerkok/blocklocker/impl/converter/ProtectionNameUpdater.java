@@ -2,7 +2,13 @@ package nl.rutgerkok.blocklocker.impl.converter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
+import com.google.common.base.Preconditions;
 
 import nl.rutgerkok.blocklocker.ProfileFactory;
 import nl.rutgerkok.blocklocker.ProtectionSign;
@@ -10,12 +16,6 @@ import nl.rutgerkok.blocklocker.SignParser;
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;
 import nl.rutgerkok.blocklocker.profile.Profile;
 import nl.rutgerkok.blocklocker.protection.Protection;
-
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
-import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
 
 /**
  * Updates outdated names on protections.

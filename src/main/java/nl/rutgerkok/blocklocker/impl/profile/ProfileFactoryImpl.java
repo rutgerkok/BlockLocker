@@ -2,6 +2,7 @@ package nl.rutgerkok.blocklocker.impl.profile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.bukkit.ChatColor;
@@ -9,7 +10,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 import org.json.simple.JSONObject;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 
 import nl.rutgerkok.blocklocker.ProfileFactory;
@@ -95,7 +95,7 @@ public final class ProfileFactoryImpl implements ProfileFactory {
             }
         }
 
-        return new PlayerProfileImpl(stripped, Optional.<UUID>absent());
+        return new PlayerProfileImpl(stripped, Optional.empty());
     }
 
     @Override
@@ -172,19 +172,19 @@ public final class ProfileFactoryImpl implements ProfileFactory {
             return Optional.of(profile);
         }
 
-        return Optional.absent();
+        return Optional.empty();
     }
 
     private Optional<UUID> getUniqueId(JSONObject object, String key) {
         Object uuidObject = object.get(key);
         if (!(uuidObject instanceof String)) {
-            return Optional.absent();
+            return Optional.empty();
         }
         try {
             UUID uuid = UUID.fromString((String) uuidObject);
             return Optional.of(uuid);
         } catch (IllegalArgumentException e) {
-            return Optional.absent();
+            return Optional.empty();
         }
     }
 
@@ -193,7 +193,7 @@ public final class ProfileFactoryImpl implements ProfileFactory {
         if (type.isInstance(value)) {
             return Optional.of(type.cast(value));
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     private int readDigit(char digit) {

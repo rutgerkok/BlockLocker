@@ -1,5 +1,6 @@
 package nl.rutgerkok.blocklocker.impl.event;
 
+import java.util.Optional;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
@@ -26,7 +27,6 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
 import nl.rutgerkok.blocklocker.BlockLockerPlugin;
@@ -144,7 +144,7 @@ public final class InteractListener extends EventListener {
         if (isOfType(offHand, Tag.SIGNS)) {
             return Optional.of(offHand.getType());
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     private void handleAllowed(PlayerInteractEvent event, Protection protection, boolean clickedSign,

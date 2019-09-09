@@ -3,12 +3,7 @@ package nl.rutgerkok.blocklocker.impl.event;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import nl.rutgerkok.blocklocker.BlockLockerPlugin;
-import nl.rutgerkok.blocklocker.Permissions;
-import nl.rutgerkok.blocklocker.SignType;
-import nl.rutgerkok.blocklocker.Translator.Translation;
-import nl.rutgerkok.blocklocker.protection.Protection;
+import java.util.Optional;
 
 import org.bukkit.block.Sign;
 import org.bukkit.command.Command;
@@ -17,8 +12,13 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+
+import nl.rutgerkok.blocklocker.BlockLockerPlugin;
+import nl.rutgerkok.blocklocker.Permissions;
+import nl.rutgerkok.blocklocker.SignType;
+import nl.rutgerkok.blocklocker.Translator.Translation;
+import nl.rutgerkok.blocklocker.protection.Protection;
 
 public final class BlockLockerCommand implements TabExecutor {
 

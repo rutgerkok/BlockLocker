@@ -1,18 +1,18 @@
 package nl.rutgerkok.blocklocker.impl.profile;
 
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
-
-import nl.rutgerkok.blocklocker.group.GroupSystem;
-import nl.rutgerkok.blocklocker.profile.PlayerProfile;
-import nl.rutgerkok.blocklocker.profile.Profile;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.json.simple.JSONObject;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+
+import nl.rutgerkok.blocklocker.group.GroupSystem;
+import nl.rutgerkok.blocklocker.profile.PlayerProfile;
+import nl.rutgerkok.blocklocker.profile.Profile;
 
 /**
  * Implementation of {@link Profile}. Players are considered part of a group

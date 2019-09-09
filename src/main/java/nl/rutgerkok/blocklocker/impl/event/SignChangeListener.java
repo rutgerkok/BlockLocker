@@ -1,13 +1,13 @@
 package nl.rutgerkok.blocklocker.impl.event;
 
+import java.util.Optional;
+
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.SignChangeEvent;
-
-import com.google.common.base.Optional;
 
 import nl.rutgerkok.blocklocker.BlockLockerPlugin;
 import nl.rutgerkok.blocklocker.Permissions;

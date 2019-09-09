@@ -1,11 +1,8 @@
 package nl.rutgerkok.blocklocker;
 
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
-
-import nl.rutgerkok.blocklocker.profile.PlayerProfile;
-import nl.rutgerkok.blocklocker.profile.Profile;
-import nl.rutgerkok.blocklocker.protection.Protection;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -13,7 +10,9 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.google.common.base.Optional;
+import nl.rutgerkok.blocklocker.profile.PlayerProfile;
+import nl.rutgerkok.blocklocker.profile.Profile;
+import nl.rutgerkok.blocklocker.protection.Protection;
 
 /**
  * This class is intended as an easy way for other plugin developers to hook
@@ -36,10 +35,10 @@ public final class BlockLockerAPI {
     public static Optional<OfflinePlayer> getOwner(Block block) {
         Optional<Protection> protection = getPlugin().getProtectionFinder().findProtection(block);
         if (!protection.isPresent()) {
-            return Optional.absent();
+            return Optional.empty();
         }
 
-        Profile owner = protection.get().getOwner().orNull();
+        Profile owner = protection.get().getOwner().orElse(null);
         if (owner instanceof PlayerProfile) {
             Optional<UUID> uuid = ((PlayerProfile) owner).getUniqueId();
             if (uuid.isPresent()) {
@@ -48,10 +47,10 @@ public final class BlockLockerAPI {
 
             // No uuid looked up yet
             getPlugin().getProtectionUpdater().update(protection.get(), false);
-            return Optional.fromNullable(Bukkit.getOfflinePlayer(owner.getDisplayName()));
+            return Optional.ofNullable(Bukkit.getOfflinePlayer(owner.getDisplayName()));
         }
 
-        return Optional.absent();
+        return Optional.empty();
     }
 
     /**
@@ -67,7 +66,7 @@ public final class BlockLockerAPI {
     public static Optional<String> getOwnerDisplayName(Block block) {
         Optional<Protection> protection = getPlugin().getProtectionFinder().findProtection(block);
         if (!protection.isPresent()) {
-            return Optional.absent();
+            return Optional.empty();
         }
         return Optional.of(protection.get().getOwnerDisplayName());
     }

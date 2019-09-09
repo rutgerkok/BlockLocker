@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+import java.util.Optional;
 
 import nl.rutgerkok.blocklocker.BlockLockerPlugin;
 import nl.rutgerkok.blocklocker.ProtectionSign;
@@ -13,8 +13,6 @@ import nl.rutgerkok.blocklocker.impl.converter.UUIDHandler.Result;
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;
 import nl.rutgerkok.blocklocker.profile.Profile;
 import nl.rutgerkok.blocklocker.protection.Protection;
-
-import com.google.common.base.Optional;
 
 class ProtectionUUIDSetter extends UUIDHandler.ResultConsumer {
 
@@ -34,8 +32,7 @@ class ProtectionUUIDSetter extends UUIDHandler.ResultConsumer {
         }
     }
 
-    private void finishFix(Protection protection,
-            Map<String, Result> results) {
+    private void finishFix(Protection protection, Map<String, Result> results) {
 
         SignParser signParser = plugin.getSignParser();
         for (ProtectionSign sign : protection.getSigns()) {
@@ -49,8 +46,7 @@ class ProtectionUUIDSetter extends UUIDHandler.ResultConsumer {
         }
     }
 
-    private Profile replaceProfile(Profile oldProfile,
-            Map<String, Result> results) {
+    private Profile replaceProfile(Profile oldProfile, Map<String, Result> results) {
         if (!(oldProfile instanceof PlayerProfile)) {
             return oldProfile;
         }
@@ -62,7 +58,7 @@ class ProtectionUUIDSetter extends UUIDHandler.ResultConsumer {
         Result result = results.get(name);
         if (result == null) {
             // No lookup :(
-            return plugin.getProfileFactory().fromNameAndUniqueId(name, Optional.<UUID> absent());
+            return plugin.getProfileFactory().fromNameAndUniqueId(name, Optional.empty());
         } else {
             // Valid profile, replace
             return plugin.getProfileFactory().fromNameAndUniqueId(result.getName(), result.getUniqueId());

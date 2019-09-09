@@ -1,16 +1,15 @@
 package nl.rutgerkok.blocklocker.impl.profile;
 
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
-
-import nl.rutgerkok.blocklocker.profile.PlayerProfile;
-import nl.rutgerkok.blocklocker.profile.Profile;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.json.simple.JSONObject;
 
-import com.google.common.base.Optional;
+import nl.rutgerkok.blocklocker.profile.PlayerProfile;
+import nl.rutgerkok.blocklocker.profile.Profile;
 
 class PlayerProfileImpl implements PlayerProfile {
 
@@ -119,7 +118,7 @@ class PlayerProfileImpl implements PlayerProfile {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "[uuid=" + uuid.orNull() + ",name=" + displayName + "]";
+        return getClass().getSimpleName() + "[uuid=" + uuid.orElse(null) + ",name=" + displayName + "]";
     }
 
 }

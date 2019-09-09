@@ -1,9 +1,9 @@
 package nl.rutgerkok.blocklocker;
 
+import java.util.Optional;
+
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
-
-import com.google.common.base.Optional;
 
 import nl.rutgerkok.blocklocker.profile.Profile;
 import nl.rutgerkok.blocklocker.protection.Protection;

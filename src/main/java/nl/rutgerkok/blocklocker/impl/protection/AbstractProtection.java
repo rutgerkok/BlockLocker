@@ -3,16 +3,16 @@ package nl.rutgerkok.blocklocker.impl.protection;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+
+import org.apache.commons.lang.Validate;
+
+import com.google.common.collect.Lists;
 
 import nl.rutgerkok.blocklocker.ProtectionSign;
 import nl.rutgerkok.blocklocker.profile.Profile;
 import nl.rutgerkok.blocklocker.profile.TimerProfile;
 import nl.rutgerkok.blocklocker.protection.Protection;
-
-import org.apache.commons.lang.Validate;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.Lists;
 
 /**
  * Base class for protection implementations.
@@ -20,9 +20,9 @@ import com.google.common.collect.Lists;
  */
 abstract class AbstractProtection implements Protection {
 
-    private Optional<Collection<Profile>> allAllowed = Optional.absent();
-    private Optional<Profile> owner = Optional.absent();
-    private Optional<Collection<ProtectionSign>> allSigns = Optional.absent();
+    private Optional<Collection<Profile>> allAllowed = Optional.empty();
+    private Optional<Profile> owner = Optional.empty();
+    private Optional<Collection<ProtectionSign>> allSigns = Optional.empty();
 
     /**
      * Constructor for creating the protection with all signs already looked up.
@@ -67,12 +67,12 @@ abstract class AbstractProtection implements Protection {
             if (sign.getType().isMainSign()) {
                 List<Profile> profiles = sign.getProfiles();
                 if (profiles.isEmpty()) {
-                    return Optional.absent();
+                    return Optional.empty();
                 }
                 return Optional.of(profiles.get(0));
             }
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     /**

@@ -1,8 +1,7 @@
 package nl.rutgerkok.blocklocker.profile;
 
+import java.util.Optional;
 import java.util.UUID;
-
-import com.google.common.base.Optional;
 
 public interface PlayerProfile extends Profile {
 

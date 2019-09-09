@@ -11,8 +11,10 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -25,8 +27,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -40,17 +40,14 @@ final class UUIDHandler {
          * Attempts to find the 16th character of names that were trimmed to 15
          * characters.
          */
-        private static Function<String, String> COMPLETE_NAME = new Function<String, String>() {
-            @Override
-            public String apply(String name) {
-                if (name.length() == MAX_SIGN_LINE_LENGTH) {
-                    List<Player> matches = Bukkit.matchPlayer(name);
-                    if (!matches.isEmpty()) {
-                        return matches.get(0).getName();
-                    }
+        private static Function<String, String> COMPLETE_NAME = name -> {
+        	if (name.length() == MAX_SIGN_LINE_LENGTH) {
+                List<Player> matches = Bukkit.matchPlayer(name);
+                if (!matches.isEmpty()) {
+                    return matches.get(0).getName();
                 }
-                return name;
             }
+            return name;
         };
 
         /**
@@ -58,12 +55,9 @@ final class UUIDHandler {
          * Minecraft's sign limitations) to a {@link Result} that only contains the
          * name, with an absent UUID.
          */
-        private static Function<String, Result> OFFLINE_MODE_LOOKUP = new Function<String, Result>() {
-            @Override
-            public Result apply(String name) {
-                name = COMPLETE_NAME.apply(name);
-                return new Result(name);
-            }
+        private static Function<String, Result> OFFLINE_MODE_LOOKUP = name -> {
+        	name = COMPLETE_NAME.apply(name);
+            return new Result(name);
         };
 
         /**
@@ -73,19 +67,17 @@ final class UUIDHandler {
          * {@code new UUID(0, 0)} so that the plugin doesn't constantly tries to look it
          * up.
          */
-        private static Function<String, Result> ONLINE_MODE_PLACEHOLDERS = new Function<String, Result>() {
-            @Override
-            public Result apply(String name) {
-                if (needsPrefixIfInvalidName(name)) {
-                    // Adding a prefix makes the name look invalid to the player
-                    name = invalidNamePrefixes[0] + name;
-                }
-                return new Result(name, ZERO_UUID);
+        private static Function<String, Result> ONLINE_MODE_PLACEHOLDERS = name -> {
+        	if (needsPrefixIfInvalidName(name)) {
+                // Adding a prefix makes the name look invalid to the player
+                name = invalidNamePrefixes[0] + name;
             }
+            return new Result(name, ZERO_UUID);
         };
     }
 
     private static class MojangWeb {
+    	
         private static final String BULK_UUID_LOOKUP_URL = "https://api.mojang.com/profiles/minecraft";
         private static JSONParser jsonParser = new JSONParser();
         private static final double PROFILES_PER_BULK_REQUEST = 100;
@@ -133,7 +125,7 @@ final class UUIDHandler {
 
         private Result(String name) {
             this.name = name;
-            this.uuid = Optional.absent();
+            this.uuid = Optional.empty();
         }
 
         private Result(String name, UUID uniqueId) {
@@ -175,7 +167,7 @@ final class UUIDHandler {
 
         @Override
         public String toString() {
-            return getClass().getSimpleName() + "[name=" + name + ",uuid=" + uuid.orNull() + "]";
+            return getClass().getSimpleName() + "[name=" + name + ",uuid=" + uuid.orElse(null) + "]";
         }
     }
 
