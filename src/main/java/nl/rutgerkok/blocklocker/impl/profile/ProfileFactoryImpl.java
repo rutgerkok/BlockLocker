@@ -192,17 +192,17 @@ public final class ProfileFactoryImpl implements ProfileFactory {
     // With Gson, there is sadly no generic implementation possible
     
     private Optional<String> getString(JsonObject object, String key) {
-    	if (object.has(key)) return Optional.absent();
+    	if (!object.has(key)) return Optional.absent();
         return Optional.of(object.get(key).getAsString());
     }
 
     private Optional<Number> getNumber(JsonObject object, String key) {
-    	if (object.has(key)) return Optional.absent();
+    	if (!object.has(key)) return Optional.absent();
         return Optional.of(object.get(key).getAsNumber());
     }
 
     private Optional<Boolean> getBoolean(JsonObject object, String key) {
-    	if (object.has(key)) return Optional.absent();
+    	if (!object.has(key)) return Optional.absent();
         return Optional.of(object.get(key).getAsBoolean());
     }
 

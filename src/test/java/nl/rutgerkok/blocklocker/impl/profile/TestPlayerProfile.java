@@ -72,7 +72,7 @@ public class TestPlayerProfile {
         Profile profile = factory.fromNameAndUniqueId(name, Optional.of(uuid));
         JsonObject object = profile.getSaveObject();
 
-        assertEquals(name, object.get(PlayerProfileImpl.NAME_KEY));
+        assertEquals(name, object.get(PlayerProfileImpl.NAME_KEY).getAsString());
         assertEquals(uuid.toString(), object.get(PlayerProfileImpl.UUID_KEY));
     }
 
