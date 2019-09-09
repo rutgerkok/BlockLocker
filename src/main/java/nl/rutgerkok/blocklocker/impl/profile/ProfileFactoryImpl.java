@@ -33,13 +33,13 @@ public final class ProfileFactoryImpl implements ProfileFactory {
         this.groupSystem = Preconditions.checkNotNull(groupSystem);
         this.translator = Preconditions.checkNotNull(translator);
 
-        this.everyoneTagList = new ArrayList<String>();
-        this.redstoneTagList = new ArrayList<String>();
-        this.timerTagStart = new ArrayList<String>();
+        this.everyoneTagList = new ArrayList<>();
+        this.redstoneTagList = new ArrayList<>();
+        this.timerTagStart = new ArrayList<>();
         
-        translator.getAllWithoutColor(Translation.TAG_EVERYONE).forEach(value->this.everyoneTagList.add("[" + value + "]"));
-        translator.getAllWithoutColor(Translation.TAG_REDSTONE).forEach(value->this.redstoneTagList.add("[" + value + "]"));
-        translator.getAllWithoutColor(Translation.TAG_TIMER).forEach(value->this.timerTagStart.add("[" + value + ":"));
+        translator.getAllWithoutColor(Translation.TAG_EVERYONE).forEach(value -> this.everyoneTagList.add("[" + value + "]"));
+        translator.getAllWithoutColor(Translation.TAG_REDSTONE).forEach(value -> this.redstoneTagList.add("[" + value + "]"));
+        translator.getAllWithoutColor(Translation.TAG_TIMER).forEach(value -> this.timerTagStart.add("[" + value + ":"));
 
         this.everyoneProfile = new EveryoneProfileImpl(translator.get(Translation.TAG_EVERYONE));
         this.redstoneProfile = new RedstoneProfileImpl(translator.get(Translation.TAG_REDSTONE));

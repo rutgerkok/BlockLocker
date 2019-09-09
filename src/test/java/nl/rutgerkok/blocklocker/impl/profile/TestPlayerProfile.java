@@ -73,7 +73,7 @@ public class TestPlayerProfile {
         JsonObject object = profile.getSaveObject();
 
         assertEquals(name, object.get(PlayerProfileImpl.NAME_KEY).getAsString());
-        assertEquals(uuid.toString(), object.get(PlayerProfileImpl.UUID_KEY));
+        assertEquals(uuid.toString(), object.get(PlayerProfileImpl.UUID_KEY).getAsString());
     }
 
     @Test
