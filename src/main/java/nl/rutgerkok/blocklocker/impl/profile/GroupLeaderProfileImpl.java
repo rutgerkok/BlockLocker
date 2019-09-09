@@ -14,10 +14,6 @@ import nl.rutgerkok.blocklocker.group.GroupSystem;
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;
 import nl.rutgerkok.blocklocker.profile.Profile;
 
-import nl.rutgerkok.blocklocker.group.GroupSystem;
-import nl.rutgerkok.blocklocker.profile.PlayerProfile;
-import nl.rutgerkok.blocklocker.profile.Profile;
-
 /**
  * Implementation of {@link Profile}. Players are considered part of a group
  * when the {@link GroupSystem#isGroupLeader(Player, String)} method returns

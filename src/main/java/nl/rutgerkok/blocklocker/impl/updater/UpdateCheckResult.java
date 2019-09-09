@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
 import com.google.gson.JsonArray;
@@ -42,17 +42,8 @@ final class UpdateCheckResult {
 
         // Parse all information
         needsUpdate = getBoolean(object, NEEDS_UPDATE_KEY);
-        
-        if (object.has(VERSION_KEY)) {
-        	latestVersion = Optional.fromNullable(object.get(VERSION_KEY).getAsString());
-        }
-        else latestVersion = Optional.absent();
-        
-        if (object.has(MD5_KEY)) {
-        	fileMd5 = Optional.fromNullable(object.get(MD5_KEY).getAsString());
-        }
-        else fileMd5 = Optional.absent();
-        
+        latestVersion = Optional.ofNullable(object.get(VERSION_KEY)).map(JsonElement::getAsString);
+        fileMd5 = Optional.ofNullable(object.get(MD5_KEY)).map(JsonElement::getAsString);
         downloadUrl = getUrl(object, DOWNLOAD_URL_KEY);
         infoUrl = getUrl(object, INFO_URL_KEY);
         this.minecraftVersions = getStringSet(object, REQUIREMENTS_KEY);
@@ -157,12 +148,12 @@ final class UpdateCheckResult {
     private Optional<URL> getUrl(JsonObject object, String key) throws ClassCastException {
         JsonElement element = object.get(key);
         if (element == null || element.getAsString().isEmpty()) {
-            return Optional.absent();
+            return Optional.empty();
         }
         try {
             return Optional.of(new URL(element.getAsString()));
         } catch (MalformedURLException e) {
-            return Optional.absent();
+            return Optional.empty();
         }
     }
 
@@ -194,10 +185,10 @@ final class UpdateCheckResult {
             return "UpdateResult{needsUpdate=" + needsUpdate + "}";
         } else {
             return "UpdateResult{needsUpdate=" + needsUpdate
-                    + ", latestVersion=" + latestVersion.orNull()
-                    + ", downloadUrl=" + downloadUrl.orNull()
-                    + ", fileMd5=" + fileMd5.orNull()
-                    + ", infoUrl=" + infoUrl.orNull()
+                    + ", latestVersion=" + latestVersion.orElse(null)
+                    + ", downloadUrl=" + downloadUrl.orElse(null)
+                    + ", fileMd5=" + fileMd5.orElse(null)
+                    + ", infoUrl=" + infoUrl.orElse(null)
                     + ", minecraftVersions=" + minecraftVersions
                     + "}";
         }

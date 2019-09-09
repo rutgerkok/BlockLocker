@@ -10,11 +10,11 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.bukkit.plugin.Plugin;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
@@ -41,8 +41,8 @@ final class UpdateDownloader {
         this.plugin = Preconditions.checkNotNull(plugin);
         this.url = url.get();
         this.downloadTo = Preconditions.checkNotNull(downloadTo);
-        this.desiredMD5 = result.getFileMD5().or("(no md5 given)");
-        this.newVersion = result.getLatestVersion().or("(no version given)");
+        this.desiredMD5 = result.getFileMD5().orElse("(no md5 given)");
+        this.newVersion = result.getLatestVersion().orElse("(no version given)");
     }
 
     private void checkMd5() throws IOException {

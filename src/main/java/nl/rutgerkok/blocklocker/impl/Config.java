@@ -5,19 +5,19 @@ import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 
-import com.google.common.base.Optional;
-
 import nl.rutgerkok.blocklocker.AttackType;
 import nl.rutgerkok.blocklocker.ProtectionType;
 import nl.rutgerkok.blocklocker.impl.updater.UpdatePreference;
 
 final class Config {
+	
     private final static class Key {
         private final static String LANGUAGE_FILE = "languageFile",
                 PROTECTABLE_CONTAINERS = "protectableContainers",

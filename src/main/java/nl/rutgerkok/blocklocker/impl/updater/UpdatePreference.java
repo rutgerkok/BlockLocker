@@ -1,6 +1,6 @@
 package nl.rutgerkok.blocklocker.impl.updater;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 /**
  * The preference the user set for auto updating.
@@ -35,7 +35,7 @@ public enum UpdatePreference {
         try {
             return Optional.of(valueOf(string));
         } catch (IllegalArgumentException e) {
-            return Optional.absent();
+            return Optional.empty();
         }
     }
 

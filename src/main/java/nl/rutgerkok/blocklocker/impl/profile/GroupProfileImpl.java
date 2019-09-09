@@ -15,11 +15,6 @@ import nl.rutgerkok.blocklocker.profile.GroupProfile;
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;
 import nl.rutgerkok.blocklocker.profile.Profile;
 
-import nl.rutgerkok.blocklocker.group.GroupSystem;
-import nl.rutgerkok.blocklocker.profile.GroupProfile;
-import nl.rutgerkok.blocklocker.profile.PlayerProfile;
-import nl.rutgerkok.blocklocker.profile.Profile;
-
 /**
  * Implementation of {@link GroupProfile}. Players are considered part of a
  * group when the name of their scoreboard team matches this group, or when they
