@@ -1,11 +1,11 @@
 package nl.rutgerkok.blocklocker.impl.nms;
 
 import java.util.Iterator;
+import java.util.Optional;
 
 import org.bukkit.World;
 import org.bukkit.block.Sign;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterators;
 import com.google.gson.JsonArray;

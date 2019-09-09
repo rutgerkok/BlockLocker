@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.bukkit.Material;
 import org.bukkit.Tag;
@@ -12,7 +13,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 
 import nl.rutgerkok.blocklocker.ChestSettings;
@@ -47,12 +47,12 @@ class ProtectionFinderImpl implements ProtectionFinder {
     public Optional<Protection> findExistingProtectionForNewSign(Block signBlock) {
         BlockState blockState = signBlock.getState();
         if (!(blockState instanceof Sign)) {
-            return Optional.absent();
+            return Optional.empty();
         }
 
         Optional<Block> protectionBlock = this.findProtectableForSign(signBlock);
         if (!protectionBlock.isPresent()) {
-            return Optional.absent();
+            return Optional.empty();
         }
 
         return findProtectionForBlock(protectionBlock.get(), SearchMode.NO_SUPPORTING_BLOCKS);
@@ -110,7 +110,7 @@ class ProtectionFinderImpl implements ProtectionFinder {
             }
         }
 
-        return Optional.absent();
+        return Optional.empty();
     }
 
     @Override
@@ -158,7 +158,7 @@ class ProtectionFinderImpl implements ProtectionFinder {
         }
 
         // Failed
-        return Optional.absent();
+        return Optional.empty();
     }
 
     private Optional<Protection> findProtectionForExistingSign(Block sign) {
@@ -166,7 +166,7 @@ class ProtectionFinderImpl implements ProtectionFinder {
         Optional<ProtectionSign> parsed = blockFinder.getSignParser().parseSign(sign);
         if (!parsed.isPresent()) {
             // Not actually a protection sign, so no protection
-            return Optional.absent();
+            return Optional.empty();
         }
 
         Optional<Block> protectionBlock = findProtectableForSign(sign);
@@ -174,13 +174,13 @@ class ProtectionFinderImpl implements ProtectionFinder {
             return findProtectionForProtectionBlock(protectionBlock.get(), parsed.get());
         }
 
-        return Optional.absent();
+        return Optional.empty();
     }
 
     private Optional<Protection> findProtectionForProtectionBlock(Block protectionBlock) {
         Optional<ProtectionType> protectionType = settings.getProtectionType(protectionBlock.getType());
         if (!protectionType.isPresent()) {
-            return Optional.absent();
+            return Optional.empty();
         }
 
         // We don't know yet if signs are attached, so we have to check for that
@@ -191,7 +191,7 @@ class ProtectionFinderImpl implements ProtectionFinder {
                 List<Block> blocks = blockFinder.findContainerNeighbors(protectionBlock);
                 Collection<ProtectionSign> signs = blockFinder.findAttachedSigns(blocks);
                 if (signs.isEmpty()) {
-                    return Optional.absent();
+                    return Optional.empty();
                 }
                 return Optional.of(ContainerProtectionImpl.fromBlocksWithSigns(
                         signs, blocks, blockFinder));
@@ -199,7 +199,7 @@ class ProtectionFinderImpl implements ProtectionFinder {
                 CompleteDoor door = new CompleteDoor(protectionBlock);
                 Collection<ProtectionSign> doorSigns = blockFinder.findAttachedSigns(door.getBlocksForSigns());
                 if (doorSigns.isEmpty()) {
-                    return Optional.absent();
+                    return Optional.empty();
                 }
                 return Optional.of(DoorProtectionImpl.fromDoorWithSigns(
                         doorSigns, blockFinder, door));
@@ -207,7 +207,7 @@ class ProtectionFinderImpl implements ProtectionFinder {
                 Collection<ProtectionSign> trapDoorSigns = blockFinder.findAttachedSigns(
                         Arrays.asList(protectionBlock, blockFinder.findSupportingBlock(protectionBlock)));
                 if (trapDoorSigns.isEmpty()) {
-                    return Optional.absent();
+                    return Optional.empty();
                 }
                 return Optional.of(AttachedProtectionImpl.fromBlockWithSigns(
                         trapDoorSigns, blockFinder, protectionBlock));
@@ -233,7 +233,7 @@ class ProtectionFinderImpl implements ProtectionFinder {
     private Optional<Protection> findProtectionForProtectionBlock(Block protectionBlock, ProtectionSign sign) {
         Optional<ProtectionType> protectionType = settings.getProtectionType(protectionBlock.getType());
         if (!protectionType.isPresent()) {
-            return Optional.absent();
+            return Optional.empty();
         }
 
         switch (protectionType.get()) {

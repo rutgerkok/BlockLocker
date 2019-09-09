@@ -1,9 +1,9 @@
 package nl.rutgerkok.blocklocker.impl.converter;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;
@@ -44,7 +44,7 @@ final class ProtectionMissingIds {
         if (missingIds) {
             return Optional.of(new ProtectionMissingIds(protection, namesMissingUniqueIds));
         } else {
-            return Optional.absent();
+            return Optional.empty();
         }
     }
 

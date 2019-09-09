@@ -1,14 +1,18 @@
 package nl.rutgerkok.blocklocker.impl.profile;
 
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonObject;
+
+import nl.rutgerkok.blocklocker.group.GroupSystem;
+import nl.rutgerkok.blocklocker.profile.PlayerProfile;
+import nl.rutgerkok.blocklocker.profile.Profile;
 
 import nl.rutgerkok.blocklocker.group.GroupSystem;
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;

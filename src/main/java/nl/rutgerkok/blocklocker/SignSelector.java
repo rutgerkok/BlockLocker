@@ -1,9 +1,9 @@
 package nl.rutgerkok.blocklocker;
 
+import java.util.Optional;
+
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
-
-import com.google.common.base.Optional;
 
 /**
  * Holds the signs the players have selected.

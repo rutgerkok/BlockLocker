@@ -1,10 +1,10 @@
 package nl.rutgerkok.blocklocker;
 
+import java.util.Optional;
+
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.event.block.SignChangeEvent;
-
-import com.google.common.base.Optional;
 
 /**
  * Parses a single sign. It essentially converts between {@link Sign} and

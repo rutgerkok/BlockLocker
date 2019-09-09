@@ -1,13 +1,12 @@
 package nl.rutgerkok.blocklocker;
 
+import java.util.Optional;
 import java.util.UUID;
-
-import nl.rutgerkok.blocklocker.profile.PlayerProfile;
-import nl.rutgerkok.blocklocker.profile.Profile;
 
 import org.bukkit.entity.Player;
 
-import com.google.common.base.Optional;
+import nl.rutgerkok.blocklocker.profile.PlayerProfile;
+import nl.rutgerkok.blocklocker.profile.Profile;
 
 public interface ProfileFactory {
 

@@ -2,6 +2,7 @@ package nl.rutgerkok.blocklocker.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -10,7 +11,6 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.event.block.SignChangeEvent;
 
-import com.google.common.base.Optional;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -44,12 +44,12 @@ class SignParserImpl implements SignParser {
     @Override
     public Optional<SignType> getSignType(Sign sign) {
         String header = sign.getLine(0);
-        return Optional.fromNullable(getSignTypeOrNull(header));
+        return Optional.ofNullable(getSignTypeOrNull(header));
     }
 
     @Override
     public Optional<SignType> getSignType(SignChangeEvent event) {
-        return Optional.fromNullable(getSignTypeOrNull(event.getLine(0)));
+        return Optional.ofNullable(getSignTypeOrNull(event.getLine(0)));
     }
 
     private SignType getSignTypeOrNull(String header) {
@@ -81,7 +81,7 @@ class SignParserImpl implements SignParser {
     private Optional<ProtectionSign> parseAdvancedSign(Location location, String header, Iterable<JsonObject> list) {
         SignType signType = getSignTypeOrNull(header);
         if (signType == null) {
-            return Optional.absent();
+            return Optional.empty();
         }
 
         List<Profile> profiles = new ArrayList<Profile>();
@@ -124,7 +124,7 @@ class SignParserImpl implements SignParser {
     private Optional<ProtectionSign> parseSimpleSign(Location location, String[] lines) {
         SignType signType = getSignTypeOrNull(lines[0]);
         if (signType == null) {
-            return Optional.absent();
+            return Optional.empty();
         }
 
         List<Profile> profiles = new ArrayList<Profile>();

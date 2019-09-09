@@ -2,13 +2,13 @@ package nl.rutgerkok.blocklocker.impl.profile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -97,7 +97,7 @@ public final class ProfileFactoryImpl implements ProfileFactory {
             }
         }
 
-        return new PlayerProfileImpl(stripped, Optional.<UUID>absent());
+        return new PlayerProfileImpl(stripped, Optional.empty());
     }
 
     @Override
@@ -174,37 +174,37 @@ public final class ProfileFactoryImpl implements ProfileFactory {
             return Optional.of(profile);
         }
 
-        return Optional.absent();
+        return Optional.empty();
     }
 
     private Optional<UUID> getUniqueId(JsonObject object, String key) {
         JsonElement uuidObject = object.get(key);
         
         if (!uuidObject.isJsonPrimitive() || !uuidObject.getAsJsonPrimitive().isString()) {
-            return Optional.absent();
+            return Optional.empty();
         }
         try {
             UUID uuid = UUID.fromString(uuidObject.getAsString());
             return Optional.of(uuid);
         } catch (IllegalArgumentException e) {
-            return Optional.absent();
+            return Optional.empty();
         }
     }
     
     // With Gson, there is sadly no generic implementation possible
     
     private Optional<String> getString(JsonObject object, String key) {
-    	if (!object.has(key)) return Optional.absent();
+    	if (!object.has(key)) return Optional.empty();
         return Optional.of(object.get(key).getAsString());
     }
-
+  
     private Optional<Number> getNumber(JsonObject object, String key) {
-    	if (!object.has(key)) return Optional.absent();
+    	if (!object.has(key)) return Optional.empty();
         return Optional.of(object.get(key).getAsNumber());
     }
 
     private Optional<Boolean> getBoolean(JsonObject object, String key) {
-    	if (!object.has(key)) return Optional.absent();
+    	if (!object.has(key)) return Optional.empty();
         return Optional.of(object.get(key).getAsBoolean());
     }
 

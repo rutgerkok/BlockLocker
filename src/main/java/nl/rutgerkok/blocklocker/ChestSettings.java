@@ -2,11 +2,10 @@ package nl.rutgerkok.blocklocker;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.bukkit.Material;
-
-import com.google.common.base.Optional;
 
 /**
  * Represents all settings of the plugin.

@@ -3,12 +3,12 @@ package nl.rutgerkok.blocklocker.impl.nms;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Optional;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.Sign;
 
-import com.google.common.base.Optional;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -235,17 +235,17 @@ public final class NMSAccessor implements ServerSpecific {
     private Optional<String> getSecretData(Object tileEntitySign) {
         Object line = ((Object[]) retrieve(tileEntitySign, TileEntitySign_lines))[0];
         if (line == null) {
-            return Optional.absent();
+            return Optional.empty();
         }
 
         Object chatModifier = call(line, IChatBaseComponent_getChatModifier);
         if (chatModifier == null) {
-            return Optional.absent();
+            return Optional.empty();
         }
 
         Object chatHoverable = call(chatModifier, ChatModifier_getGetHoverEvent);
         if (chatHoverable == null) {
-            return Optional.absent();
+            return Optional.empty();
         }
 
         return Optional.of(chatComponentToString(call(chatHoverable, ChatHoverable_getChatComponent)));
@@ -277,7 +277,7 @@ public final class NMSAccessor implements ServerSpecific {
 
         Object tileEntity = call(nmsWorld, WorldServer_getTileEntity, getBlockPosition(x, y, z));
         if (!TileEntitySign.isInstance(tileEntity)) {
-            return Optional.absent();
+            return Optional.empty();
         }
 
         return Optional.of(tileEntity);

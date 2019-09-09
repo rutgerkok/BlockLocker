@@ -3,6 +3,7 @@ package nl.rutgerkok.blocklocker.impl.converter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -10,7 +11,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 
 import nl.rutgerkok.blocklocker.BlockLockerPlugin;

@@ -1,11 +1,18 @@
 package nl.rutgerkok.blocklocker;
 
+import java.util.Date;
+import java.util.UUID;
+import java.util.Optional;
+
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.google.common.base.Optional;
+import nl.rutgerkok.blocklocker.profile.PlayerProfile;
+import nl.rutgerkok.blocklocker.profile.Profile;
+import nl.rutgerkok.blocklocker.protection.Protection;
 
 /**
  * This class is intended as an easy way for other plugin developers to hook
@@ -13,13 +20,9 @@ import com.google.common.base.Optional;
  * kept for all future releases of the plugin, unless stated otherwise. In other
  * words: if your plugin uses only the methods in this class, it won't break for
  * any future releases of this plugin.
- * 
- * @deprecated This class uses google guava's Optional.class, a new Version was made that utilises java.util.Optional.
- * @see BlockLockerAPIv2
  *
  */
-@Deprecated
-public final class BlockLockerAPI {
+public final class BlockLockerAPIv2 {
 
     /**
      * Gets the owner of the given block.
@@ -28,8 +31,26 @@ public final class BlockLockerAPI {
      *            The block.
      * @return The owner, or empty if the block is not protected.
      */
+    @SuppressWarnings("deprecation")
     public static Optional<OfflinePlayer> getOwner(Block block) {
-        return Optional.fromJavaUtil(BlockLockerAPIv2.getOwner(block));
+        Optional<Protection> protection = getPlugin().getProtectionFinder().findProtection(block);
+        if (!protection.isPresent()) {
+            return Optional.empty();
+        }
+
+        Profile owner = protection.get().getOwner().orElse(null);
+        if (owner instanceof PlayerProfile) {
+            Optional<UUID> uuid = ((PlayerProfile) owner).getUniqueId();
+            if (uuid.isPresent()) {
+                return Optional.of(Bukkit.getOfflinePlayer(uuid.get()));
+            }
+
+            // No uuid looked up yet
+            getPlugin().getProtectionUpdater().update(protection.get(), false);
+            return Optional.ofNullable(Bukkit.getOfflinePlayer(owner.getDisplayName()));
+        }
+
+        return Optional.empty();
     }
 
     /**
@@ -37,13 +58,17 @@ public final class BlockLockerAPI {
      * 
      * @param block
      *            The block.
-     * @return The display name, or {@code Optional.absent()} if the block isn't
+     * @return The display name, or {@code Optional.empty()} if the block isn't
      *         protected. Unlike {@link #getOwner(Block)}, this method still
      *         returns the name of the owner even if the UUID of the owner is
      *         not yet known.
      */
     public static Optional<String> getOwnerDisplayName(Block block) {
-        return Optional.fromJavaUtil(BlockLockerAPIv2.getOwnerDisplayName(block));
+        Optional<Protection> protection = getPlugin().getProtectionFinder().findProtection(block);
+        if (!protection.isPresent()) {
+            return Optional.empty();
+        }
+        return Optional.of(protection.get().getOwnerDisplayName());
     }
 
     /**
@@ -54,7 +79,7 @@ public final class BlockLockerAPI {
      * @return The plugin instance.
      */
     public static final BlockLockerPlugin getPlugin() {
-        return (BlockLockerPlugin) JavaPlugin.getProvidingPlugin(BlockLockerAPI.class);
+        return (BlockLockerPlugin) JavaPlugin.getProvidingPlugin(BlockLockerAPIv2.class);
     }
 
     /**
@@ -78,7 +103,31 @@ public final class BlockLockerAPI {
      *         False otherwise.
      */
     public static boolean isAllowed(Player player, Block block, boolean allowBypass) {
-        return BlockLockerAPIv2.isAllowed(player, block, allowBypass);
+        // Check admin bypass
+        if (allowBypass && player.hasPermission(Permissions.CAN_BYPASS)) {
+            return true;
+        }
+
+        Optional<Protection> protection = getPlugin().getProtectionFinder().findProtection(block);
+        if (!protection.isPresent()) {
+            return true;
+        }
+
+        // Check normal allowance
+        PlayerProfile playerProfile = getPlugin().getProfileFactory().fromPlayer(player);
+        if (protection.get().isAllowed(playerProfile)) {
+            return true;
+        }
+
+        // Check expiration
+        if (allowBypass) {
+            Optional<Date> expireDate = getPlugin().getChestSettings().getChestExpireDate();
+            if (expireDate.isPresent() && protection.get().isExpired(expireDate.get())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -93,7 +142,12 @@ public final class BlockLockerAPI {
      *         owner or if the block is unprotected.
      */
     public static boolean isOwner(Player player, Block block) {
-        return BlockLockerAPIv2.isOwner(player, block);
+        Optional<Protection> protection = getPlugin().getProtectionFinder().findProtection(block);
+        if (!protection.isPresent()) {
+            return false;
+        }
+        PlayerProfile playerProfile = getPlugin().getProfileFactory().fromPlayer(player);
+        return protection.get().isOwner(playerProfile);
     }
 
     /**
@@ -104,10 +158,10 @@ public final class BlockLockerAPI {
      * @return True if the given block is protected, false otherwise.
      */
     public static boolean isProtected(Block block) {
-        return BlockLockerAPIv2.isProtected(block);
+        return getPlugin().getProtectionFinder().findProtection(block).isPresent();
     }
 
-    private BlockLockerAPI() {
+    private BlockLockerAPIv2() {
         // No instances
     }
 }

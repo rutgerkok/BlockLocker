@@ -4,7 +4,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
+
+import org.bukkit.Material;
 
 import nl.rutgerkok.blocklocker.AttackType;
 import nl.rutgerkok.blocklocker.ChestSettings;
@@ -12,10 +15,6 @@ import nl.rutgerkok.blocklocker.ProtectionType;
 import nl.rutgerkok.blocklocker.SignType;
 import nl.rutgerkok.blocklocker.Translator;
 import nl.rutgerkok.blocklocker.Translator.Translation;
-
-import org.bukkit.Material;
-
-import com.google.common.base.Optional;
 
 class ChestSettingsImpl implements ChestSettings {
 
@@ -58,7 +57,7 @@ class ChestSettingsImpl implements ChestSettings {
     public Optional<Date> getChestExpireDate() {
         int days = config.getAutoExpireDays();
         if (days <= 0) {
-            return Optional.absent();
+            return Optional.empty();
         }
 
         // Calculate the cutoff date
@@ -94,7 +93,7 @@ class ChestSettingsImpl implements ChestSettings {
                 return Optional.of(type);
             }
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     @Override
