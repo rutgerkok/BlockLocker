@@ -10,6 +10,7 @@ import org.bukkit.util.StringUtil;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import nl.rutgerkok.blocklocker.ProfileFactory;
@@ -177,12 +178,13 @@ public final class ProfileFactoryImpl implements ProfileFactory {
     }
 
     private Optional<UUID> getUniqueId(JsonObject object, String key) {
-        Object uuidObject = object.get(key);
-        if (!(uuidObject instanceof String)) {
+        JsonElement uuidObject = object.get(key);
+        
+        if (!uuidObject.isJsonPrimitive() || !uuidObject.getAsJsonPrimitive().isString()) {
             return Optional.absent();
         }
         try {
-            UUID uuid = UUID.fromString((String) uuidObject);
+            UUID uuid = UUID.fromString(uuidObject.getAsString());
             return Optional.of(uuid);
         } catch (IllegalArgumentException e) {
             return Optional.absent();

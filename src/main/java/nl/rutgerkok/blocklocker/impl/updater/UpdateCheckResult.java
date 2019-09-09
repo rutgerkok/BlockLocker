@@ -17,6 +17,7 @@ import com.google.gson.JsonObject;
  * The result of an update check.
  */
 final class UpdateCheckResult {
+	
     private static final String DOWNLOAD_URL_KEY = "downloadUrl";
     private static final String ERROR_KEY = "error";
     private static final String INFO_URL_KEY = "infoUrl";
@@ -41,8 +42,17 @@ final class UpdateCheckResult {
 
         // Parse all information
         needsUpdate = getBoolean(object, NEEDS_UPDATE_KEY);
-        latestVersion = Optional.fromNullable(object.get(VERSION_KEY).getAsString());
-        fileMd5 = Optional.fromNullable(object.get(MD5_KEY).getAsString());
+        
+        if (object.has(VERSION_KEY)) {
+        	latestVersion = Optional.fromNullable(object.get(VERSION_KEY).getAsString());
+        }
+        else latestVersion = Optional.absent();
+        
+        if (object.has(MD5_KEY)) {
+        	fileMd5 = Optional.fromNullable(object.get(MD5_KEY).getAsString());
+        }
+        else fileMd5 = Optional.absent();
+        
         downloadUrl = getUrl(object, DOWNLOAD_URL_KEY);
         infoUrl = getUrl(object, INFO_URL_KEY);
         this.minecraftVersions = getStringSet(object, REQUIREMENTS_KEY);
