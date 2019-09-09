@@ -109,7 +109,7 @@ public class TestPlayerProfile {
         Profile profile = factory.fromDisplayText(name);
         JsonObject object = profile.getSaveObject();
 
-        assertEquals(name, object.get(PlayerProfileImpl.NAME_KEY));
+        assertEquals(name, object.get(PlayerProfileImpl.NAME_KEY).getAsString());
         assertFalse(object.has(PlayerProfileImpl.UUID_KEY));
     }
 }
