@@ -3,17 +3,17 @@ package nl.rutgerkok.blocklocker.impl.profile;
 import java.util.Date;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
+import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
+import com.google.gson.JsonObject;
+
 import nl.rutgerkok.blocklocker.group.GroupSystem;
 import nl.rutgerkok.blocklocker.profile.GroupProfile;
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;
 import nl.rutgerkok.blocklocker.profile.Profile;
-
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.json.simple.JSONObject;
-
-import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
 
 /**
  * Implementation of {@link GroupProfile}. Players are considered part of a
@@ -57,12 +57,11 @@ class GroupProfileImpl implements GroupProfile {
     public String getDisplayName() {
         return "[" + groupName + "]";
     }
-
-    @SuppressWarnings("unchecked")
+    
     @Override
-    public JSONObject getSaveObject() {
-        JSONObject object = new JSONObject();
-        object.put(GROUP_KEY, groupName);
+    public JsonObject getSaveObject() {
+    	JsonObject object = new JsonObject();
+        object.addProperty(GROUP_KEY, groupName);
         return object;
     }
 

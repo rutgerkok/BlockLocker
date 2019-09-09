@@ -7,10 +7,10 @@ import java.util.UUID;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
-import org.json.simple.JSONObject;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.google.gson.JsonObject;
 
 import nl.rutgerkok.blocklocker.ProfileFactory;
 import nl.rutgerkok.blocklocker.Translator;
@@ -20,6 +20,7 @@ import nl.rutgerkok.blocklocker.profile.PlayerProfile;
 import nl.rutgerkok.blocklocker.profile.Profile;
 
 public final class ProfileFactoryImpl implements ProfileFactory {
+	
     private final Profile everyoneProfile;
     private final List<String> everyoneTagList;
     private final GroupSystem groupSystem;
@@ -129,7 +130,7 @@ public final class ProfileFactoryImpl implements ProfileFactory {
      *            The object to convert from.
      * @return The profile, if any.
      */
-    public Optional<Profile> fromSavedObject(JSONObject json) {
+    public Optional<Profile> fromSavedObject(JsonObject json) {
         // Player
         Optional<String> name = getValue(json, PlayerProfileImpl.NAME_KEY, String.class);
         if (name.isPresent()) {
@@ -175,7 +176,7 @@ public final class ProfileFactoryImpl implements ProfileFactory {
         return Optional.absent();
     }
 
-    private Optional<UUID> getUniqueId(JSONObject object, String key) {
+    private Optional<UUID> getUniqueId(JsonObject object, String key) {
         Object uuidObject = object.get(key);
         if (!(uuidObject instanceof String)) {
             return Optional.absent();
@@ -188,7 +189,7 @@ public final class ProfileFactoryImpl implements ProfileFactory {
         }
     }
 
-    private <T> Optional<T> getValue(JSONObject object, String key, Class<T> type) {
+    private <T> Optional<T> getValue(JsonObject object, String key, Class<T> type) {
         Object value = object.get(key);
         if (type.isInstance(value)) {
             return Optional.of(type.cast(value));

@@ -7,10 +7,11 @@ import java.lang.reflect.Method;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.Sign;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONValue;
 
 import com.google.common.base.Optional;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 
 /**
  * Implementation of methods required by
@@ -18,8 +19,6 @@ import com.google.common.base.Optional;
  *
  */
 public final class NMSAccessor implements ServerSpecific {
-
-
 
     static Object call(Object on, Method method, Object... parameters) {
         try {
@@ -123,6 +122,8 @@ public final class NMSAccessor implements ServerSpecific {
     final Field TileEntitySign_lines;
     final Class<?> WorldServer;
     final Method WorldServer_getTileEntity;
+    
+    private final JsonParser jsonParser = new JsonParser();
 
     public NMSAccessor() {
         String version = getMinecraftClassVersion();
@@ -198,9 +199,9 @@ public final class NMSAccessor implements ServerSpecific {
         String firstLine = firstLineObj == null ? "" : chatComponentToString(firstLineObj);
 
         // Parse and sanitize the sting
-        Object data = JSONValue.parse(secretData.get());
-        if (data instanceof JSONArray) {
-            return new JsonSign(firstLine, (JSONArray) data);
+        JsonElement data = jsonParser.parse(secretData.get());
+        if (data.isJsonArray()) {
+            return new JsonSign(firstLine, data.getAsJsonArray());
         }
         return JsonSign.EMPTY;
     }
@@ -251,13 +252,13 @@ public final class NMSAccessor implements ServerSpecific {
     }
 
     @Override
-    public void setJsonData(Sign sign, JSONArray jsonArray) {
+    public void setJsonData(Sign sign, JsonArray jsonArray) {
         Optional<?> nmsSign = toNmsSign(sign.getWorld(), sign.getX(), sign.getY(), sign.getZ());
         if (!nmsSign.isPresent()) {
             throw new RuntimeException("No sign at " + sign.getLocation());
         }
 
-        setSecretData(nmsSign.get(), jsonArray.toJSONString());
+        setSecretData(nmsSign.get(), jsonArray.toString());
     }
 
     private void setSecretData(Object tileEntitySign, String data) {

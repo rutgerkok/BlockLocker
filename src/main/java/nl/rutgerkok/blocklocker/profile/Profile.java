@@ -2,7 +2,7 @@ package nl.rutgerkok.blocklocker.profile;
 
 import java.util.Date;
 
-import org.json.simple.JSONObject;
+import com.google.gson.JsonObject;
 
 /**
  * Represents a profile. A profile is usually a player, but it may also be a whole group or something abstract like
@@ -23,7 +23,7 @@ public interface Profile {
      *
      * @return The object as it should be saved.
      */
-    JSONObject getSaveObject();
+    JsonObject getSaveObject();
 
     /**
      * Gets whether this profile includes another profile. For example,

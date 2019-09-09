@@ -2,9 +2,8 @@ package nl.rutgerkok.blocklocker.impl.updater;
 
 import java.io.IOException;
 
-import org.json.simple.JSONObject;
-
 import com.google.common.base.Preconditions;
+import com.google.gson.JsonObject;
 
 /**
  * Result of an update attempt.
@@ -35,7 +34,7 @@ final class UpdateResult {
      */
     static UpdateResult failed() {
         try {
-            return new UpdateResult(Status.CHECK_FAILED, new UpdateCheckResult(new JSONObject()));
+            return new UpdateResult(Status.CHECK_FAILED, new UpdateCheckResult(new JsonObject()));
         } catch (IOException e) {
             throw new AssertionError(e);
         }

@@ -2,9 +2,8 @@ package nl.rutgerkok.blocklocker.impl.profile;
 
 import java.util.Date;
 
-import org.json.simple.JSONObject;
-
 import com.google.common.base.Preconditions;
+import com.google.gson.JsonObject;
 
 import nl.rutgerkok.blocklocker.profile.Profile;
 
@@ -42,12 +41,11 @@ class RedstoneProfileImpl implements Profile {
     public String getDisplayName() {
         return '[' + tag + ']';
     }
-
-    @SuppressWarnings("unchecked")
+    
     @Override
-    public JSONObject getSaveObject() {
-        JSONObject object = new JSONObject();
-        object.put(REDSTONE_KEY, true);
+    public JsonObject getSaveObject() {
+    	JsonObject object = new JsonObject();
+        object.addProperty(REDSTONE_KEY, true);
         return object;
     }
 
