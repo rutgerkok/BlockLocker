@@ -4,18 +4,20 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
-import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
-import org.json.simple.JSONObject;
-
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSet.Builder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 /**
  * The result of an update check.
  */
 final class UpdateCheckResult {
+	
     private static final String DOWNLOAD_URL_KEY = "downloadUrl";
     private static final String ERROR_KEY = "error";
     private static final String INFO_URL_KEY = "infoUrl";
@@ -31,7 +33,7 @@ final class UpdateCheckResult {
     private final Set<String> minecraftVersions;
     private final boolean needsUpdate;
 
-    UpdateCheckResult(JSONObject object) throws IOException, ClassCastException {
+    UpdateCheckResult(JsonObject object) throws IOException, ClassCastException {
         // Look for errors
         Object error = object.get(ERROR_KEY);
         if (error instanceof String) {
@@ -40,8 +42,8 @@ final class UpdateCheckResult {
 
         // Parse all information
         needsUpdate = getBoolean(object, NEEDS_UPDATE_KEY);
-        latestVersion = Optional.fromNullable((String) object.get(VERSION_KEY));
-        fileMd5 = Optional.fromNullable((String) object.get(MD5_KEY));
+        latestVersion = Optional.ofNullable(object.get(VERSION_KEY)).map(JsonElement::getAsString);
+        fileMd5 = Optional.ofNullable(object.get(MD5_KEY)).map(JsonElement::getAsString);
         downloadUrl = getUrl(object, DOWNLOAD_URL_KEY);
         infoUrl = getUrl(object, INFO_URL_KEY);
         this.minecraftVersions = getStringSet(object, REQUIREMENTS_KEY);
@@ -80,11 +82,10 @@ final class UpdateCheckResult {
         return true;
     }
 
-    private boolean getBoolean(JSONObject object, String key) {
-        Boolean bool = (Boolean) object.get(key);
-        if (bool == null) {
-            return false;
-        }
+    private boolean getBoolean(JsonObject object, String key) {
+    	JsonElement element = object.get(key);
+    	if (element == null) return false;
+        Boolean bool = element.getAsBoolean();
         return bool.booleanValue();
     }
 
@@ -132,28 +133,27 @@ final class UpdateCheckResult {
         return minecraftVersions;
     }
 
-    private Set<String> getStringSet(JSONObject object, String key) {
-        List<?> list = (List<?>) object.get(key);
-        if (list == null || list.isEmpty()) {
-            return Collections.emptySet();
-        }
-        if (list.get(0) instanceof String) {
-            @SuppressWarnings("unchecked")
-            List<String> strings = (List<String>) list;
-            return ImmutableSet.copyOf(strings);
+    private Set<String> getStringSet(JsonObject object, String key) {
+    	if (!object.has(key)) return Collections.emptySet();
+    	
+    	JsonArray array = object.get(key).getAsJsonArray();
+        if (array.size() > 0 && array.get(0).isJsonPrimitive() && array.get(0).getAsJsonPrimitive().isString()) {
+        	Builder<String> builder = ImmutableSet.builder();
+        	array.forEach(el -> builder.add(el.getAsString()));
+        	return builder.build();
         }
         return Collections.emptySet();
     }
 
-    private Optional<URL> getUrl(JSONObject object, String key) throws ClassCastException {
-        String url = (String) object.get(key);
-        if (url == null || url.isEmpty()) {
-            return Optional.absent();
+    private Optional<URL> getUrl(JsonObject object, String key) throws ClassCastException {
+        JsonElement element = object.get(key);
+        if (element == null || element.getAsString().isEmpty()) {
+            return Optional.empty();
         }
         try {
-            return Optional.of(new URL(url));
+            return Optional.of(new URL(element.getAsString()));
         } catch (MalformedURLException e) {
-            return Optional.absent();
+            return Optional.empty();
         }
     }
 
@@ -185,10 +185,10 @@ final class UpdateCheckResult {
             return "UpdateResult{needsUpdate=" + needsUpdate + "}";
         } else {
             return "UpdateResult{needsUpdate=" + needsUpdate
-                    + ", latestVersion=" + latestVersion.orNull()
-                    + ", downloadUrl=" + downloadUrl.orNull()
-                    + ", fileMd5=" + fileMd5.orNull()
-                    + ", infoUrl=" + infoUrl.orNull()
+                    + ", latestVersion=" + latestVersion.orElse(null)
+                    + ", downloadUrl=" + downloadUrl.orElse(null)
+                    + ", fileMd5=" + fileMd5.orElse(null)
+                    + ", infoUrl=" + infoUrl.orElse(null)
                     + ", minecraftVersions=" + minecraftVersions
                     + "}";
         }

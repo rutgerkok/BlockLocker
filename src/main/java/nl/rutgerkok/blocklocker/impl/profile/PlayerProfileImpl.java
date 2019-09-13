@@ -6,7 +6,8 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.json.simple.JSONObject;
+
+import com.google.gson.JsonObject;
 
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;
 import nl.rutgerkok.blocklocker.profile.Profile;
@@ -56,14 +57,13 @@ class PlayerProfileImpl implements PlayerProfile {
     public String getDisplayName() {
         return displayName;
     }
-
-    @SuppressWarnings("unchecked")
+    
     @Override
-    public JSONObject getSaveObject() {
-        JSONObject object = new JSONObject();
-        object.put(NAME_KEY, displayName);
+    public JsonObject getSaveObject() {
+    	JsonObject object = new JsonObject();
+        object.addProperty(NAME_KEY, displayName);
         if (uuid.isPresent()) {
-            object.put(UUID_KEY, uuid.get().toString());
+            object.addProperty(UUID_KEY, uuid.get().toString());
         }
         return object;
     }

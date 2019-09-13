@@ -8,8 +8,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.json.simple.JSONObject;
 import org.junit.jupiter.api.Test;
+
+import com.google.gson.JsonObject;
 
 import nl.rutgerkok.blocklocker.ProfileFactory;
 import nl.rutgerkok.blocklocker.Translator.Translation;
@@ -69,10 +70,10 @@ public class TestPlayerProfile {
         UUID uuid = UUID.randomUUID();
         ProfileFactory factory = getProfileFactory();
         Profile profile = factory.fromNameAndUniqueId(name, Optional.of(uuid));
-        JSONObject object = profile.getSaveObject();
+        JsonObject object = profile.getSaveObject();
 
-        assertEquals(name, object.get(PlayerProfileImpl.NAME_KEY));
-        assertEquals(uuid.toString(), object.get(PlayerProfileImpl.UUID_KEY));
+        assertEquals(name, object.get(PlayerProfileImpl.NAME_KEY).getAsString());
+        assertEquals(uuid.toString(), object.get(PlayerProfileImpl.UUID_KEY).getAsString());
     }
 
     @Test
@@ -86,7 +87,7 @@ public class TestPlayerProfile {
     }
 
     private void testRoundtrip(ProfileFactoryImpl factory, Profile profile) {
-        JSONObject object = profile.getSaveObject();
+        JsonObject object = profile.getSaveObject();
         Profile newProfile = factory.fromSavedObject(object).get();
         assertEquals(profile, newProfile);
     }
@@ -106,9 +107,9 @@ public class TestPlayerProfile {
         String name = "test";
         ProfileFactoryImpl factory = getProfileFactory();
         Profile profile = factory.fromDisplayText(name);
-        JSONObject object = profile.getSaveObject();
+        JsonObject object = profile.getSaveObject();
 
-        assertEquals(name, object.get(PlayerProfileImpl.NAME_KEY));
-        assertFalse(object.containsKey(PlayerProfileImpl.UUID_KEY));
+        assertEquals(name, object.get(PlayerProfileImpl.NAME_KEY).getAsString());
+        assertFalse(object.has(PlayerProfileImpl.UUID_KEY));
     }
 }

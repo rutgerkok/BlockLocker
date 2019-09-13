@@ -2,10 +2,10 @@ package nl.rutgerkok.blocklocker.impl.profile;
 
 import java.util.Date;
 
+import com.google.gson.JsonObject;
+
 import nl.rutgerkok.blocklocker.profile.Profile;
 import nl.rutgerkok.blocklocker.profile.TimerProfile;
-
-import org.json.simple.JSONObject;
 
 class TimerProfileImpl implements TimerProfile {
 
@@ -36,11 +36,10 @@ class TimerProfileImpl implements TimerProfile {
         return seconds;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public JSONObject getSaveObject() {
-        JSONObject object = new JSONObject();
-        object.put(TIME_KEY, seconds);
+    public JsonObject getSaveObject() {
+    	JsonObject object = new JsonObject();
+        object.addProperty(TIME_KEY, seconds);
         return object;
     }
 

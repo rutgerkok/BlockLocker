@@ -10,8 +10,9 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.event.block.SignChangeEvent;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import nl.rutgerkok.blocklocker.ChestSettings;
 import nl.rutgerkok.blocklocker.ProtectionSign;
@@ -77,14 +78,14 @@ class SignParserImpl implements SignParser {
      *            The profile collection to add all profiles to.
      * @return The parsed sign, if the sign is actually a protection sign.
      */
-    private Optional<ProtectionSign> parseAdvancedSign(Location location, String header, Iterable<JSONObject> list) {
+    private Optional<ProtectionSign> parseAdvancedSign(Location location, String header, Iterable<JsonObject> list) {
         SignType signType = getSignTypeOrNull(header);
         if (signType == null) {
             return Optional.empty();
         }
 
         List<Profile> profiles = new ArrayList<Profile>();
-        for (JSONObject object : list) {
+        for (JsonObject object : list) {
             Optional<Profile> profile = profileFactory.fromSavedObject(object);
             if (profile.isPresent()) {
                 profiles.add(profile.get());
@@ -136,8 +137,7 @@ class SignParserImpl implements SignParser {
         // advanced signs
         return Optional.<ProtectionSign> of(new ProtectionSignImpl(location, signType, profiles));
     }
-
-    @SuppressWarnings("unchecked")
+    
     @Override
     public void saveSign(ProtectionSign sign) {
         // Find sign
@@ -153,7 +153,7 @@ class SignParserImpl implements SignParser {
         
         signState.setLine(0, chestSettings.getFancyLocalizedHeader(sign.getType(), signState.getLine(0)));
 
-        JSONArray jsonArray = new JSONArray();
+        JsonArray jsonArray = new JsonArray();
         int i = 1; // Start at 1 to avoid overwriting the header
         for (Profile profile : sign.getProfiles()) {
             signState.setLine(i, profile.getDisplayName());

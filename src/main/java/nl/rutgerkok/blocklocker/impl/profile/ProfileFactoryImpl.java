@@ -8,9 +8,10 @@ import java.util.UUID;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
-import org.json.simple.JSONObject;
 
 import com.google.common.base.Preconditions;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import nl.rutgerkok.blocklocker.ProfileFactory;
 import nl.rutgerkok.blocklocker.Translator;
@@ -20,6 +21,7 @@ import nl.rutgerkok.blocklocker.profile.PlayerProfile;
 import nl.rutgerkok.blocklocker.profile.Profile;
 
 public final class ProfileFactoryImpl implements ProfileFactory {
+	
     private final Profile everyoneProfile;
     private final List<String> everyoneTagList;
     private final GroupSystem groupSystem;
@@ -32,13 +34,13 @@ public final class ProfileFactoryImpl implements ProfileFactory {
         this.groupSystem = Preconditions.checkNotNull(groupSystem);
         this.translator = Preconditions.checkNotNull(translator);
 
-        this.everyoneTagList = new ArrayList<String>();
-        this.redstoneTagList = new ArrayList<String>();
-        this.timerTagStart = new ArrayList<String>();
+        this.everyoneTagList = new ArrayList<>();
+        this.redstoneTagList = new ArrayList<>();
+        this.timerTagStart = new ArrayList<>();
         
-        translator.getAllWithoutColor(Translation.TAG_EVERYONE).forEach(value->this.everyoneTagList.add("[" + value + "]"));
-        translator.getAllWithoutColor(Translation.TAG_REDSTONE).forEach(value->this.redstoneTagList.add("[" + value + "]"));
-        translator.getAllWithoutColor(Translation.TAG_TIMER).forEach(value->this.timerTagStart.add("[" + value + ":"));
+        translator.getAllWithoutColor(Translation.TAG_EVERYONE).forEach(value -> this.everyoneTagList.add("[" + value + "]"));
+        translator.getAllWithoutColor(Translation.TAG_REDSTONE).forEach(value -> this.redstoneTagList.add("[" + value + "]"));
+        translator.getAllWithoutColor(Translation.TAG_TIMER).forEach(value -> this.timerTagStart.add("[" + value + ":"));
 
         this.everyoneProfile = new EveryoneProfileImpl(translator.get(Translation.TAG_EVERYONE));
         this.redstoneProfile = new RedstoneProfileImpl(translator.get(Translation.TAG_REDSTONE));
@@ -129,9 +131,9 @@ public final class ProfileFactoryImpl implements ProfileFactory {
      *            The object to convert from.
      * @return The profile, if any.
      */
-    public Optional<Profile> fromSavedObject(JSONObject json) {
+    public Optional<Profile> fromSavedObject(JsonObject json) {
         // Player
-        Optional<String> name = getValue(json, PlayerProfileImpl.NAME_KEY, String.class);
+        Optional<String> name = getString(json, PlayerProfileImpl.NAME_KEY);
         if (name.isPresent()) {
             Optional<UUID> uuid = getUniqueId(json, PlayerProfileImpl.UUID_KEY);
             Profile profile = new PlayerProfileImpl(name.get(), uuid);
@@ -139,19 +141,19 @@ public final class ProfileFactoryImpl implements ProfileFactory {
         }
 
         // [Everyone]
-        Optional<Boolean> isEveryone = getValue(json, EveryoneProfileImpl.EVERYONE_KEY, Boolean.class);
+        Optional<Boolean> isEveryone = getBoolean(json, EveryoneProfileImpl.EVERYONE_KEY);
         if (isEveryone.isPresent()) {
             return Optional.of(this.everyoneProfile);
         }
 
         // [Redstone]
-        Optional<Boolean> isRedstone = getValue(json, RedstoneProfileImpl.REDSTONE_KEY, Boolean.class);
+        Optional<Boolean> isRedstone = getBoolean(json, RedstoneProfileImpl.REDSTONE_KEY);
         if (isRedstone.isPresent()) {
             return Optional.of(this.redstoneProfile);
         }
 
         // Timer
-        Optional<Number> secondsOpen = getValue(json, TimerProfileImpl.TIME_KEY, Number.class);
+        Optional<Number> secondsOpen = getNumber(json, TimerProfileImpl.TIME_KEY);
         if (secondsOpen.isPresent()) {
             Profile profile = new TimerProfileImpl(translator.getWithoutColor(Translation.TAG_TIMER),
                     secondsOpen.get().intValue());
@@ -159,14 +161,14 @@ public final class ProfileFactoryImpl implements ProfileFactory {
         }
 
         // Groups
-        Optional<String> groupName = getValue(json, GroupProfileImpl.GROUP_KEY, String.class);
+        Optional<String> groupName = getString(json, GroupProfileImpl.GROUP_KEY);
         if (groupName.isPresent()) {
             Profile profile = new GroupProfileImpl(groupSystem, groupName.get());
             return Optional.of(profile);
         }
 
         // Group leaders
-        groupName = getValue(json, GroupLeaderProfileImpl.GROUP_LEADER_KEY, String.class);
+        groupName = getString(json, GroupLeaderProfileImpl.GROUP_LEADER_KEY);
         if (groupName.isPresent()) {
             Profile profile = new GroupLeaderProfileImpl(groupSystem, groupName.get());
             return Optional.of(profile);
@@ -175,25 +177,35 @@ public final class ProfileFactoryImpl implements ProfileFactory {
         return Optional.empty();
     }
 
-    private Optional<UUID> getUniqueId(JSONObject object, String key) {
-        Object uuidObject = object.get(key);
-        if (!(uuidObject instanceof String)) {
+    private Optional<UUID> getUniqueId(JsonObject object, String key) {
+        JsonElement uuidObject = object.get(key);
+        
+        if (!uuidObject.isJsonPrimitive() || !uuidObject.getAsJsonPrimitive().isString()) {
             return Optional.empty();
         }
         try {
-            UUID uuid = UUID.fromString((String) uuidObject);
+            UUID uuid = UUID.fromString(uuidObject.getAsString());
             return Optional.of(uuid);
         } catch (IllegalArgumentException e) {
             return Optional.empty();
         }
     }
+    
+    // With Gson, there is sadly no generic implementation possible
+    
+    private Optional<String> getString(JsonObject object, String key) {
+    	if (!object.has(key)) return Optional.empty();
+        return Optional.of(object.get(key).getAsString());
+    }
+  
+    private Optional<Number> getNumber(JsonObject object, String key) {
+    	if (!object.has(key)) return Optional.empty();
+        return Optional.of(object.get(key).getAsNumber());
+    }
 
-    private <T> Optional<T> getValue(JSONObject object, String key, Class<T> type) {
-        Object value = object.get(key);
-        if (type.isInstance(value)) {
-            return Optional.of(type.cast(value));
-        }
-        return Optional.empty();
+    private Optional<Boolean> getBoolean(JsonObject object, String key) {
+    	if (!object.has(key)) return Optional.empty();
+        return Optional.of(object.get(key).getAsBoolean());
     }
 
     private int readDigit(char digit) {

@@ -23,15 +23,16 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 
 import com.google.common.base.Preconditions;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 final class UUIDHandler {
 
@@ -79,7 +80,7 @@ final class UUIDHandler {
     private static class MojangWeb {
     	
         private static final String BULK_UUID_LOOKUP_URL = "https://api.mojang.com/profiles/minecraft";
-        private static JSONParser jsonParser = new JSONParser();
+        private static JsonParser jsonParser = new JsonParser();
         private static final double PROFILES_PER_BULK_REQUEST = 100;
 
         private static HttpURLConnection createConnectionForBulkLookup() throws Exception {
@@ -98,13 +99,16 @@ final class UUIDHandler {
             int requests = (int) Math.ceil(names.size() / PROFILES_PER_BULK_REQUEST);
             for (int i = 0; i < requests; i++) {
                 HttpURLConnection connection = createConnectionForBulkLookup();
-                String body = JSONArray.toJSONString(names.subList(i * 100,
-                        Math.min((i + 1) * 100, names.size())));
-                writeBody(connection, body);
-                JSONArray array = (JSONArray) jsonParser
-                        .parse(new InputStreamReader(connection.getInputStream()));
-                for (Object profile : array) {
-                    Result result = toResult((JSONObject) profile);
+                List<String> sublist = names.subList(i * 100, Math.min((i + 1) * 100, names.size()));
+                
+                // There is probably a better way to do this
+                JsonArray json = new JsonArray();
+                sublist.stream().forEach(json::add);
+                writeBody(connection, json.toString());
+                
+                JsonArray array = jsonParser.parse(new InputStreamReader(connection.getInputStream())).getAsJsonArray();
+                for (JsonElement profile : array) {
+                    Result result = toResult(profile.getAsJsonObject());
                     results.put(result.name.toLowerCase(), result);
                 }
                 if (i != requests - 1) {
@@ -280,9 +284,9 @@ final class UUIDHandler {
      *            The object from mojang.com.
      * @return The result.
      */
-    private static Result toResult(JSONObject mojangObject) {
-        String id = (String) mojangObject.get("id");
-        String name = (String) mojangObject.get("name");
+    private static Result toResult(JsonObject mojangObject) {
+        String id = mojangObject.get("id").getAsString();
+        String name = mojangObject.get("name").getAsString();
         UUID uuid = parseMojangUniqueId(id);
         return new Result(name, uuid);
     }

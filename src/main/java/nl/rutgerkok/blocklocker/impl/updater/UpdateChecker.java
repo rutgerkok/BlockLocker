@@ -8,11 +8,10 @@ import java.net.URL;
 import java.net.URLEncoder;
 
 import org.bukkit.plugin.Plugin;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import com.google.common.base.Charsets;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 /**
  * Checks whether an update is available.
@@ -22,7 +21,7 @@ final class UpdateChecker {
 
     private static final String UPDATE_URL = "http://rutgerkok.nl/tools/updater/blocklocker.php";
 
-    private final JSONParser jsonParser = new JSONParser();
+    private final JsonParser jsonParser = new JsonParser();
 
     /**
      * Checks online for updates. Blocking method.
@@ -42,13 +41,11 @@ final class UpdateChecker {
         UserAgent.setFor(plugin, connection);
 
         try (InputStream stream = connection.getInputStream()) {
-            Object object = jsonParser.parse(new InputStreamReader(stream, Charsets.UTF_8));
-            return new UpdateCheckResult((JSONObject) object);
+            JsonObject object = jsonParser.parse(new InputStreamReader(stream, Charsets.UTF_8)).getAsJsonObject();
+            return new UpdateCheckResult(object);
         } catch (IOException e) {
             // Just rethrow, don't wrap
             throw e;
-        } catch (ParseException e) {
-            throw new IOException("Invalid JSON", e);
         } catch (Exception e) {
             throw new IOException(e);
         }

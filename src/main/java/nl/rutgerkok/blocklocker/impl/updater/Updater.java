@@ -2,18 +2,19 @@ package nl.rutgerkok.blocklocker.impl.updater;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import nl.rutgerkok.blocklocker.Translator;
-import nl.rutgerkok.blocklocker.impl.updater.UpdateResult.Status;
-
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
+
+import nl.rutgerkok.blocklocker.Translator;
+import nl.rutgerkok.blocklocker.impl.updater.UpdateResult.Status;
 
 /**
  * Handles the complete update procedure.
@@ -68,7 +69,7 @@ public final class Updater {
         if (matcher.find() && matcher.groupCount() == 1) {
             return Optional.of(matcher.group(1));
         } else {
-            return Optional.absent();
+            return Optional.empty();
         }
     }
 
@@ -129,7 +130,8 @@ public final class Updater {
     private void updateInstallSync(UpdateCheckResult result) throws IOException {
         if (preference.installUpdates() && result.getDownloadUrl().isPresent()) {
             Optional<String> minecraftVersion = getMinecraftVersion();
-            if (result.getMinecraftVersions().containsAll(minecraftVersion.asSet())) {
+            
+            if (minecraftVersion.isPresent() && result.getMinecraftVersions().containsAll(ImmutableSet.of(minecraftVersion.get()))) {
                 // Update automatically
                 UpdateDownloader downloader = new UpdateDownloader(plugin, result, installDestination);
                 downloader.downloadSync();

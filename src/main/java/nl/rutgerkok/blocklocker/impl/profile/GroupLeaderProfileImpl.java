@@ -6,9 +6,9 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.json.simple.JSONObject;
 
 import com.google.common.base.Preconditions;
+import com.google.gson.JsonObject;
 
 import nl.rutgerkok.blocklocker.group.GroupSystem;
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;
@@ -51,12 +51,11 @@ class GroupLeaderProfileImpl implements Profile {
     public String getDisplayName() {
         return "+" + groupName + "+";
     }
-
-    @SuppressWarnings("unchecked")
+    
     @Override
-    public JSONObject getSaveObject() {
-        JSONObject object = new JSONObject();
-        object.put(GROUP_LEADER_KEY, groupName);
+    public JsonObject getSaveObject() {
+    	JsonObject object = new JsonObject();
+        object.addProperty(GROUP_LEADER_KEY, groupName);
         return object;
     }
 

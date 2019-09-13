@@ -44,14 +44,6 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		
-		<!-- Extra dependency, should be replaced by GSON at some point -->
-		<!-- For now, this library is still included in CraftBukkit. -->
-		<dependency>
-		    <groupId>com.googlecode.json-simple</groupId>
-		    <artifactId>json-simple</artifactId>
-		    <version>1.1.1</version>
-		</dependency>
 
 		<!-- Third party plugins -->
 		<dependency>

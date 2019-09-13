@@ -3,7 +3,8 @@ package nl.rutgerkok.blocklocker.impl.profile;
 import java.util.Date;
 
 import org.apache.commons.lang.Validate;
-import org.json.simple.JSONObject;
+
+import com.google.gson.JsonObject;
 
 import nl.rutgerkok.blocklocker.profile.Profile;
 
@@ -41,12 +42,11 @@ class EveryoneProfileImpl implements Profile {
     public String getDisplayName() {
         return '[' + tag + ']';
     }
-
-    @SuppressWarnings("unchecked")
+    
     @Override
-    public JSONObject getSaveObject() {
-        JSONObject object = new JSONObject();
-        object.put(EVERYONE_KEY, true);
+    public JsonObject getSaveObject() {
+    	JsonObject object = new JsonObject();
+        object.addProperty(EVERYONE_KEY, true);
         return object;
     }
 

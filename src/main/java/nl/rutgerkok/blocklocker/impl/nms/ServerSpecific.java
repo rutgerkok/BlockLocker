@@ -5,24 +5,24 @@ import java.util.Optional;
 
 import org.bukkit.World;
 import org.bukkit.block.Sign;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterators;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 public interface ServerSpecific {
 
     /**
      * Holds the JSON data on a sign.
      */
-    public static class JsonSign implements Iterable<JSONObject> {
-        public static final JsonSign EMPTY = new JsonSign("", new JSONArray());
+    public static class JsonSign implements Iterable<JsonObject> {
+        public static final JsonSign EMPTY = new JsonSign("", new JsonArray());
 
         private final String firstLine;
-        private final JSONArray jsonData;
+        private final JsonArray jsonData;
 
-        public JsonSign(String firstLine, JSONArray jsonData) {
+        public JsonSign(String firstLine, JsonArray jsonData) {
             this.firstLine = Preconditions.checkNotNull(firstLine);
             this.jsonData = Preconditions.checkNotNull(jsonData);
         }
@@ -46,8 +46,8 @@ public interface ServerSpecific {
         }
 
         @Override
-        public Iterator<JSONObject> iterator() {
-            return Iterators.filter(jsonData.iterator(), JSONObject.class);
+        public Iterator<JsonObject> iterator() {
+            return Iterators.filter(jsonData.iterator(), JsonObject.class);
         }
     }
 
@@ -79,6 +79,6 @@ public interface ServerSpecific {
      * @param jsonArray
      *            The array to store.
      */
-    void setJsonData(Sign sign, JSONArray jsonArray);
+    void setJsonData(Sign sign, JsonArray jsonArray);
 
 }

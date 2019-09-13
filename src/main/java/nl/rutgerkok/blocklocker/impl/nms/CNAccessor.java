@@ -3,16 +3,19 @@ package nl.rutgerkok.blocklocker.impl.nms;
 import org.bukkit.World;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONValue;
 
 import com.google.common.base.Strings;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 
 /**
  * Server-specific calls for cn.nukkit.
  *
  */
 public final class CNAccessor implements ServerSpecific {
+	
+	private final JsonParser jsonparser = new JsonParser();
 
     /**
      * Creates a server-specific accessor for Nukkit.
@@ -33,7 +36,8 @@ public final class CNAccessor implements ServerSpecific {
             try {
                 String data = (String) sign.getClass().getMethod("getHiddenData").invoke(blockState);
                 if (!Strings.isNullOrEmpty(data)) {
-                    return new JsonSign(sign.getLine(0), (JSONArray) JSONValue.parseWithException(data));
+                	JsonElement element = jsonparser.parse(data);
+                    return new JsonSign(sign.getLine(0), element.getAsJsonArray());
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -43,8 +47,8 @@ public final class CNAccessor implements ServerSpecific {
     }
 
     @Override
-    public void setJsonData(Sign sign, JSONArray jsonArray) {
-        String jsonString = jsonArray.toJSONString();
+    public void setJsonData(Sign sign, JsonArray jsonArray) {
+        String jsonString = jsonArray.toString();
         try {
             sign.getClass().getMethod("setHiddenData", String.class).invoke(sign, jsonString);
         } catch (Exception e) {

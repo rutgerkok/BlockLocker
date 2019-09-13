@@ -1,11 +1,8 @@
 package nl.rutgerkok.blocklocker.impl.updater;
 
 import java.net.URL;
+import java.util.Optional;
 import java.util.Set;
-
-import nl.rutgerkok.blocklocker.Permissions;
-import nl.rutgerkok.blocklocker.Translator;
-import nl.rutgerkok.blocklocker.Translator.Translation;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -15,8 +12,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+
+import nl.rutgerkok.blocklocker.Permissions;
+import nl.rutgerkok.blocklocker.Translator;
+import nl.rutgerkok.blocklocker.Translator.Translation;
 
 /**
  * Used to notify people that an update of the plugin is out.
@@ -54,7 +54,7 @@ final class UpdateNotifier implements Listener {
      */
     void sendNotification(CommandSender sender) {
         UpdateCheckResult checkResult = result.getUpdateCheckResult();
-        String newVersion = checkResult.getLatestVersion().or("?");
+        String newVersion = checkResult.getLatestVersion().orElse("?");
 
         // Show status
         switch (result.getStatus()) {
