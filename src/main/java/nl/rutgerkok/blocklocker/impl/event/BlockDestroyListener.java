@@ -15,7 +15,6 @@ import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Ghast;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
-import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
@@ -25,7 +24,6 @@ import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.entity.EntityBreakDoorEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 
 import nl.rutgerkok.blocklocker.AttackType;
@@ -131,20 +129,6 @@ public class BlockDestroyListener extends EventListener {
             attackType = AttackType.ZOMBIE;
         } else if (event.getEntity() instanceof Enderman) {
             attackType = AttackType.ENDERMAN;
-        }
-        if (plugin.getChestSettings().allowDestroyBy(attackType)) {
-            return;
-        }
-        if (isProtected(event.getBlock())) {
-            event.setCancelled(true);
-        }
-    }
-
-    @EventHandler(ignoreCancelled = true)
-    public void onVillagerDoorOpen(EntityInteractEvent event) {
-        AttackType attackType = AttackType.UNKNOWN;
-        if (event.getEntity() instanceof Villager) {
-            attackType = AttackType.VILLAGER;
         }
         if (plugin.getChestSettings().allowDestroyBy(attackType)) {
             return;
