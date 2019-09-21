@@ -8,6 +8,7 @@ import nl.rutgerkok.blocklocker.protection.Protection;
  *
  */
 public enum AttackType {
+	
     CREEPER,
     ENDERMAN,
     FIRE,
@@ -16,5 +17,7 @@ public enum AttackType {
     SAPLING,
     TNT,
     UNKNOWN,
+    VILLAGER,
     ZOMBIE
+    
 }
