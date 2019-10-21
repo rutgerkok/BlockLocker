@@ -35,6 +35,7 @@ import nl.rutgerkok.blocklocker.impl.event.BlockPlaceListener;
 import nl.rutgerkok.blocklocker.impl.event.InteractListener;
 import nl.rutgerkok.blocklocker.impl.event.SignChangeListener;
 import nl.rutgerkok.blocklocker.impl.group.FactionsGroupSystem;
+import nl.rutgerkok.blocklocker.impl.group.GuildsGroupSystem;
 import nl.rutgerkok.blocklocker.impl.group.PermissionsGroupSystem;
 import nl.rutgerkok.blocklocker.impl.group.ScoreboardGroupSystem;
 import nl.rutgerkok.blocklocker.impl.group.TownyGroupSystem;
@@ -145,6 +146,9 @@ BlockLockerPlugin {
         }
         if (mcMMOGroupSystem.isAvailable()) {
         	this.combinedGroupSystem.addSystem(new mcMMOGroupSystem());
+        }
+        if (GuildsGroupSystem.isAvailable()) {
+            this.combinedGroupSystem.addSystem(new GuildsGroupSystem());
         }
     }
 
