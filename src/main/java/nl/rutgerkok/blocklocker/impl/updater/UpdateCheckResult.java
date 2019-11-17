@@ -18,18 +18,14 @@ import com.google.gson.JsonObject;
  */
 final class UpdateCheckResult {
 	
-    private static final String DOWNLOAD_URL_KEY = "downloadUrl";
     private static final String ERROR_KEY = "error";
     private static final String INFO_URL_KEY = "infoUrl";
     private static final String NEEDS_UPDATE_KEY = "needsUpdate";
     private static final String REQUIREMENTS_KEY = "requirements";
     private static final String VERSION_KEY = "version";
-    private static final String MD5_KEY = "fileMd5";
 
-    private final Optional<URL> downloadUrl;
     private final Optional<URL> infoUrl;
     private final Optional<String> latestVersion;
-    private final Optional<String> fileMd5;
     private final Set<String> minecraftVersions;
     private final boolean needsUpdate;
 
@@ -43,8 +39,6 @@ final class UpdateCheckResult {
         // Parse all information
         needsUpdate = getBoolean(object, NEEDS_UPDATE_KEY);
         latestVersion = Optional.ofNullable(object.get(VERSION_KEY)).map(JsonElement::getAsString);
-        fileMd5 = Optional.ofNullable(object.get(MD5_KEY)).map(JsonElement::getAsString);
-        downloadUrl = getUrl(object, DOWNLOAD_URL_KEY);
         infoUrl = getUrl(object, INFO_URL_KEY);
         this.minecraftVersions = getStringSet(object, REQUIREMENTS_KEY);
     }
@@ -61,9 +55,6 @@ final class UpdateCheckResult {
             return false;
         }
         UpdateCheckResult other = (UpdateCheckResult) obj;
-        if (!downloadUrl.equals(other.downloadUrl)) {
-            return false;
-        }
         if (!infoUrl.equals(other.infoUrl)) {
             return false;
         }
@@ -71,9 +62,6 @@ final class UpdateCheckResult {
             return false;
         }
         if (!minecraftVersions.equals(other.minecraftVersions)) {
-            return false;
-        }
-        if (!fileMd5.equals(other.fileMd5)) {
             return false;
         }
         if (needsUpdate != other.needsUpdate) {
@@ -87,23 +75,6 @@ final class UpdateCheckResult {
     	if (element == null) return false;
         Boolean bool = element.getAsBoolean();
         return bool.booleanValue();
-    }
-
-    /**
-     * Gets the URL of the file that must be downloaded.
-     *
-     * @return The URL of the file.
-     */
-    public Optional<URL> getDownloadUrl() {
-        return downloadUrl;
-    }
-
-    /**
-     * Gets the correct MD5 of the downloaded file. Make sure that they match.
-     * @return The correct MD5.
-     */
-    public Optional<String> getFileMD5() {
-        return fileMd5;
     }
 
     /**
@@ -161,11 +132,9 @@ final class UpdateCheckResult {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + downloadUrl.hashCode();
         result = prime * result + infoUrl.hashCode();
         result = prime * result + latestVersion.hashCode();
         result = prime * result + minecraftVersions.hashCode();
-        result = prime * result + fileMd5.hashCode();
         result = prime * result + (needsUpdate ? 1231 : 1237);
         return result;
     }
@@ -186,8 +155,6 @@ final class UpdateCheckResult {
         } else {
             return "UpdateResult{needsUpdate=" + needsUpdate
                     + ", latestVersion=" + latestVersion.orElse(null)
-                    + ", downloadUrl=" + downloadUrl.orElse(null)
-                    + ", fileMd5=" + fileMd5.orElse(null)
                     + ", infoUrl=" + infoUrl.orElse(null)
                     + ", minecraftVersions=" + minecraftVersions
                     + "}";

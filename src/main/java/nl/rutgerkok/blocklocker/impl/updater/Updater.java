@@ -1,17 +1,16 @@
 package nl.rutgerkok.blocklocker.impl.updater;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
+
+import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import nl.rutgerkok.blocklocker.Translator;
 import nl.rutgerkok.blocklocker.impl.updater.UpdateResult.Status;
@@ -27,7 +26,6 @@ public final class Updater {
      */
     private static final long CHECK_INTERVAL = 20 * 60 * 60 * 12;
 
-    private final File installDestination;
     private final Plugin plugin;
     private volatile UpdatePreference preference;
     private final BukkitRunnable task = new BukkitRunnable() {
@@ -47,19 +45,6 @@ public final class Updater {
         this.translator = Preconditions.checkNotNull(translator);
         this.plugin = Preconditions.checkNotNull(plugin);
 
-        this.installDestination = new File(plugin.getServer().getUpdateFolderFile(), getJarFileName());
-    }
-
-    /**
-     * Gets the name of the JAR file we're in, like BlockLocker-1.2.4.jar.
-     * @return The name of the JAR file.
-     */
-    private String getJarFileName() {
-        return new File(Updater.class.getProtectionDomain()
-                .getCodeSource()
-                .getLocation()
-                .getPath())
-                        .getName();
     }
 
     private Optional<String> getMinecraftVersion() {
@@ -128,21 +113,14 @@ public final class Updater {
     }
 
     private void updateInstallSync(UpdateCheckResult result) throws IOException {
-        if (preference.installUpdates() && result.getDownloadUrl().isPresent()) {
-            Optional<String> minecraftVersion = getMinecraftVersion();
-            
-            if (minecraftVersion.isPresent() && result.getMinecraftVersions().containsAll(ImmutableSet.of(minecraftVersion.get()))) {
-                // Update automatically
-                UpdateDownloader downloader = new UpdateDownloader(plugin, result, installDestination);
-                downloader.downloadSync();
-                notifyServer(new UpdateResult(Status.AUTOMATICALLY_UPDATED, result));
-            } else {
-                // Server version no longer supported
-                notifyServer(new UpdateResult(Status.UNSUPPORTED_SERVER, result));
-            }
-        } else {
-            // Don't update automatically, but show notification
+        Optional<String> minecraftVersion = getMinecraftVersion();
+
+        if (result.getMinecraftVersions().containsAll(ImmutableSet.of(minecraftVersion.get()))) {
+            // Notify that an update is available
             notifyServer(new UpdateResult(Status.MANUAL_UPDATE, result));
+        } else {
+            // Server version no longer supported
+            notifyServer(new UpdateResult(Status.UNSUPPORTED_SERVER, result));
         }
     }
 

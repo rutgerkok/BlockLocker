@@ -7,11 +7,11 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 
-import org.bukkit.plugin.Plugin;
-
 import com.google.common.base.Charsets;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
+import org.bukkit.plugin.Plugin;
 
 /**
  * Checks whether an update is available.

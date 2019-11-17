@@ -16,13 +16,11 @@ final class UpdateResult {
     enum Status {
         NO_UPDATE,
         MANUAL_UPDATE,
-        AUTOMATICALLY_UPDATED,
         CHECK_FAILED,
         UNSUPPORTED_SERVER;
 
         public boolean hasNotification() {
             return this == MANUAL_UPDATE
-                    || this == AUTOMATICALLY_UPDATED
                     || this == UNSUPPORTED_SERVER;
         }
     }
@@ -49,15 +47,6 @@ final class UpdateResult {
     }
 
     /**
-     * Gets whether this update result has a notification that should be shown.
-     * 
-     * @return True if this update result has a notification, false otherwise.
-     */
-    boolean hasNotification() {
-        return status.hasNotification();
-    }
-
-    /**
      * Gets the status of the update notification.
      * 
      * @return The status.
@@ -73,6 +62,15 @@ final class UpdateResult {
      */
     UpdateCheckResult getUpdateCheckResult() {
         return checkResult;
+    }
+
+    /**
+     * Gets whether this update result has a notification that should be shown.
+     * 
+     * @return True if this update result has a notification, false otherwise.
+     */
+    boolean hasNotification() {
+        return status.hasNotification();
     }
 
 }

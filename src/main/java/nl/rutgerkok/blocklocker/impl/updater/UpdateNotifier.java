@@ -4,15 +4,15 @@ import java.net.URL;
 import java.util.Optional;
 import java.util.Set;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-
-import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
 
 import nl.rutgerkok.blocklocker.Permissions;
 import nl.rutgerkok.blocklocker.Translator;
@@ -58,9 +58,6 @@ final class UpdateNotifier implements Listener {
 
         // Show status
         switch (result.getStatus()) {
-            case AUTOMATICALLY_UPDATED:
-                translator.sendMessage(sender, Translation.UPDATER_UPDATED_AUTOMATICALLY, newVersion);
-                break;
             case MANUAL_UPDATE:
                 translator.sendMessage(sender, Translation.UPDATER_UPDATE_AVAILABLE, newVersion);
                 break;
