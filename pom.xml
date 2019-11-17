@@ -127,12 +127,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
-	<distributionManagement>
-		<repository>
-			<id>github</id>
-			<name>GitHub rutgerkok Apache Maven Packages</name>
-			<url>https://maven.pkg.github.com/rutgerkok/BlockLocker</url>
-		</repository>
-	</distributionManagement>
 </project>
