@@ -3,13 +3,13 @@ package nl.rutgerkok.blocklocker.impl.nms;
 import java.util.Iterator;
 import java.util.Optional;
 
-import org.bukkit.World;
-import org.bukkit.block.Sign;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterators;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+
+import org.bukkit.World;
+import org.bukkit.block.Sign;
 
 public interface ServerSpecific {
 
@@ -29,7 +29,7 @@ public interface ServerSpecific {
 
         /**
          * Gets the text on the first line of a sign, may be an empty string.
-         * 
+         *
          * @return The text.
          */
         public String getFirstLine() {
@@ -38,7 +38,7 @@ public interface ServerSpecific {
 
         /**
          * Gets whether there is data on this sign.
-         * 
+         *
          * @return True if there is data, false otherwise.
          */
         public boolean hasData() {
@@ -52,11 +52,10 @@ public interface ServerSpecific {
     }
 
     /**
-     * Gets the stored {@link JSONObject}s. If the sign contains no extra data
-     * at all, an empty {@link Optional} will be returned. Otherwise, all
-     * non-null {@link JSONObject}s stored in the sign will be added to the
-     * list.
-     * 
+     * Gets the stored {@link JsonObject}s. If the sign contains no extra data at
+     * all, an empty {@link Optional} will be returned. Otherwise, all non-null
+     * {@link JsonObject}s stored in the sign will be added to the list.
+     *
      * @param world
      *            The world the sign is in.
      * @param x

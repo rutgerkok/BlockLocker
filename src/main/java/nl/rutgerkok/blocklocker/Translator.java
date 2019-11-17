@@ -64,6 +64,25 @@ public abstract class Translator {
     public abstract String get(Translation key);
 
     /**
+     * Returns a list of all possible translations.
+     * 
+     * @param key
+     * 			The key of the translation.
+     * @return A list of all possible translations, or the key (in a list) if not found.
+     */
+    public abstract List<String> getAll(Translation key);
+    
+    /**
+     * Same as {@link #getAll(Translation)}, but with
+     * {@link ChatColor#stripColor(String)} applied.
+     * 
+     * @param key
+     * 			The key of the translation.
+     * @return A list of all possible translations, or the key (in a list) if not found.
+     */
+    public abstract List<String> getAllWithoutColor(Translation key);
+
+    /**
      * Same as {@link #get(Translation)}, but with
      * {@link ChatColor#stripColor(String)} applied.
      *
@@ -72,25 +91,6 @@ public abstract class Translator {
      * @return The translation, or the key if not found.
      */
     public abstract String getWithoutColor(Translation key);
-    
-    /**
-     * Returns a list of all possible translations.
-     * 
-     * @param key
-     * 			The key of the translation.
-     * @return A list of all possible translations, or the key (in a list) if not found.
-     */
-    public abstract List<String> getAll(Translation key);
-
-    /**
-     * Same as {@link #getAll(Translation)}, but with
-     * {@link ChatColor#stripColor(String)} applied.
-     * 
-     * @param key
-     * 			The key of the translation.
-     * #return A list of all possible translations, or the key (in a list) if not found.
-     */
-    public abstract List<String> getAllWithoutColor(Translation key);
     
     /**
      * Sends the specified message translated to the given player.
