@@ -42,6 +42,12 @@ After running the command there will be a file `blocklocker-XX.jar` (where `XX` 
 Hooking into BlockLocker
 ------------------------
 
+BlockLocker has two APIs for other plugins to use: version 1 and version 2. Right now, the only difference between them is that version 1 uses `com.google.common.base.Optional` while version 2 uses `java.util.Optional`. Version 1 was first included in BlockLocker 0.1, and the plan is to include it in all future versions of BlockLocker as long as the class `com.google.common.base.Optional` exists. Version 2 was realeased on November 17, 2019 with BlockLocker 1.7.
+
+* If your plugin supports Minecraft 1.14, chances are that people are still using BlockLocker 1.6, and you should use API version 1.
+* If your plugin supports Minecraft 1.13 or older, you'll have to use API version 1, as version 2 is not available for Minecraft 1.13.
+* If your plugin only supports Minecraft 1.15 and newer, then you can safely use API version 2.
+
 ### Maven
 Add the following repository to your `pom.xml` file:
 
@@ -58,18 +64,20 @@ Add the following file:
 <dependency>
 	<groupId>nl.rutgerkok</groupId>
 	<artifactId>blocklocker</artifactId>
-	<version>0.1</version>
+	<version>0.1</version> <!-- or 1.7, see below -->
 	<scope>provided</scope>
 </dependency>
 ```
+
+If you want to use API version 1, use BlockLocker version 0.1, otherwise for API version 2 use BlockLocker 1.7. Other BlockLocker versions are not uploaded to this repository.
 
 ### Check whether the plugin is enabled
 ```java
 boolean enabled = Bukkit.getPluginManager().getPlugin("BlockLocker") != null;
 ```
 
-### The BlockLockerAPI class
-This class contains some static methods that will never be removed. If don't want your plugin to be broken by future BlockLocker updates, use this class.
+### The BlockLockerAPI - version 1
+The nice thing about API version 1 is that it works with all old BlockLocker versions, all the way back to version 0.1. Version 1 still uses the `com.google.common.base.Optional` class. Because Java 8 also includes an `Optional` class, it can be expected that Google's `Optional` will be removed at some point in the future. At this moment, this API will also dissappear. However, currently the `Optional` class is not deprecated by Google, so it will take at least two years for that class to get removed. So it's still safe to use this API.
 
 Example usage:
 
@@ -90,6 +98,9 @@ isProtected(Block block)
 You can view the complete class, along with documentation, [here](https://github.com/rutgerkok/BlockLocker/blob/master/src/main/java/nl/rutgerkok/blocklocker/BlockLockerAPI.java).
 
 If you solely use these methods, your plugin will work with *all* versions of BlockLocker from the future and past.
+
+### The BlockLockerAPI - version 2
+Use the class `BlockLockerAPIv2` instead of `BlockLockerAPI`. There are no differences between version 2 and version 1 yet, except that the API now uses `java.util.Optional` instead of the older `com.google.common.base.Optional`.
 
 ### More advanced functionality
 I have kept the number of methods in BlockLockerAPI small, as each method will need
