@@ -29,17 +29,6 @@ public final class BlockLockerCommand implements TabExecutor {
     }
 
     @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        if (args.length == 2) {
-            return null;
-        }
-        if (args.length > 2) {
-            return Collections.emptyList();
-        }
-        return Arrays.asList("2", "3", "4");
-    }
-
-    @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 0) {
             return false;
@@ -49,6 +38,17 @@ public final class BlockLockerCommand implements TabExecutor {
             return reloadCommand(sender);
         }
         return signChangeCommand(sender, args);
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        if (args.length == 2) {
+            return null;
+        }
+        if (args.length > 2) {
+            return Collections.emptyList();
+        }
+        return Arrays.asList("2", "3", "4");
     }
 
     private boolean reloadCommand(CommandSender sender) {
@@ -97,7 +97,7 @@ public final class BlockLockerCommand implements TabExecutor {
 
         // Parse name
         String name = args.length > 1 ? args[1] : "";
-        if (name.length() > 16) {
+        if (name.length() > 25) {
             plugin.getTranslator().sendMessage(player, Translation.COMMAND_PLAYER_NAME_TOO_LONG);
             return true;
         }
