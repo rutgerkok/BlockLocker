@@ -3,6 +3,8 @@ package nl.rutgerkok.blocklocker.impl.event;
 import java.util.Optional;
 import java.util.Set;
 
+import com.google.common.collect.ImmutableSet;
+
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -28,8 +30,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-
-import com.google.common.collect.ImmutableSet;
 
 import nl.rutgerkok.blocklocker.AttackType;
 import nl.rutgerkok.blocklocker.BlockLockerPlugin;
@@ -268,44 +268,44 @@ public final class InteractListener extends EventListener {
     }
 
     /**
- * Prevents access to containers.
- *
- * @param event
- *            The event object.
- */
-@EventHandler(ignoreCancelled = true)
-public void onPlayerInteract(PlayerInteractEvent event) {
-    if (event.getAction() != Action.RIGHT_CLICK_BLOCK) {
-        return;
-    }
-
-    Player player = event.getPlayer();
-    Block block = event.getClickedBlock();
-    Material material = block.getType();
-    boolean clickedSign = Tag.STANDING_SIGNS.isTagged(material) || Tag.WALL_SIGNS.isTagged(material);
-    // When using the offhand check, access checks must still be performed,
-    // but no messages must be sent
-    boolean usedOffHand = event.getHand() == EquipmentSlot.OFF_HAND;
-    Optional<Protection> protection = plugin.getProtectionFinder().findProtection(block);
-
-    if (!protection.isPresent()) {
-        if (tryPlaceSign(event.getPlayer(), block, event.getBlockFace(), SignType.PRIVATE)) {
-            plugin.getTranslator().sendMessage(player, Translation.PROTECTION_CLAIMED_CONTAINER);
-            event.setCancelled(true);
+     * Prevents access to containers.
+     *
+     * @param event
+     *            The event object.
+     */
+    @EventHandler(ignoreCancelled = true)
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) {
+            return;
         }
-        return;
-    }
 
-    // Check if protection needs update
-    plugin.getProtectionUpdater().update(protection.get(), false);
+        Player player = event.getPlayer();
+        Block block = event.getClickedBlock();
+        Material material = block.getType();
+        boolean clickedSign = Tag.STANDING_SIGNS.isTagged(material) || Tag.WALL_SIGNS.isTagged(material);
+        // When using the offhand check, access checks must still be performed,
+        // but no messages must be sent
+        boolean usedOffHand = event.getHand() == EquipmentSlot.OFF_HAND;
+        Optional<Protection> protection = plugin.getProtectionFinder().findProtection(block);
 
-    // Check if player is allowed, open door
-    if (checkAllowed(player, protection.get(), clickedSign)) {
-        handleAllowed(event, protection.get(), clickedSign, usedOffHand);
-    } else {
-        handleDisallowed(event, protection.get(), clickedSign, usedOffHand);
+        if (!protection.isPresent()) {
+            if (tryPlaceSign(event.getPlayer(), block, event.getBlockFace(), SignType.PRIVATE)) {
+                plugin.getTranslator().sendMessage(player, Translation.PROTECTION_CLAIMED_CONTAINER);
+                event.setCancelled(true);
+            }
+            return;
+        }
+
+        // Check if protection needs update
+        plugin.getProtectionUpdater().update(protection.get(), false);
+
+        // Check if player is allowed, open door
+        if (checkAllowed(player, protection.get(), clickedSign)) {
+            handleAllowed(event, protection.get(), clickedSign, usedOffHand);
+        } else {
+            handleDisallowed(event, protection.get(), clickedSign, usedOffHand);
+        }
     }
-}
 
     private ItemStack removeOneItem(ItemStack item) {
         if (item.getAmount() > 1) {
