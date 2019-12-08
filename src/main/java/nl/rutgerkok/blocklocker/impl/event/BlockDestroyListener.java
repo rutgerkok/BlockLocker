@@ -117,7 +117,7 @@ public class BlockDestroyListener extends EventListener {
         if (plugin.getChestSettings().allowDestroyBy(AttackType.PISTON)) {
             return;
         }
-        if (event.isSticky() && isProtected(event.getBlock())) {
+        if (event.isSticky() && anyProtected(event.getBlocks())) {
             event.setCancelled(true);
         }
     }
