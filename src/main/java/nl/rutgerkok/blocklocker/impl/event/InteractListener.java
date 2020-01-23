@@ -3,8 +3,6 @@ package nl.rutgerkok.blocklocker.impl.event;
 import java.util.Optional;
 import java.util.Set;
 
-import com.google.common.collect.ImmutableSet;
-
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -30,6 +28,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+
+import com.google.common.collect.ImmutableSet;
 
 import nl.rutgerkok.blocklocker.AttackType;
 import nl.rutgerkok.blocklocker.BlockLockerPlugin;
@@ -67,6 +67,28 @@ public final class InteractListener extends EventListener {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Gets whether players are allowed to build in the given game mode.
+     * 
+     * @param gameMode
+     *            The game mode.
+     * @return True for survival and creative, false for the other modes.
+     */
+    private boolean canBuildInMode(GameMode gameMode) {
+        switch (gameMode) {
+            case ADVENTURE:
+                return false;
+            case CREATIVE:
+                return true;
+            case SPECTATOR:
+                return false;
+            case SURVIVAL:
+                return true;
+            default:
+                return false; // Speculative
+        }
     }
 
     private boolean checkAllowed(Player player, Protection protection, boolean clickedSign) {
@@ -391,7 +413,7 @@ public final class InteractListener extends EventListener {
     }
 
     private boolean tryPlaceSign(Player player, Block block, BlockFace clickedSide, SignType signType) {
-        if (player.isSneaking() || player.getGameMode() == GameMode.SPECTATOR) {
+        if (player.isSneaking() || !canBuildInMode(player.getGameMode())) {
             return false;
         }
         Optional<Material> optionalSignMaterial = getSignInHand(player);
