@@ -1,0 +1,39 @@
+# Translation file for the French language. Translations by Kervinou.
+command:
+  cannot_be_used_by_console: 'Cette commande n''est pas possible à partir de la console !'
+  cannot_edit_owner: '&4Vous ne pouvez pas changer le propriétaire de cette protection. Détruisez la protection en premier.'
+  line_number_out_of_bounds: '&4Saisir un numéro de ligne entre 2 et 4 (inclus).'
+  no_permission: '&4Vous n''avez pas la permission d''utiliser cette commande.'
+  no_sign_selected: '&4Vous devez choisir un panneau sur un des block protégés d''abord en cliquant droit dessus.'
+  player_name_too_long: '&4Le nom du joueur dépasse les 16 caractères, cela dépasse le panneau. C''est d''ailleurs aussi plus long que la longueur conseillée par les créateurs de Minecraft !!'
+  plugin_reloaded: '&6La Configuration du plugin a été rechargée !'
+  sign_no_longer_part_of_protection: '&4Le panneau sélectionné n''est pas accolé à un block protégé.'
+  updated_sign: '&6Protection mise à jour !'
+protection:
+  add_more_users_sign_instead: '&4Un seul panneau nommé [Privé] est possible, ajoutez un autre panneau nommé [Ainsi que]'
+  bypassed: '&6Vous venez de passer outre une protection appartenant à {0}.'
+  cannot_change_sign: '&4Vous ne pouvez pas changer ce panneau, trop proche d''un block protégé.'
+  chest_hint: '&6Vous pouvez mettre un panneau sur ce coffre pour le protéger.'
+  claimed_container: '&6Block protégé. Personne d''autre ne peut y avoir accès.'
+  claimed_manually: '&6Protection créée. Seuls les personnes listées sur le panneau peuvent y accéder.'
+  expired: '&6La protection de ce block a expiré à cause de l''inactivité du propriétaire.'
+  in_wilderness: '&4Vous ne pouvez pas créer une protection ici: vous êtes dans une région sauvage !'
+  is_claimed_by: '&6Ce block appartient à {0}.'
+  no_access: '&4Intéraction non autorisée, il appartient à {0}.'
+  no_permission_for_claim: '&4Vous n''avez pas la permission de protéger ce block, désolé !'
+  not_nearby: '&4Aucun block protégeable à proximité. Faites (Shift-)Clic-Droit sur un block avec un panneau dans la main pour le protéger.'
+  selected_sign: '&6Protection sélectionnée: écrire "/bl <numero de ligne> <nom_du_joueur>" pour éditer cette protection.'
+tag:
+  everyone: ToutLeMonde
+  more_users: 
+  - '[Ainsi que]'
+  - '[More Users]'
+  private:
+  - '[Privé]'
+  - '[Private]'
+  redstone: Redstone
+  timer: Timer
+updater:
+  more_information: '&6Pour plus de détails: {0}'
+  unsupported_server: '&4La dernière version de BlockLocker (version {0}) ne fonctionne pas avec cette version de Minecraft, seulement Minecraft {1}.'
+  update_available: '&6Une mise à jour de BlockLocker (version {0}) est disponible pour un téléchargement manuel'
