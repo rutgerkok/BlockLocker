@@ -1,0 +1,39 @@
+# Translation file for the Dutch language
+command:
+  cannot_be_used_by_console: 'Dit commando kan niet door de console gebruikt worden. Sorry!'
+  cannot_edit_owner: '&4Je kunt niet aanpassen wie de eigenaar is van de bescherming. Je kunt wel de bescherming slopen.'
+  line_number_out_of_bounds: '&4Gebruik alsjeblieft een regelnummer van 2 t/m 4.'
+  no_permission: '&4Je hebt geen toestemming om dit commando te gebruiken. Sorry!'
+  no_sign_selected: '&4Selecteer eerst een bordje door te rechtklikken.'
+  player_name_too_long: '&4De spelernaam is langer dan 16 tekens. Dit gaat niet passen. Mojang staat ook niet toe dat spelernamen langer dan 16 tekens zijn.'
+  plugin_reloaded: '&6Configuratiebestanden zijn opnieuw geladen!'
+  sign_no_longer_part_of_protection: '&4Het eerder geselecteerde bordje hoort niet langer bij een bescherming.'
+  updated_sign: '&6Bordje is bijgewerkt!'
+protection:
+  add_more_users_sign_instead: '&4Je mag maar één bordje met [Op slot] ophangen per bescherming. Gebruik in plaats daarvan bordjes met [More Users]..'
+  bypassed: '&6Je hebt ingebroken bij een bescherming van {0}.'
+  cannot_change_sign: '&4Je kunt geen bordje aanpassen aan een beschermd blok.'
+  chest_hint: '&6Plaats een bordje tegen deze kist om de kist te beschermen.'
+  claimed_container: '&6Deze container is nu beschermd. Alleen jij kan er nog bij.'
+  claimed_manually: '&6Je hebt een beschermingsbordje opgehangen. Alleen spelers die staan op het bordje kunnen er nog bij.'
+  expired: '&6The protection of this block has expired due to inactivity of the owner.'
+  in_wilderness: '&4You cannot create a protection here: you are in the wilderness.'
+  is_claimed_by: '&6Dit blok is beschermd door {0}.'
+  no_access: '&4Dit blok is beschermd door {0}, je kunt er niet bij.'
+  no_permission_for_claim: '&4Je hebt geen toestemming om beschermingsbordjes op te hangen, sorry.'
+  not_nearby: '&4Er is hier geen blok dat beschermd kan worden. (Shift-)rechtsklik een containerblok met een bordje in je hand om het te beschermen.'
+  selected_sign: '&6Bordje geselecteerd. Typ "/blocklocker <line number> <name>" om het te bewerken.'
+tag:
+  everyone: Everyone
+  more_users: 
+  - '[Meer Spelers]'
+  - '[More Users]'
+  private:
+  - '[Op slot]'
+  - '[Private]'
+  redstone: Redstone
+  timer: Timer
+updater:
+  more_information: '&6Meer informatie: {0}'
+  unsupported_server: '&4De nieuwste versie van BlockLocker (versie {0}) ondersteunt niet langer deze Minecraftversie, maar slechts nog Minecraft {1}.'
+  update_available: '&6Een bijgewerkte versie van BlockLocker (versie {0}) is kan handmatig gedownload worden.'

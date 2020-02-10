@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Collection;
+import java.util.Locale;
+import java.util.Optional;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
@@ -75,17 +77,27 @@ BlockLockerPlugin {
     }
 
     /**
-     * Gets a configuration file from the jar file.
+     * Gets a configuration file from the jar file. You can only use single file
+     * names as paths; slashes are not allowed. The file name must end with .yml
+     * (case insensitive).
      *
      * @param path
      *            Path in the jar file.
      * @return The configuration file.
      */
-    private Configuration getJarConfig(String path) {
+    private Optional<Configuration> getJarConfig(String path) {
+        if (path.contains("/") || path.contains("\\")) {
+            // Disallow searching through the JAR file.
+            return Optional.empty();
+        }
+        if (!path.toLowerCase(Locale.ROOT).endsWith(".yml")) {
+            return Optional.empty();
+        }
+
         InputStream resource = getResource(path);
         if (resource == null) {
             // Not found
-            return new YamlConfiguration();
+            return Optional.empty();
         }
         Reader reader = new InputStreamReader(resource, Charsets.UTF_8);
         Configuration config = YamlConfiguration.loadConfiguration(reader);
@@ -94,7 +106,7 @@ BlockLockerPlugin {
         } catch (IOException e) {
             getLogger().log(Level.SEVERE, "Failed to close stream", e);
         }
-        return config;
+        return Optional.of(config);
     }
 
     @Override
@@ -184,7 +196,14 @@ BlockLockerPlugin {
     private Translator loadTranslations(String fileName) {
         File file = new File(getDataFolder(), fileName);
         Configuration config = YamlConfiguration.loadConfiguration(file);
-        config.addDefaults(getJarConfig(Config.DEFAULT_TRANSLATIONS_FILE));
+        Optional<Configuration> defaultsForLanguage = getJarConfig(fileName);
+        if (defaultsForLanguage.isPresent()) {
+            config.addDefaults(defaultsForLanguage.get());
+        } else {
+            Configuration defaultsForEnglish = getJarConfig(Config.DEFAULT_TRANSLATIONS_FILE)
+                    .orElseGet(YamlConfiguration::new);
+            config.addDefaults(defaultsForEnglish);
+        }
 
         ConfigTranslator translator = new ConfigTranslator(config);
         if (translator.needsSave()) {
