@@ -11,6 +11,7 @@ public enum AttackType {
 	
     CREEPER,
     ENDERMAN,
+    EXPLODED_BLOCK,
     FIRE,
     GHAST,
     PISTON,
