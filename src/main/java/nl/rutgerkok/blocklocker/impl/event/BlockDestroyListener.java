@@ -166,7 +166,7 @@ public class BlockDestroyListener extends EventListener {
     @EventHandler(ignoreCancelled = true)
     public void onBlockExplodeEvent(BlockExplodeEvent event) {
         // Generally caused by a Bed, but when the event is triggered the bed is no longer there so we can't check that
-        AttackType attackType = AttackType.EXPLODED_BLOCK;
+        AttackType attackType = AttackType.BLOCK_EXPLOSION;
         if (plugin.getChestSettings().allowDestroyBy(attackType)) {
             return;
         }
