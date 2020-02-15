@@ -18,6 +18,7 @@ import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
@@ -151,6 +152,21 @@ public class BlockDestroyListener extends EventListener {
                 attackType = AttackType.GHAST;
             }
         }
+        if (plugin.getChestSettings().allowDestroyBy(attackType)) {
+            return;
+        }
+        for (Iterator<Block> it = event.blockList().iterator(); it.hasNext();) {
+            Block block = it.next();
+            if (isProtected(block)) {
+                it.remove();
+            }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onBlockExplodeEvent(BlockExplodeEvent event) {
+        // Generally caused by a Bed, but when the event is triggered the bed is no longer there so we can't check that
+        AttackType attackType = AttackType.EXPLODED_BLOCK;
         if (plugin.getChestSettings().allowDestroyBy(attackType)) {
             return;
         }

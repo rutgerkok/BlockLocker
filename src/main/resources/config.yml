@@ -130,6 +130,7 @@ autoExpireDays: 0
 # These are the values you can use, along with how they can destroy protections.
 # CREEPER - creepers can destroy protections by exploding
 # ENDERMAN - endermans can destroy protections by picking up blocks
+# EXPLODED_BLOCK - some blocks can destroy protections by exploding
 # FIRE - fire can burn protections
 # GHAST - ghasts can shoot exploding fireballs
 # PISTON - pistons can remove the protection signs
