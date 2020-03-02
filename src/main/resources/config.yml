@@ -128,9 +128,10 @@ autoExpireDays: 0
 # protections.
 #
 # These are the values you can use, along with how they can destroy protections.
+# BLOCK_EXPLOSION - some blocks like beds can destroy protections by exploding
+#                  Note: TNT is an entity when exploding, so it's not affected by this value
 # CREEPER - creepers can destroy protections by exploding
 # ENDERMAN - endermans can destroy protections by picking up blocks
-# EXPLODED_BLOCK - some blocks can destroy protections by exploding
 # FIRE - fire can burn protections
 # GHAST - ghasts can shoot exploding fireballs
 # PISTON - pistons can remove the protection signs
