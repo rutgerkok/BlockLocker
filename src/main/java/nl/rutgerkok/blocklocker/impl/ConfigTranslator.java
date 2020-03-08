@@ -24,38 +24,39 @@ import nl.rutgerkok.blocklocker.Translator;
 class ConfigTranslator extends Translator {
 
     /**
-     * Little class that contains multiple translated values.
-     * This class extends a translationValue which is the primary value,
-     * it contains a list with all the other possible values.
+     * Little class that contains multiple translated values. This class extends a
+     * translationValue which is the primary value, it contains a list with all the
+     * other possible values.
      *
      */
     private static class MultiTranslationValue extends TranslationValue {
-    	private final List<TranslationValue> aliases;
-    	
-    	private MultiTranslationValue(List<String> values) {
-    		super(values.get(0));
-    		this.aliases = new ArrayList<>();
-    		
-    		for (String alias : values.subList(1, values.size())) {
-    			this.aliases.add(new TranslationValue(alias));
-    		}
-    	}
-    	
-    	@Override
-    	public List<TranslationValue> getAll() {
-    	    List<TranslationValue> all = new ArrayList<>();
-    	    
-    	    all.add(this);
-    	    
-    	    this.aliases.forEach(value->all.add(value));
-    	    
-    	    return all;
-    	}
+        private final List<TranslationValue> aliases;
+
+        private MultiTranslationValue(List<String> values) {
+            super(values.get(0));
+            this.aliases = new ArrayList<>();
+
+            for (String alias : values.subList(1, values.size())) {
+                this.aliases.add(new TranslationValue(alias));
+            }
+        }
+
+        @Override
+        public List<TranslationValue> getAll() {
+            List<TranslationValue> all = new ArrayList<>();
+
+            all.add(this);
+
+            this.aliases.forEach(value -> all.add(value));
+
+            return all;
+        }
     }
+
     /**
-     * Little class to hold the different representations of the translated
-     * values. The original ({@code &1foo}), the colored ({@code §1foo}) and
-     * uncolored ({@code foo}).
+     * Little class to hold the different representations of the translated values.
+     * The original ({@code &1foo}), the colored ({@code §1foo}) and uncolored
+     * ({@code foo}).
      *
      */
     private static class TranslationValue {
@@ -68,14 +69,14 @@ class ConfigTranslator extends Translator {
             this.colored = ChatColor.translateAlternateColorCodes('&', original);
             this.uncolored = ChatColor.stripColor(colored);
         }
-        
+
         public List<TranslationValue> getAll() {
             return Arrays.asList(this);
         }
     }
 
     private boolean needsSave = false;
-    
+
     private final Map<Translation, TranslationValue> translations;
 
     ConfigTranslator(ConfigurationSection config) {
@@ -83,29 +84,23 @@ class ConfigTranslator extends Translator {
         for (Translation translation : Translation.values()) {
             String key = translation.toString();
 
-            if (!hasSpecifiedValue(config, key)) {
+            if (!config.contains(key, true)) {
                 // Not overridden, so no value in config file
                 needsSave = true;
             }
 
-            // Check if there is a list as value
-            List<String> values = config.getStringList(key);
-            
-            // No list, add string to list
-            if (values.size() <= 0) {
-                values.add(config.getString(key));
+            // Get and store the value
+            Object value = config.get(key);
+            if (value instanceof String) {
+                translations.put(translation, new TranslationValue((String) value));
+            } else if (isStringList(value)) {
+                @SuppressWarnings("unchecked") // Checked by line above
+                List<String> stringList = (List<String>) value;
+                translations.put(translation, new MultiTranslationValue(stringList));
+            } else {
+                // Make sure there are no null entries
+                translations.put(translation, new TranslationValue("~~TODO translate " + key + "~~"));
             }
-            
-        	// Check the list for null values
-        	for (int i = 0; i < values.size(); i++) {
-        		if (values.get(i) == null) {
-        			// No default value was specified, strange
-                    values.set(i, "~~TODO translate " + key + "~~");
-        		}
-        	}
-        	
-        	// When there is only one value, add a translationValue, otherwise add a multiTranslationValue
-        	translations.put(translation, (values.size() == 1) ? new TranslationValue(values.get(0)) : new MultiTranslationValue(values));
         }
     }
 
@@ -120,44 +115,49 @@ class ConfigTranslator extends Translator {
     }
 
     @Override
-	public List<String> getAll(Translation key) {
-		List<String> all = new ArrayList<>();
-		
-		translations.get(key).getAll().forEach(value->all.add(value.colored));
-		
-		return all;
-	}
+    public List<String> getAll(Translation key) {
+        List<String> all = new ArrayList<>();
+
+        translations.get(key).getAll().forEach(value -> all.add(value.colored));
+
+        return all;
+    }
 
     @Override
-	public List<String> getAllWithoutColor(Translation key) {
-		List<String> all = new ArrayList<>();
-		
-		translations.get(key).getAll().forEach(value->all.add(value.uncolored));
-		
-		return all;
-	}
-    
-	@Override
+    public List<String> getAllWithoutColor(Translation key) {
+        List<String> all = new ArrayList<>();
+
+        translations.get(key).getAll().forEach(value -> all.add(value.uncolored));
+
+        return all;
+    }
+
+    @Override
     public String getWithoutColor(Translation key) {
         return translations.get(key).uncolored;
     }
 
-	/**
-     * Checks if the user has specified a value for the given key. If a default
-     * value was specified, this method still returns false, unlike the method
-     * on {@link ConfigurationSection}.
-     * 
-     * @param config
-     *            The configuration section.
-     * @param key
-     *            The key.
-     * @return True if the user has specified a value for the given key, false
-     *         otherwise.
+    /**
+     * Checks if all values in the list are strings. Returns false if not a list or
+     * if the list contains something else.
+     *
+     * @param value
+     *            The list.
+     * @return True if value is a list and contains only strings.
      */
-    private boolean hasSpecifiedValue(ConfigurationSection config, String key) {
-        return !config.getString(key, "foo").equals("foo");
+    private boolean isStringList(Object value) {
+        if (!(value instanceof List<?>)) {
+            return false;
+        }
+        List<?> list = (List<?>) value;
+        for (Object element : list) {
+            if (!(element instanceof String)) {
+                return false;
+            }
+        }
+        return true;
     }
-	
+
     boolean needsSave() {
         return needsSave;
     }
@@ -175,7 +175,7 @@ class ConfigTranslator extends Translator {
         for (Entry<Translation, TranslationValue> translationEntry : translations.entrySet()) {
             String key = translationEntry.getKey().toString();
             List<TranslationValue> values = translationEntry.getValue().getAll();
-            if (values.size() == 1) { 
+            if (values.size() == 1) {
                 config.set(key, translationEntry.getValue().original);
             } else {
                 List<String> stringValues = values.stream()
