@@ -42,17 +42,17 @@ abstract class EventListener implements Listener {
     }
 
     boolean isProtectedForRedstone(Block block) {
-        if (plugin.getProtectCache().hasValidCache(block)) {
-            return plugin.getProtectCache().getLocked(block);
+        if (plugin.getRedstoneProtectCache().hasValidCache(block)) {
+            return plugin.getRedstoneProtectCache().getLocked(block);
         } else {
             Optional<Protection> protection = plugin.getProtectionFinder().findProtection(block, SearchMode.NO_SUPPORTING_BLOCKS);
             if (!protection.isPresent()) {
-                plugin.getProtectCache().setCache(block, false);
+                plugin.getRedstoneProtectCache().setCache(block, false);
                 return false;
             }
             Profile redstone = plugin.getProfileFactory().fromRedstone();
             boolean protecting = !protection.get().isAllowed(redstone);
-            plugin.getProtectCache().setCache(block, protecting);
+            plugin.getRedstoneProtectCache().setCache(block, protecting);
             return protecting;
         }
     }

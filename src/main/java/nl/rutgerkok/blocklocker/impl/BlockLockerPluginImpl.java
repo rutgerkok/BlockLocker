@@ -58,6 +58,7 @@ BlockLockerPlugin {
     private Translator translator;
     private CombinedLocationChecker combinedLocationChecker;
     private Cache protectCache;
+    private Cache redstoneProtectCache;
 
     @Override
     public ChestSettings getChestSettings() {
@@ -138,9 +139,13 @@ BlockLockerPlugin {
     public Translator getTranslator() {
         return translator;
     }
-
+    @Override
     public Cache getProtectCache() {
         return protectCache;
+    }
+    @Override
+    public Cache getRedstoneProtectCache() {
+        return redstoneProtectCache;
     }
 
     private void loadGroupSystems() {
@@ -190,6 +195,7 @@ BlockLockerPlugin {
         protectionUpdater = new ProtectionUpdaterImpl(this);
         signSelector = new SignSelectorImpl(this);
         protectCache = new Cache(this);
+        redstoneProtectCache = new Cache(this);
     }
 
     private Translator loadTranslations(String fileName) {
