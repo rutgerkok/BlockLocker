@@ -1,7 +1,10 @@
 package nl.rutgerkok.blocklocker.impl.event;
 
 import com.google.common.collect.ImmutableSet;
-import nl.rutgerkok.blocklocker.*;
+import nl.rutgerkok.blocklocker.BlockLockerPlugin;
+import nl.rutgerkok.blocklocker.Permissions;
+import nl.rutgerkok.blocklocker.ProtectionSign;
+import nl.rutgerkok.blocklocker.SignType;
 import nl.rutgerkok.blocklocker.Translator.Translation;
 import nl.rutgerkok.blocklocker.location.IllegalLocationException;
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;
@@ -246,18 +249,8 @@ public final class InteractListener extends EventListener {
         if (!(event.getEntity() instanceof Villager)) {
             return;
         }
-        if (plugin.getChestSettings().allowDestroyBy(AttackType.VILLAGER)) {
-            return;
-        }
-        if (plugin.getProtectCache().hasValidCache(event.getBlock())) {
-            if (plugin.getProtectCache().getLocked(event.getBlock())) {
-                event.setCancelled(true);
-            }
-        } else {
-            if (isProtected(event.getBlock())) {
-                event.setCancelled(true);
-                plugin.getProtectCache().setCache(event.getBlock(), true);
-            }
+        if (isProtected(event.getBlock())) {
+            event.setCancelled(true);
         }
     }
 
