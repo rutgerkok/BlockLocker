@@ -19,14 +19,12 @@ public class Cache {
     }
 
     public boolean hasValidCache(Block block) {
-        if (!block.hasMetadata(prefix + "time")) {
-            return false;
+        List<MetadataValue> metadatas = block.getMetadata(prefix + "time");
+        if (!metadatas.isEmpty()) {
+            long expires = metadatas.get(0).asLong();
+            return expireTime < (System.currentTimeMillis() - expires);
         }
-        if ((System.currentTimeMillis() - block.getMetadata(prefix + "time").get(0).asLong()) > expireTime) {
-            this.resetCache(block);
-            return false;
-        }
-        return true;
+        return false;
     }
 
     public boolean getLocked(Block block) {
