@@ -31,7 +31,9 @@ abstract class EventListener implements Listener {
     }
 
     boolean isProtected(Block block) {
-
+        if(block == null){
+            return false;
+        }
         if (plugin.getProtectCache().hasValidCache(block)) {
             return plugin.getProtectCache().getLocked(block);
         } else {
@@ -42,6 +44,9 @@ abstract class EventListener implements Listener {
     }
 
     boolean isProtectedForRedstone(Block block) {
+        if(block == null){
+            return false;
+        }
         if (plugin.getRedstoneProtectCache().hasValidCache(block)) {
             return plugin.getRedstoneProtectCache().getLocked(block);
         } else {
