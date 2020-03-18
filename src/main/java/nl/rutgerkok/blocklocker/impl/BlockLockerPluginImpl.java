@@ -194,8 +194,8 @@ BlockLockerPlugin {
         protectionFinder = new ProtectionFinderImpl(blockFinder, chestSettings);
         protectionUpdater = new ProtectionUpdaterImpl(this);
         signSelector = new SignSelectorImpl(this);
-        protectCache = new Cache(this);
-        redstoneProtectCache = new Cache(this);
+        protectCache = new Cache(this,"regular_");
+        redstoneProtectCache = new Cache(this,"redstone_");
     }
 
     private Translator loadTranslations(String fileName) {
