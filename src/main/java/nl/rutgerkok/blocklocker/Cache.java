@@ -18,6 +18,9 @@ public class Cache {
     }
 
     public boolean hasValidCache(Block block){
+        if(block == null){
+            return false;
+        }
         if(!block.hasMetadata("time")){
             return false;
         }
