@@ -273,14 +273,13 @@ public final class InteractListener extends EventListener {
     @EventHandler(ignoreCancelled = true)
     public void onInventoryMoveItemEvent(InventoryMoveItemEvent event) {
         Block from = getInventoryBlockOrNull(event.getSource());
-        Block to = getInventoryBlockOrNull(event.getDestination());
-
         if (from != null) {
             if (isProtectedForRedstone(from)) {
                 event.setCancelled(true);
                 return;
             }
         }
+        Block to = getInventoryBlockOrNull(event.getDestination());
         if (to != null) {
             if (isProtectedForRedstone(to)) {
                 event.setCancelled(true);
