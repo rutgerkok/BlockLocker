@@ -10,6 +10,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.logging.Level;
 
+import nl.rutgerkok.blocklocker.*;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -19,14 +20,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 
-import nl.rutgerkok.blocklocker.BlockLockerPlugin;
-import nl.rutgerkok.blocklocker.ChestSettings;
-import nl.rutgerkok.blocklocker.ProfileFactory;
-import nl.rutgerkok.blocklocker.ProtectionFinder;
-import nl.rutgerkok.blocklocker.ProtectionUpdater;
-import nl.rutgerkok.blocklocker.SignParser;
-import nl.rutgerkok.blocklocker.SignSelector;
-import nl.rutgerkok.blocklocker.Translator;
 import nl.rutgerkok.blocklocker.group.CombinedGroupSystem;
 import nl.rutgerkok.blocklocker.group.GroupSystem;
 import nl.rutgerkok.blocklocker.impl.blockfinder.BlockFinder;
@@ -64,6 +57,7 @@ BlockLockerPlugin {
     private SignSelector signSelector;
     private Translator translator;
     private CombinedLocationChecker combinedLocationChecker;
+    private Cache protectCache;
 
     @Override
     public ChestSettings getChestSettings() {
@@ -145,6 +139,10 @@ BlockLockerPlugin {
         return translator;
     }
 
+    public Cache getProtectCache() {
+        return protectCache;
+    }
+
     private void loadGroupSystems() {
         this.combinedGroupSystem = new CombinedGroupSystem();
         this.combinedGroupSystem.addSystem(new PermissionsGroupSystem());
@@ -191,6 +189,7 @@ BlockLockerPlugin {
         protectionFinder = new ProtectionFinderImpl(blockFinder, chestSettings);
         protectionUpdater = new ProtectionUpdaterImpl(this);
         signSelector = new SignSelectorImpl(this);
+        protectCache = new Cache(this);
     }
 
     private Translator loadTranslations(String fileName) {

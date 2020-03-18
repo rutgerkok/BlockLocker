@@ -89,6 +89,12 @@ public interface BlockLockerPlugin {
     Translator getTranslator();
 
     /**
+     * Gets the caches, used to caching protection query result.
+     * @return The cache.
+     */
+    Cache getProtectCache();
+
+    /**
      * Reloads the configuration files of the plugin.
      */
     void reload();

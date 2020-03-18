@@ -1,17 +1,18 @@
 package nl.rutgerkok.blocklocker.impl.event;
 
-import java.util.Optional;
-import java.util.Set;
-
+import com.google.common.collect.ImmutableSet;
+import nl.rutgerkok.blocklocker.*;
+import nl.rutgerkok.blocklocker.Translator.Translation;
+import nl.rutgerkok.blocklocker.location.IllegalLocationException;
+import nl.rutgerkok.blocklocker.profile.PlayerProfile;
+import nl.rutgerkok.blocklocker.profile.Profile;
+import nl.rutgerkok.blocklocker.protection.Protection;
+import nl.rutgerkok.blocklocker.protection.Protection.SoundCondition;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Tag;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.DoubleChest;
-import org.bukkit.block.Sign;
+import org.bukkit.block.*;
 import org.bukkit.block.data.Levelled;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.block.data.type.WallSign;
@@ -23,25 +24,10 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.*;
 
-import com.google.common.collect.ImmutableSet;
-
-import nl.rutgerkok.blocklocker.AttackType;
-import nl.rutgerkok.blocklocker.BlockLockerPlugin;
-import nl.rutgerkok.blocklocker.Permissions;
-import nl.rutgerkok.blocklocker.ProtectionSign;
-import nl.rutgerkok.blocklocker.SignType;
-import nl.rutgerkok.blocklocker.Translator.Translation;
-import nl.rutgerkok.blocklocker.location.IllegalLocationException;
-import nl.rutgerkok.blocklocker.profile.PlayerProfile;
-import nl.rutgerkok.blocklocker.profile.Profile;
-import nl.rutgerkok.blocklocker.protection.Protection;
-import nl.rutgerkok.blocklocker.protection.Protection.SoundCondition;
+import java.util.Optional;
+import java.util.Set;
 
 public final class InteractListener extends EventListener {
 
@@ -53,7 +39,7 @@ public final class InteractListener extends EventListener {
     }
 
     private boolean allowedByBlockPlaceEvent(Block placedBlock, BlockState replacedBlockState, Block placedAgainst,
-            Player player) {
+                                             Player player) {
         Material originalMaterial = placedBlock.getType();
 
         BlockPlaceEvent placeEvent = new BlockPlaceEvent(placedBlock, replacedBlockState, placedAgainst,
@@ -71,9 +57,8 @@ public final class InteractListener extends EventListener {
 
     /**
      * Gets whether players are allowed to build in the given game mode.
-     * 
-     * @param gameMode
-     *            The game mode.
+     *
+     * @param gameMode The game mode.
      * @return True for survival and creative, false for the other modes.
      */
     private boolean canBuildInMode(GameMode gameMode) {
@@ -118,8 +103,7 @@ public final class InteractListener extends EventListener {
      * Gets the block the inventory is stored in, or null if the inventory is not
      * stored in a block.
      *
-     * @param inventory
-     *            The inventory.
+     * @param inventory The inventory.
      * @return The block, or null.
      */
     private Block getInventoryBlockOrNull(Inventory inventory) {
@@ -173,7 +157,7 @@ public final class InteractListener extends EventListener {
     }
 
     private void handleAllowed(PlayerInteractEvent event, Protection protection, boolean clickedSign,
-            boolean usedOffHand) {
+                               boolean usedOffHand) {
         Block clickedBlock = event.getClickedBlock();
         Player player = event.getPlayer();
         PlayerProfile playerProfile = plugin.getProfileFactory().fromPlayer(player);
@@ -214,7 +198,7 @@ public final class InteractListener extends EventListener {
     }
 
     private void handleDisallowed(PlayerInteractEvent event, Protection protection, boolean clickedSign,
-            boolean usedOffHand) {
+                                  boolean usedOffHand) {
         event.setCancelled(true);
 
         if (usedOffHand) {
@@ -265,19 +249,25 @@ public final class InteractListener extends EventListener {
         if (plugin.getChestSettings().allowDestroyBy(AttackType.VILLAGER)) {
             return;
         }
-        if (isProtected(event.getBlock())) {
-            event.setCancelled(true);
+        if (plugin.getProtectCache().hasValidCache(event.getBlock())) {
+            if (plugin.getProtectCache().getLocked(event.getBlock())) {
+                event.setCancelled(true);
+            }
+        } else {
+            if (isProtected(event.getBlock())) {
+                event.setCancelled(true);
+                plugin.getProtectCache().setCache(event.getBlock(), true);
+            }
         }
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onInventoryMoveItemEvent(InventoryMoveItemEvent event) {
         Block from = getInventoryBlockOrNull(event.getSource());
-        if (from != null) {
-            if (isProtectedForRedstone(from)) {
-                event.setCancelled(true);
-                return;
-            }
+        if (isProtectedForRedstone(from)) {
+            event.setCancelled(true);
+            ;
+            return;
         }
         Block to = getInventoryBlockOrNull(event.getDestination());
         if (to != null) {
@@ -291,8 +281,7 @@ public final class InteractListener extends EventListener {
     /**
      * Prevents access to containers.
      *
-     * @param event
-     *            The event object.
+     * @param event The event object.
      */
     @EventHandler(ignoreCancelled = true)
     public void onPlayerInteract(PlayerInteractEvent event) {
