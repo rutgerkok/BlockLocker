@@ -89,11 +89,6 @@ public interface BlockLockerPlugin {
     Translator getTranslator();
 
     /**
-     * Gets the caches, used to caching protection query result.
-     * @return The cache.
-     */
-    Cache getProtectCache();
-    /**
      * Gets the caches, used to caching protection query result (for redstone).
      * @return The cache.
      */

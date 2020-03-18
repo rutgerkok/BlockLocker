@@ -3,52 +3,43 @@ package nl.rutgerkok.blocklocker;
 import nl.rutgerkok.blocklocker.impl.BlockLockerPluginImpl;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 
 import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 public class Cache {
     private BlockLockerPluginImpl plugin;
     private long expireTime = 1000;
-    private String prefix;
+    private Map<Block, Boolean> accessCaching = new WeakHashMap<>(50);
+    private Map<Block, Long> cachingExpire = new WeakHashMap<>(50);
 
-    public Cache(BlockLockerPluginImpl plugin, String prefix) {
+    public Cache(BlockLockerPluginImpl plugin) {
         this.plugin = plugin;
-        this.prefix = prefix;
     }
 
     public boolean hasValidCache(Block block) {
-        List<MetadataValue> metadatas = block.getMetadata(prefix + "time");
-        if (!metadatas.isEmpty()) {
-            long expires = metadatas.get(0).asLong();
-            return expireTime < (System.currentTimeMillis() - expires);
+        if(!accessCaching.containsKey(block)){
+            return false;
         }
-        return false;
+        return (System.currentTimeMillis() - cachingExpire.get(block)) <= expireTime;
     }
 
     public boolean getLocked(Block block) {
-        List<MetadataValue> metadatas = block.getMetadata(prefix + "locked");
-        return metadatas.get(0).asBoolean();
+        return accessCaching.getOrDefault(block,false);
     }
 
     public void setCache(Block block, boolean locked) {
-        block.removeMetadata(prefix + "locked", plugin);
-        block.removeMetadata(prefix + "time", plugin);
-        block.setMetadata(prefix + "locked", new FixedMetadataValue(plugin, locked));
-        block.setMetadata(prefix + "time", new FixedMetadataValue(plugin, System.currentTimeMillis()));
+        accessCaching.put(block,locked);
+        cachingExpire.put(block,System.currentTimeMillis());
     }
 
     public void resetCache(Block block) {
-        block.removeMetadata(prefix + "expires", plugin);
-        block.removeMetadata(prefix + "time", plugin);
-        for (BlockFace blockface : BlockFace.values()) {
-            Block relative = block.getRelative(blockface);
-            if (relative.getType() == block.getType()) {
-                relative.removeMetadata(prefix + "expires", plugin);
-                relative.removeMetadata(prefix + "time", plugin);
-            }
-        }
+        accessCaching.remove(block);
+        cachingExpire.remove(block);
     }
 
 }

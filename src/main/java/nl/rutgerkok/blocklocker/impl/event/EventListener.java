@@ -34,13 +34,7 @@ abstract class EventListener implements Listener {
         if(block == null){
             return false;
         }
-        if (plugin.getProtectCache().hasValidCache(block)) {
-            return plugin.getProtectCache().getLocked(block);
-        } else {
-            boolean protecting = plugin.getProtectionFinder().findProtection(block).isPresent();
-            plugin.getProtectCache().setCache(block, protecting);
-            return protecting;
-        }
+        return plugin.getProtectionFinder().findProtection(block).isPresent();
     }
 
     boolean isProtectedForRedstone(Block block) {

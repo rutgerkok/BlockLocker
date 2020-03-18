@@ -259,7 +259,6 @@ public final class InteractListener extends EventListener {
         Block from = getInventoryBlockOrNull(event.getSource());
         if (isProtectedForRedstone(from)) {
             event.setCancelled(true);
-            ;
             return;
         }
         Block to = getInventoryBlockOrNull(event.getDestination());
