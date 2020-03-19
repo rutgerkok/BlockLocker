@@ -31,9 +31,6 @@ abstract class EventListener implements Listener {
     }
 
     boolean isProtected(Block block) {
-        if(block == null){
-            return false;
-        }
         return plugin.getProtectionFinder().findProtection(block).isPresent();
     }
 
