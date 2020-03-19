@@ -8,7 +8,7 @@ import java.util.WeakHashMap;
 public class Cache {
     private BlockLockerPluginImpl plugin;
     private long expireTime = 1000;
-    private Map<Block, CacheContainer> accessCaching = new WeakHashMap<>(50);
+    private Map<Block, CacheContainer> accessCaching = new WeakHashMap<>(500);
 
     public Cache(BlockLockerPluginImpl plugin) {
         this.plugin = plugin;
