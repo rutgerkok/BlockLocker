@@ -1,10 +1,7 @@
 package nl.rutgerkok.blocklocker.impl.event;
 
 import com.google.common.collect.ImmutableSet;
-import nl.rutgerkok.blocklocker.BlockLockerPlugin;
-import nl.rutgerkok.blocklocker.Permissions;
-import nl.rutgerkok.blocklocker.ProtectionSign;
-import nl.rutgerkok.blocklocker.SignType;
+import nl.rutgerkok.blocklocker.*;
 import nl.rutgerkok.blocklocker.Translator.Translation;
 import nl.rutgerkok.blocklocker.location.IllegalLocationException;
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;
@@ -248,6 +245,9 @@ public final class InteractListener extends EventListener {
         // Prevents villagers from opening doors
         if (!(event.getEntity() instanceof Villager)) {
             return;
+        }
+        if (plugin.getChestSettings().allowDestroyBy(AttackType.VILLAGER)) {
+           return;
         }
         if (isProtected(event.getBlock())) {
             event.setCancelled(true);
