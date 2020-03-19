@@ -1,25 +1,28 @@
 package nl.rutgerkok.blocklocker;
 
 import nl.rutgerkok.blocklocker.impl.BlockLockerPluginImpl;
+import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
-import java.util.Map;
-import java.util.WeakHashMap;
+
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Cache {
     private BlockLockerPluginImpl plugin;
     private long expireTime = 10000;
-    private Map<Block, CacheContainer> accessCaching = new WeakHashMap<>(500);
+    private Map<Block, CacheContainer> accessCaching = Collections.synchronizedMap(new HashMap<>(1000));
 
     public Cache(BlockLockerPluginImpl plugin) {
         this.plugin = plugin;
+        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, this::cleanCache,10000*20,10000*20);
     }
 
     public boolean hasValidCache(Block block) {
-       CacheContainer container = accessCaching.get(block);
-       if(container == null){
-           return false;
-       }
-       return System.currentTimeMillis() - container.getTime() > expireTime;
+        CacheContainer container = accessCaching.get(block);
+        if (container == null) {
+            return false;
+        }
+        return System.currentTimeMillis() - container.getTime() > expireTime;
     }
 
     public boolean getLocked(Block block) {
@@ -34,11 +37,23 @@ public class Cache {
         accessCaching.remove(block);
     }
 
+    public void cleanCache() {
+        final List<Block> pendingRemoval = new CopyOnWriteArrayList<>();
+        accessCaching.keySet().parallelStream().forEach(b -> { //Faster when there have a lot of caches.
+            if (!hasValidCache(b)) {
+                pendingRemoval.add(b);
+            }
+        });
+        pendingRemoval.forEach(b -> accessCaching.remove(b));
+    }
+
 }
-class CacheContainer{
+
+class CacheContainer {
     private boolean locked;
     private long time;
-    public CacheContainer(boolean locked, long time){
+
+    public CacheContainer(boolean locked, long time) {
         this.locked = locked;
         this.time = time;
     }
