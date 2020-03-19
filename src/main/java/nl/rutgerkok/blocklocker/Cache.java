@@ -2,45 +2,60 @@ package nl.rutgerkok.blocklocker;
 
 import nl.rutgerkok.blocklocker.impl.BlockLockerPluginImpl;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Player;
-import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.metadata.MetadataValue;
-
-import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
 public class Cache {
     private BlockLockerPluginImpl plugin;
     private long expireTime = 1000;
-    private Map<Block, Boolean> accessCaching = new WeakHashMap<>(50);
-    private Map<Block, Long> cachingExpire = new WeakHashMap<>(50);
+    private Map<Block, CacheContainer> accessCaching = new WeakHashMap<>(50);
 
     public Cache(BlockLockerPluginImpl plugin) {
         this.plugin = plugin;
     }
 
     public boolean hasValidCache(Block block) {
-        Long time = cachingExpire.get(block);
-        if(time == null){
-            return false;
-        }
-        return time <= expireTime;
+       CacheContainer container = accessCaching.get(block);
+       if(container == null){
+           return false;
+       }
+       return System.currentTimeMillis() - container.getTime() > expireTime;
     }
 
     public boolean getLocked(Block block) {
-        return accessCaching.getOrDefault(block,false);
+        return accessCaching.get(block).isLocked();
     }
 
     public void setCache(Block block, boolean locked) {
-        accessCaching.put(block,locked);
-        cachingExpire.put(block,System.currentTimeMillis());
+        accessCaching.put(block, new CacheContainer(locked, System.currentTimeMillis()));
     }
 
     public void resetCache(Block block) {
         accessCaching.remove(block);
-        cachingExpire.remove(block);
     }
 
+}
+class CacheContainer{
+    private boolean locked;
+    private long time;
+    public CacheContainer(boolean locked, long time){
+        this.locked = locked;
+        this.time = time;
+    }
+
+    public long getTime() {
+        return time;
+    }
+
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
+    }
+
+    public void setTime(long time) {
+        this.time = time;
+    }
 }
