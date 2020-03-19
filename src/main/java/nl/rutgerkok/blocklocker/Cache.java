@@ -22,10 +22,11 @@ public class Cache {
     }
 
     public boolean hasValidCache(Block block) {
-        if(!accessCaching.containsKey(block)){
+        Long time = cachingExpire.get(block);
+        if(time == null){
             return false;
         }
-        return (System.currentTimeMillis() - cachingExpire.get(block)) <= expireTime;
+        return time <= expireTime;
     }
 
     public boolean getLocked(Block block) {
