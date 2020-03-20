@@ -7,14 +7,14 @@ import org.bukkit.block.Block;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class Cache {
+public class Cache extends TimerTask {
     private BlockLockerPluginImpl plugin;
     private long expireTime = 10000;
     private Map<Block, CacheContainer> accessCaching = new HashMap<>(1000);
 
     public Cache(BlockLockerPluginImpl plugin) {
         this.plugin = plugin;
-        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, this::cleanCache,10000*20,10000*20);
+        new Timer().scheduleAtFixedRate(this,10000,10000);
     }
 
     public boolean hasValidCache(Block block) {
@@ -49,6 +49,13 @@ public class Cache {
         this.accessCaching = accessCachingCopy;
     }
 
+    /**
+     * The action to be performed by this timer task.
+     */
+    @Override
+    public void run() {
+        cleanCache();
+    }
 }
 
 class CacheContainer {
