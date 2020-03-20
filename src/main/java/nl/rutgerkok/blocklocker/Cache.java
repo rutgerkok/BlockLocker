@@ -14,7 +14,7 @@ public class Cache extends TimerTask {
 
     public Cache(BlockLockerPluginImpl plugin) {
         this.plugin = plugin;
-        new Timer().scheduleAtFixedRate(this,10000,10000);
+        new Timer().scheduleAtFixedRate(this,0,10000);
     }
 
     public boolean hasValidCache(Block block) {
