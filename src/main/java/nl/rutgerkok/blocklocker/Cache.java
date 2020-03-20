@@ -10,7 +10,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class Cache {
     private BlockLockerPluginImpl plugin;
     private long expireTime = 10000;
-    private Map<Block, CacheContainer> accessCaching = Collections.synchronizedMap(new HashMap<>(1000));
+    private Map<Block, CacheContainer> accessCaching = new HashMap<>(1000);
 
     public Cache(BlockLockerPluginImpl plugin) {
         this.plugin = plugin;
@@ -39,12 +39,14 @@ public class Cache {
 
     public void cleanCache() {
         final List<Block> pendingRemoval = new CopyOnWriteArrayList<>();
+        final Map<Block, CacheContainer> accessCachingCopy = new HashMap<>(accessCaching);
         accessCaching.keySet().parallelStream().forEach(b -> { //Faster when there have a lot of caches.
             if (!hasValidCache(b)) {
                 pendingRemoval.add(b);
             }
         });
-        pendingRemoval.forEach(b -> accessCaching.remove(b));
+        pendingRemoval.forEach(accessCachingCopy::remove);
+        this.accessCaching = accessCachingCopy;
     }
 
 }
