@@ -3,6 +3,7 @@ package nl.rutgerkok.blocklocker;
 import nl.rutgerkok.blocklocker.impl.BlockLockerPluginImpl;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -14,7 +15,12 @@ public class Cache extends TimerTask {
 
     public Cache(BlockLockerPluginImpl plugin) {
         this.plugin = plugin;
-        new Timer().scheduleAtFixedRate(this,0,10000);
+        new BukkitRunnable(){
+            @Override
+            public void run() {
+                cleanCache();
+            }
+        }.runTaskTimerAsynchronously(plugin,0,expireTime*20);
     }
 
     public boolean hasValidCache(Block block) {
