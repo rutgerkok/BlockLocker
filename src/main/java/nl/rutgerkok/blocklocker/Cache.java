@@ -40,7 +40,7 @@ public class Cache extends TimerTask {
     public void cleanCache() {
         final List<Block> pendingRemoval = new CopyOnWriteArrayList<>();
         final Map<Block, CacheContainer> accessCachingCopy = new HashMap<>(accessCaching);
-        accessCaching.keySet().parallelStream().forEach(b -> { //Faster when there have a lot of caches.
+        accessCachingCopy.keySet().parallelStream().forEach(b -> { //Faster when there have a lot of caches.
             if (!hasValidCache(b)) {
                 pendingRemoval.add(b);
             }
