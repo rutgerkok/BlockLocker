@@ -37,6 +37,7 @@ import nl.rutgerkok.blocklocker.Permissions;
 import nl.rutgerkok.blocklocker.ProtectionSign;
 import nl.rutgerkok.blocklocker.SignType;
 import nl.rutgerkok.blocklocker.Translator.Translation;
+import nl.rutgerkok.blocklocker.event.PlayerProtectionCreateEvent;
 import nl.rutgerkok.blocklocker.location.IllegalLocationException;
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;
 import nl.rutgerkok.blocklocker.profile.Profile;
@@ -447,7 +448,12 @@ public final class InteractListener extends EventListener {
             waterlogged = ((Levelled) signBlock.getBlockData()).getLevel() == 0;
         }
 
-        // Create sign and fire event for the sign to be placed
+		// Fire our PlayerProtectionCreateEvent
+		if (this.plugin.callEvent(new PlayerProtectionCreateEvent(player, signBlock)).isCancelled()) {
+			return false;
+		}
+
+		// Create sign and fire Bukkit's BlockPlaceEvent for the sign to be placed
         BlockState oldState = signBlock.getState();
         Waterlogged newBlockData = getSignBlockData(clickedSide, player, signMaterial);
         newBlockData.setWaterlogged(waterlogged);

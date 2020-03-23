@@ -2,6 +2,8 @@ package nl.rutgerkok.blocklocker;
 
 import java.util.logging.Logger;
 
+import org.bukkit.event.Event;
+
 import nl.rutgerkok.blocklocker.group.CombinedGroupSystem;
 import nl.rutgerkok.blocklocker.group.GroupSystem;
 import nl.rutgerkok.blocklocker.location.CombinedLocationChecker;
@@ -12,7 +14,14 @@ import nl.rutgerkok.blocklocker.location.CombinedLocationChecker;
  */
 public interface BlockLockerPlugin {
 
-
+	/**
+	 * Calls the given event, allowing other plugins to react to this event.
+	 *
+	 * @param <E> The type of the event.
+	 * @param event The event, may not be null.
+	 * @return The same event, for chaining.
+	 */
+	<E extends Event> E callEvent(E event);
 
     /**
      * Gets the {@link ChestSettings} object, containing all customizable
