@@ -1,38 +1,46 @@
 package nl.rutgerkok.blocklocker;
 
+import com.google.common.collect.MapMaker;
 import nl.rutgerkok.blocklocker.impl.BlockLockerPluginImpl;
-import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Map;
+import java.util.TimerTask;
 
 public class Cache extends TimerTask {
     private BlockLockerPluginImpl plugin;
     private long expireTime = 10000;
-    private HashMap<Block, CacheContainer> accessCaching = new HashMap<>(1000);
+    private Map<Block, CacheContainer> accessCaching = new MapMaker().initialCapacity(1000).makeMap();
+    private boolean cachingFlushing = false;
 
     public Cache(BlockLockerPluginImpl plugin) {
         this.plugin = plugin;
-        new BukkitRunnable(){
+        new BukkitRunnable() {
             @Override
             public void run() {
                 cleanCache();
             }
-        }.runTaskTimerAsynchronously(plugin,0,expireTime*20);
+        }.runTaskTimerAsynchronously(plugin, 0, expireTime * 20);
     }
 
-    public boolean hasValidCache(Block block) {
+    public CacheFlag getLocked(Block block) {
         CacheContainer container = accessCaching.get(block);
         if (container == null) {
-            return false;
+            return CacheFlag.MISS_CACHE;
         }
-        return System.currentTimeMillis() - container.getTime() > expireTime;
+        if (isExpired(container)) {
+            return CacheFlag.MISS_CACHE;
+        }
+        if (container.isLocked()) {
+            return CacheFlag.PROTECTED;
+        } else {
+            return CacheFlag.NOT_PROTECTED;
+        }
     }
 
-    public boolean getLocked(Block block) {
-        return accessCaching.get(block).isLocked();
+    public boolean isExpired(CacheContainer container) {
+        return System.currentTimeMillis() - container.getTime() > expireTime;
     }
 
     public void setCache(Block block, boolean locked) {
@@ -43,17 +51,13 @@ public class Cache extends TimerTask {
         accessCaching.remove(block);
     }
 
-    public synchronized void cleanCache() {
-        final List<Block> pendingRemoval = new CopyOnWriteArrayList<>();
-        //noinspection unchecked
-        final HashMap<Block, CacheContainer> accessCachingCopy = (HashMap<Block, CacheContainer>)accessCaching.clone();
-        accessCachingCopy.keySet().parallelStream().forEach(b -> { //Faster when there have a lot of caches.
-            if (!hasValidCache(b)) {
-                pendingRemoval.add(b);
-            }
-        });
-        pendingRemoval.forEach(accessCachingCopy::remove);
-        this.accessCaching = accessCachingCopy;
+    public void cleanCache() {
+        if (cachingFlushing) {
+            return; //Make sure there only one thread to clean the caches.
+        }
+        cachingFlushing = true;
+        accessCaching.keySet().removeIf(e -> isExpired(accessCaching.get(e)));
+        cachingFlushing = false;
     }
 
     /**
@@ -90,3 +94,4 @@ class CacheContainer {
         this.time = time;
     }
 }
+

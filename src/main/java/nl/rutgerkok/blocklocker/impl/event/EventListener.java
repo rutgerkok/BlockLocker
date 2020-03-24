@@ -1,6 +1,7 @@
 package nl.rutgerkok.blocklocker.impl.event;
 
 import nl.rutgerkok.blocklocker.BlockLockerPlugin;
+import nl.rutgerkok.blocklocker.CacheFlag;
 import nl.rutgerkok.blocklocker.SearchMode;
 import nl.rutgerkok.blocklocker.profile.Profile;
 import nl.rutgerkok.blocklocker.protection.Protection;
@@ -35,11 +36,9 @@ abstract class EventListener implements Listener {
     }
 
     boolean isProtectedForRedstone(Block block) {
-        if(block == null){
-            return false;
-        }
-        if (plugin.getRedstoneProtectCache().hasValidCache(block)) {
-            return plugin.getRedstoneProtectCache().getLocked(block);
+        CacheFlag flag = plugin.getRedstoneProtectCache().getLocked(block);
+        if (flag != CacheFlag.MISS_CACHE) {
+            return flag == CacheFlag.PROTECTED;
         } else {
             Optional<Protection> protection = plugin.getProtectionFinder().findProtection(block, SearchMode.NO_SUPPORTING_BLOCKS);
             if (!protection.isPresent()) {
