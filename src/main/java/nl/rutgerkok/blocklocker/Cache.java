@@ -10,7 +10,7 @@ import java.util.TimerTask;
 
 public class Cache extends TimerTask {
     private BlockLockerPluginImpl plugin;
-    private long expireTime = 10000;
+    private long expireTime = 10;
     private Map<Block, CacheContainer> accessCaching = new MapMaker().initialCapacity(1000).makeMap();
     private boolean cachingFlushing = false;
 
