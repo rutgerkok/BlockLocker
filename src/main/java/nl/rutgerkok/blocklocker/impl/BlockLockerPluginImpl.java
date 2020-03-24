@@ -14,6 +14,7 @@ import nl.rutgerkok.blocklocker.*;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -58,6 +59,12 @@ BlockLockerPlugin {
     private Translator translator;
     private CombinedLocationChecker combinedLocationChecker;
     private Cache redstoneProtectCache;
+
+    @Override
+	public <E extends Event> E callEvent(E event) {
+		this.getServer().getPluginManager().callEvent(event);
+		return event;
+	}
 
     @Override
     public ChestSettings getChestSettings() {

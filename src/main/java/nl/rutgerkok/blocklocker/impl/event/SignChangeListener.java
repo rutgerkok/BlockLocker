@@ -13,6 +13,7 @@ import nl.rutgerkok.blocklocker.BlockLockerPlugin;
 import nl.rutgerkok.blocklocker.Permissions;
 import nl.rutgerkok.blocklocker.SignType;
 import nl.rutgerkok.blocklocker.Translator.Translation;
+import nl.rutgerkok.blocklocker.event.PlayerProtectionCreateEvent;
 import nl.rutgerkok.blocklocker.location.IllegalLocationException;
 import nl.rutgerkok.blocklocker.profile.Profile;
 import nl.rutgerkok.blocklocker.protection.Protection;
@@ -107,6 +108,13 @@ public class SignChangeListener extends EventListener {
             event.setCancelled(true);
             return;
         }
+
+		// Check event
+		if (this.plugin.callEvent(new PlayerProtectionCreateEvent(event.getPlayer(), block)).isCancelled()) {
+			block.breakNaturally();
+			event.setCancelled(true);
+			return;
+		}
 
         // Make sure the owner name is on the second line
         event.setLine(1, event.getPlayer().getName());

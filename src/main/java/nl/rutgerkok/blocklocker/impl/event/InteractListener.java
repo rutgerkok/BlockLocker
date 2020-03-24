@@ -25,9 +25,21 @@ import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.*;
-
+import com.google.common.collect.ImmutableSet;
 import java.util.Optional;
 import java.util.Set;
+import nl.rutgerkok.blocklocker.AttackType;
+import nl.rutgerkok.blocklocker.BlockLockerPlugin;
+import nl.rutgerkok.blocklocker.Permissions;
+import nl.rutgerkok.blocklocker.ProtectionSign;
+import nl.rutgerkok.blocklocker.SignType;
+import nl.rutgerkok.blocklocker.Translator.Translation;
+import nl.rutgerkok.blocklocker.event.PlayerProtectionCreateEvent;
+import nl.rutgerkok.blocklocker.location.IllegalLocationException;
+import nl.rutgerkok.blocklocker.profile.PlayerProfile;
+import nl.rutgerkok.blocklocker.profile.Profile;
+import nl.rutgerkok.blocklocker.protection.Protection;
+import nl.rutgerkok.blocklocker.protection.Protection.SoundCondition;
 
 public final class InteractListener extends EventListener {
 
@@ -429,7 +441,12 @@ public final class InteractListener extends EventListener {
             waterlogged = ((Levelled) signBlock.getBlockData()).getLevel() == 0;
         }
 
-        // Create sign and fire event for the sign to be placed
+		// Fire our PlayerProtectionCreateEvent
+		if (this.plugin.callEvent(new PlayerProtectionCreateEvent(player, signBlock)).isCancelled()) {
+			return false;
+		}
+
+		// Create sign and fire Bukkit's BlockPlaceEvent for the sign to be placed
         BlockState oldState = signBlock.getState();
         Waterlogged newBlockData = getSignBlockData(clickedSide, player, signMaterial);
         newBlockData.setWaterlogged(waterlogged);
