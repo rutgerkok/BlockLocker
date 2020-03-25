@@ -72,12 +72,15 @@ public final class InteractListener extends EventListener {
 
     /**
      * Gets whether players are allowed to build in the given game mode.
-     * 
+     *
      * @param gameMode
-     *            The game mode.
+     *            The game mode, may be null.
      * @return True for survival and creative, false for the other modes.
      */
     private boolean canBuildInMode(GameMode gameMode) {
+        if (gameMode == null) {
+            return false;
+        }
         switch (gameMode) {
             case ADVENTURE:
                 return false;
