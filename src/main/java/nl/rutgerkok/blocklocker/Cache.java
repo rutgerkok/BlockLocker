@@ -2,17 +2,20 @@ package nl.rutgerkok.blocklocker;
 
 import com.google.common.collect.MapMaker;
 import nl.rutgerkok.blocklocker.impl.BlockLockerPluginImpl;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Map;
 import java.util.TimerTask;
+import java.util.concurrent.locks.Lock;
 
 public class Cache extends TimerTask {
     private BlockLockerPluginImpl plugin;
     private long expireTime = 10;
     private Map<Block, CacheContainer> accessCaching = new MapMaker().initialCapacity(1000).makeMap();
     private boolean cachingFlushing = false;
+    private final Object lock = new Object();
 
     public Cache(BlockLockerPluginImpl plugin) {
         this.plugin = plugin;
@@ -44,20 +47,20 @@ public class Cache extends TimerTask {
     }
 
     public void setCache(Block block, boolean locked) {
-        accessCaching.put(block, new CacheContainer(locked, System.currentTimeMillis()));
-    }
-
-    public void resetCache(Block block) {
-        accessCaching.remove(block);
+        synchronized (lock) {
+            accessCaching.put(block, new CacheContainer(locked, System.currentTimeMillis()));
+        }
     }
 
     public void cleanCache() {
-        if (cachingFlushing) {
-            return; //Make sure there only one thread to clean the caches.
+        synchronized (lock) {
+            if (cachingFlushing) {
+                return; //Make sure there only one thread to clean the caches.
+            }
+            cachingFlushing = true;
+            accessCaching.keySet().removeIf(e -> isExpired(accessCaching.get(e)));
+            cachingFlushing = false;
         }
-        cachingFlushing = true;
-        accessCaching.keySet().removeIf(e -> isExpired(accessCaching.get(e)));
-        cachingFlushing = false;
     }
 
     /**
