@@ -25,7 +25,10 @@ public class Cache extends TimerTask {
     }
 
     public CacheFlag getLocked(Block block) {
-        CacheContainer container = accessCaching.get(block);
+        CacheContainer container;
+        synchronized (lock) {
+            container = accessCaching.get(block);
+        }
         if (container == null) {
             return CacheFlag.MISS_CACHE;
         }
