@@ -1,17 +1,17 @@
 package nl.rutgerkok.blocklocker.impl.event;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.Optional;
-
+import nl.rutgerkok.blocklocker.BlockLockerPlugin;
+import nl.rutgerkok.blocklocker.CacheFlag;
+import nl.rutgerkok.blocklocker.SearchMode;
+import nl.rutgerkok.blocklocker.profile.Profile;
+import nl.rutgerkok.blocklocker.protection.Protection;
 import org.apache.commons.lang.Validate;
 import org.bukkit.block.Block;
 import org.bukkit.event.Listener;
 
-import nl.rutgerkok.blocklocker.BlockLockerPlugin;
-import nl.rutgerkok.blocklocker.SearchMode;
-import nl.rutgerkok.blocklocker.profile.Profile;
-import nl.rutgerkok.blocklocker.protection.Protection;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Optional;
 
 abstract class EventListener implements Listener {
 
@@ -36,12 +36,20 @@ abstract class EventListener implements Listener {
     }
 
     boolean isProtectedForRedstone(Block block) {
-        Optional<Protection> protection = plugin.getProtectionFinder().findProtection(block, SearchMode.NO_SUPPORTING_BLOCKS);
-        if (!protection.isPresent()) {
-            return false;
+        CacheFlag flag = plugin.getRedstoneProtectCache().getLocked(block);
+        if (flag != CacheFlag.MISS_CACHE) {
+            return flag == CacheFlag.PROTECTED;
+        } else {
+            Optional<Protection> protection = plugin.getProtectionFinder().findProtection(block, SearchMode.NO_SUPPORTING_BLOCKS);
+            if (!protection.isPresent()) {
+                plugin.getRedstoneProtectCache().setCache(block, false);
+                return false;
+            }
+            Profile redstone = plugin.getProfileFactory().fromRedstone();
+            boolean protecting = !protection.get().isAllowed(redstone);
+            plugin.getRedstoneProtectCache().setCache(block, protecting);
+            return protecting;
         }
-        Profile redstone = plugin.getProfileFactory().fromRedstone();
-        return !protection.get().isAllowed(redstone);
     }
 
     boolean isExpired(Protection protection) {
