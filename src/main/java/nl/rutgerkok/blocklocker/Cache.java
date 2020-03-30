@@ -1,17 +1,18 @@
 package nl.rutgerkok.blocklocker;
 
-import com.google.common.collect.MapMaker;
 import nl.rutgerkok.blocklocker.impl.BlockLockerPluginImpl;
 import org.bukkit.block.Block;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TimerTask;
 
 public class Cache extends TimerTask {
     private BlockLockerPluginImpl plugin;
     private long expireTime = 10;
-    private Map<Block, CacheContainer> accessCaching = new MapMaker().initialCapacity(1000).makeMap();
+    private Map<Block, CacheContainer> accessCaching = new HashMap<>(1000);
+    private final Object lock = new Object();
 
     public Cache(BlockLockerPluginImpl plugin) {
         this.plugin = plugin;
@@ -43,13 +44,15 @@ public class Cache extends TimerTask {
     }
 
     public void setCache(Block block, boolean locked) {
-        accessCaching.put(block, new CacheContainer(locked, System.currentTimeMillis()));
-
+        synchronized (lock) {
+            accessCaching.put(block, new CacheContainer(locked, System.currentTimeMillis()));
+        }
     }
 
     public void cleanCache() {
-        accessCaching.keySet().removeIf(e -> isExpired(accessCaching.get(e)));
-
+        synchronized (lock) {
+            accessCaching.keySet().removeIf(e -> isExpired(accessCaching.get(e)));
+        }
     }
 
     /**
