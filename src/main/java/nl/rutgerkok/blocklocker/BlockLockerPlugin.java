@@ -41,6 +41,12 @@ public interface BlockLockerPlugin {
     CombinedGroupSystem getGroupSystems();
 
     /**
+     * Gets the cache that stores whether a block is protected or not.
+     * @return The cache.
+     */
+    HopperCache getHopperCache();
+
+    /**
      * Gets the location checkers, which are used to prevent players from placing chests in the wilderness.
      * @return A location checker.
      */
@@ -97,11 +103,6 @@ public interface BlockLockerPlugin {
      */
     Translator getTranslator();
 
-    /**
-     * Gets the caches, used to caching protection query result (for redstone).
-     * @return The cache.
-     */
-    Cache getRedstoneProtectCache();
     /**
      * Reloads the configuration files of the plugin.
      */

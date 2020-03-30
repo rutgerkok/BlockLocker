@@ -58,7 +58,7 @@ BlockLockerPlugin {
     private SignSelector signSelector;
     private Translator translator;
     private CombinedLocationChecker combinedLocationChecker;
-    private Cache redstoneProtectCache;
+    private HopperCache redstoneProtectCache;
 
     @Override
 	public <E extends Event> E callEvent(E event) {
@@ -146,7 +146,7 @@ BlockLockerPlugin {
         return translator;
     }
     @Override
-    public Cache getRedstoneProtectCache() {
+    public HopperCache getHopperCache() {
         return redstoneProtectCache;
     }
 
@@ -196,7 +196,7 @@ BlockLockerPlugin {
         protectionFinder = new ProtectionFinderImpl(blockFinder, chestSettings);
         protectionUpdater = new ProtectionUpdaterImpl(this);
         signSelector = new SignSelectorImpl(this);
-        redstoneProtectCache = new Cache(this);
+        redstoneProtectCache = new HopperCacheImpl(this);
     }
 
     private Translator loadTranslations(String fileName) {
