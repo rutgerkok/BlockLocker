@@ -2,8 +2,6 @@ package nl.rutgerkok.blocklocker.impl;
 
 import java.util.Collection;
 
-import com.google.common.collect.ImmutableList;
-
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -11,6 +9,8 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Bisected.Half;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.Door;
+
+import com.google.common.collect.ImmutableList;
 
 import nl.rutgerkok.blocklocker.OpenBlockSound;
 import nl.rutgerkok.blocklocker.protection.Protection.SoundCondition;
@@ -46,7 +46,8 @@ public final class CompleteDoor {
     private static BlockFace getFaceToRightDoor(Block bottomHalfDoorBlock) {
         Door door = asDoorMaterialOrNull(bottomHalfDoorBlock);
         if (door == null) {
-            throw new RuntimeException("Block " + bottomHalfDoorBlock + " is not a door");
+            // Not a valid door, lower half is missing, so just guess something
+            return BlockFace.SOUTH;
         }
 
         switch (door.getFacing()) {
