@@ -25,15 +25,21 @@ protection:
   not_nearby: '&4附近没有物品被保护,你可以右击木牌来保护物品.'
   selected_sign: '&6你选择了一个木牌,输入"/blocklocker <行数> <名字>"来编辑木牌.'
 tag:
-  everyone: 任何人
+  everyone: 
+  - '所有人'
+  - 'Everyone'
   more_users:
   - '[更多使用者]'
   - '[More Users]'
   private:
   - '[私有]'
   - '[Private]'
-  redstone: 红石
-  timer: 计时
+  redstone: 
+  - '红石'
+  - 'Redstone'
+  timer: 
+  - '计时'
+  - 'Timer'
 updater:
   more_information: '&6更多信息: {0}'
   unsupported_server: '&4最新版本的BlockLocker(版本 {0}) 不支持这个服务器版本,只支持MC {1}.'
