@@ -2,8 +2,8 @@ BlockLocker
 ===========
 
 [![Build Status](https://travis-ci.com/rutgerkok/BlockLocker.svg?branch=master)](https://travis-ci.com/rutgerkok/BlockLocker) [![Download at SpigotMC.org](https://img.shields.io/badge/download-SpigotMC.org-orange.svg)](http://www.spigotmc.org/resources/blocklocker.3268/)
-![Latest release](https://img.shields.io/github/release/rutgerkok/BlockLocker.svg)
-![Commits since latest release](https://img.shields.io/github/commits-since/rutgerkok/BlockLocker/latest.svg)
+[![Latest release](https://img.shields.io/github/release/rutgerkok/BlockLocker.svg)](https://github.com/rutgerkok/BlockLocker/releases)
+[![Commits since latest release](https://img.shields.io/github/commits-since/rutgerkok/BlockLocker/latest.svg)](https://github.com/rutgerkok/BlockLocker/releases)
 
 Lockette/Deadbolt clone that properly supports UUIDs (and the new doors), written from scratch.
 
