@@ -4,6 +4,7 @@ main: nl.rutgerkok.blocklocker.impl.BlockLockerPluginImpl
 author: Rutger Kok
 load: startup
 api-version: 1.14
+softdepend: [Guilds, Factions, mcMMO, Towny]
 permissions:
   blocklocker.protect:
     description: "Protect containers and doors."
