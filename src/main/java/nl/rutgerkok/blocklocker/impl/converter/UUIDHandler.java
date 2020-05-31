@@ -426,13 +426,6 @@ final class UUIDHandler {
             String providedName = it.next();
             String nameLowercase = providedName.toLowerCase();
 
-            // Check for name pattern
-            if (!validUserPattern.matcher(providedName).matches()) {
-                // Lookup will fail, so remove it from pending names
-                it.remove();
-                continue;
-            }
-
             // Get from cache
             Result cached = uuidCache.getIfPresent(nameLowercase);
             if (cached != null) {
@@ -450,6 +443,12 @@ final class UUIDHandler {
                 // By checking for matching players, we also correct for any
                 // truncated names
                 results.put(nameLowercase, new Result(player.getName(), player.getUniqueId()));
+                it.remove();
+                continue;
+            }
+
+            //Player is not online so lets check API. First we need to remove any Geyser/Bedrock players from the iteration
+            if (!validUserPattern.matcher(providedName).matches()) {
                 it.remove();
                 continue;
             }
