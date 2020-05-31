@@ -447,7 +447,8 @@ final class UUIDHandler {
                 continue;
             }
 
-            //Player is not online so lets check API. First we need to remove any Geyser/Bedrock players from the iteration
+            // Player is not online so lets check API. First we need to remove names that are for sure invalid
+            // Those might be put on the sign by players as comments, or they may be Geyser/Floodgate names
             if (!validUserPattern.matcher(providedName).matches()) {
                 it.remove();
                 continue;
