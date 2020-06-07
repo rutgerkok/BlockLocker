@@ -1,10 +1,9 @@
 package nl.rutgerkok.blocklocker.impl.event;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -37,6 +36,9 @@ public final class BlockLockerCommand implements TabExecutor {
         if (args[0].equalsIgnoreCase("reload")) {
             return reloadCommand(sender);
         }
+        if (args[0].equalsIgnoreCase("remove")) {
+            return removeCommand(sender);
+        }
         return signChangeCommand(sender, args);
     }
 
@@ -63,6 +65,37 @@ public final class BlockLockerCommand implements TabExecutor {
             // Avoid sending message twice to the console
             plugin.getTranslator().sendMessage(sender, Translation.COMMAND_PLUGIN_RELOADED);
         }
+        return true;
+    }
+    private boolean removeCommand(CommandSender sender) {
+        if (!sender.hasPermission(Permissions.CAN_REMOVE)) {
+            plugin.getTranslator().sendMessage(sender, Translation.COMMAND_NO_PERMISSION);
+            return true;
+        }
+
+        if (!(sender instanceof Player)) {
+            plugin.getTranslator().sendMessage(sender, Translation.COMMAND_CANNOT_BE_USED_BY_CONSOLE);
+            return true;
+        }
+
+        Player player = (Player) sender;
+        Optional<Sign> selectedSign = plugin.getSignSelector().getSelectedSign(player);
+        if (!selectedSign.isPresent()) {
+            plugin.getTranslator().sendMessage(player, Translation.COMMAND_NO_SIGN_SELECTED);
+            return true;
+        }
+
+        Sign sign = selectedSign.get();
+        Optional<SignType> signType = plugin.getSignParser().getSignType(sign);
+        Optional<Protection> protection = plugin.getProtectionFinder().findProtection(sign.getBlock());
+
+        if (!protection.isPresent() || !signType.isPresent()) {
+            plugin.getTranslator().sendMessage(player, Translation.COMMAND_SIGN_NO_LONGER_PART_OF_PROTECTION);
+            return true;
+        }
+        sign.getLocation().getBlock().breakNaturally();
+        plugin.getTranslator().sendMessage(sender, Translation.PROTECTION_BYPASSED);
+
         return true;
     }
 
