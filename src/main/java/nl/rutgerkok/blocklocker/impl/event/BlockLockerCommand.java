@@ -68,7 +68,7 @@ public final class BlockLockerCommand implements TabExecutor {
         return true;
     }
     private boolean removeCommand(CommandSender sender) {
-        if (!sender.hasPermission(Permissions.CAN_REMOVE) && !sender.hasPermission(Permissions.CAN_BYPASS)) {
+        if (!sender.hasPermission(Permissions.CAN_REMOVE)) {
             plugin.getTranslator().sendMessage(sender, Translation.COMMAND_NO_PERMISSION);
             return true;
         }
@@ -94,7 +94,8 @@ public final class BlockLockerCommand implements TabExecutor {
             return true;
         }
         sign.getLocation().getBlock().breakNaturally();
-        plugin.getTranslator().sendMessage(sender, Translation.PROTECTION_BYPASSED);
+        String ownerName = protection.get().getOwnerDisplayName();
+        plugin.getTranslator().sendMessage(sender, Translation.PROTECTION_BYPASSED, ownerName);
 
         return true;
     }
