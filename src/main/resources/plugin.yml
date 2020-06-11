@@ -15,6 +15,9 @@ permissions:
   blocklocker.reload:
     description: "Reload the plugin using /blocklocker reload."
     default: op
+  blocklocker.removeother:
+    description: "Remove protection with the plugin using /blocklocker remove."
+    default: op
   blocklocker.wilderness:
     description: "Place chests in the wilderness (outside of Towny claims)"
     default: true

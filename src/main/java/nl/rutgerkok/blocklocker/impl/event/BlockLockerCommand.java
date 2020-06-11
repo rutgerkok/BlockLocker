@@ -93,7 +93,7 @@ public final class BlockLockerCommand implements TabExecutor {
             plugin.getTranslator().sendMessage(player, Translation.COMMAND_SIGN_NO_LONGER_PART_OF_PROTECTION);
             return true;
         }
-        sign.getLocation().getBlock().breakNaturally();
+        sign.getLocation().getBlock().setType(Material.AIR);
         String ownerName = protection.get().getOwnerDisplayName();
         plugin.getTranslator().sendMessage(sender, Translation.PROTECTION_BYPASSED, ownerName);
 

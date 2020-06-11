@@ -7,7 +7,7 @@ public final class Permissions {
     public static final String CAN_BYPASS = "blocklocker.bypass";
     public static final String CAN_PROTECT = "blocklocker.protect";
     public static final String CAN_RELOAD = "blocklocker.reload";
-    public static final String CAN_REMOVE = "blocklocker.remove";
+    public static final String CAN_REMOVE = "blocklocker.removeother";
     public static final String CAN_WILDERNESS = "blocklocker.wilderness";
 
     private static final String GROUP_PREFIX = "blocklocker.group.";
