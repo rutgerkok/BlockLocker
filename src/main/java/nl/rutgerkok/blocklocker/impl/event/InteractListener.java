@@ -106,7 +106,7 @@ public final class InteractListener extends EventListener {
         }
 
         // Allow admins to bypass the protection
-        if (!allowed && player.hasPermission(Permissions.CAN_BYPASS) || !allowed && player.hasPermission(Permissions.CAN_REMOVE)) {
+        if (!allowed && player.hasPermission(Permissions.CAN_BYPASS)) {
             allowed = true;
             if (!clickedSign) {
                 // Only show message about bypass when not clicking a sign
@@ -322,7 +322,13 @@ public final class InteractListener extends EventListener {
         // Check if protection needs update
         plugin.getProtectionUpdater().update(protection.get(), false);
 
+        // Check if player is allowed, remove sign
+        if(player.hasPermission(Permissions.CAN_REMOVE)){
+            handleAllowed(event, protection.get(), clickedSign, usedOffHand);
+        }
+
         // Check if player is allowed, open door
+
         if (checkAllowed(player, protection.get(), clickedSign)) {
             handleAllowed(event, protection.get(), clickedSign, usedOffHand);
         } else {
