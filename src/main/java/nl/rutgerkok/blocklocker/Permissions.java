@@ -1,5 +1,7 @@
 package nl.rutgerkok.blocklocker;
 
+import java.util.Locale;
+
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 
@@ -20,7 +22,7 @@ public final class Permissions {
      * @return The permission node.
      */
     public static Permission getGroupNode(String groupName) {
-        return new Permission(GROUP_PREFIX + groupName.toLowerCase(), PermissionDefault.FALSE);
+        return new Permission(GROUP_PREFIX + groupName.toLowerCase(Locale.ROOT), PermissionDefault.FALSE);
     }
 
     private Permissions() {

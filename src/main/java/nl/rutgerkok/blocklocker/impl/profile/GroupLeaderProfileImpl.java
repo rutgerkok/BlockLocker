@@ -1,6 +1,7 @@
 package nl.rutgerkok.blocklocker.impl.profile;
 
 import java.util.Date;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -51,7 +52,7 @@ class GroupLeaderProfileImpl implements Profile {
     public String getDisplayName() {
         return "+" + groupName + "+";
     }
-    
+
     @Override
     public JsonObject getSaveObject() {
     	JsonObject object = new JsonObject();
@@ -63,7 +64,7 @@ class GroupLeaderProfileImpl implements Profile {
     public int hashCode() {
         // Bits are inverted to avoid hash code collision with {@link
         // GroupSystem}.
-        return ~groupName.toLowerCase().hashCode();
+        return ~groupName.toLowerCase(Locale.ROOT).hashCode();
     }
 
     @Override

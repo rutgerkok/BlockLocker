@@ -1,5 +1,6 @@
 package nl.rutgerkok.blocklocker.impl.updater;
 
+import java.util.Locale;
 import java.util.Optional;
 
 /**
@@ -25,13 +26,13 @@ public enum UpdatePreference {
      * {@link String#trim() trimmed}, uppercased and spaces are replaced with
      * underscores. Then {@link #valueOf(String)} is called, and the result is
      * returned as an {@link Optional}.
-     * 
+     *
      * @param string
      *            String to parse.
      * @return The update preference, or absent if parsing failed.
      */
     public static Optional<UpdatePreference> parse(String string) {
-        string = string.trim().toUpperCase().replace(' ', '_');
+        string = string.trim().toUpperCase(Locale.ROOT).replace(' ', '_');
         try {
             return Optional.of(valueOf(string));
         } catch (IllegalArgumentException e) {

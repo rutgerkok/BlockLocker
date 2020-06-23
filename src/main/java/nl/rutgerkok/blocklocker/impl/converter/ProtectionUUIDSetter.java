@@ -3,6 +3,7 @@ package nl.rutgerkok.blocklocker.impl.converter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -37,7 +38,7 @@ class ProtectionUUIDSetter extends UUIDHandler.ResultConsumer {
         SignParser signParser = plugin.getSignParser();
         for (ProtectionSign sign : protection.getSigns()) {
             List<Profile> oldProfileCollection = sign.getProfiles();
-            List<Profile> newProfileCollection = new ArrayList<Profile>(3);
+            List<Profile> newProfileCollection = new ArrayList<>(3);
             for (Profile profile : oldProfileCollection) {
                 profile = replaceProfile(profile, results);
                 newProfileCollection.add(profile);
@@ -54,7 +55,7 @@ class ProtectionUUIDSetter extends UUIDHandler.ResultConsumer {
         if (playerProfile.getUniqueId().isPresent()) {
             return oldProfile;
         }
-        String name = playerProfile.getDisplayName().toLowerCase();
+        String name = playerProfile.getDisplayName().toLowerCase(Locale.ROOT);
         Result result = results.get(name);
         if (result == null) {
             // No lookup :(

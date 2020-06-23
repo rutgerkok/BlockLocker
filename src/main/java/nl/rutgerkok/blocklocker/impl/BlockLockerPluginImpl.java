@@ -10,7 +10,6 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.logging.Level;
 
-import nl.rutgerkok.blocklocker.*;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -21,6 +20,15 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 
+import nl.rutgerkok.blocklocker.BlockLockerPlugin;
+import nl.rutgerkok.blocklocker.ChestSettings;
+import nl.rutgerkok.blocklocker.HopperCache;
+import nl.rutgerkok.blocklocker.ProfileFactory;
+import nl.rutgerkok.blocklocker.ProtectionFinder;
+import nl.rutgerkok.blocklocker.ProtectionUpdater;
+import nl.rutgerkok.blocklocker.SignParser;
+import nl.rutgerkok.blocklocker.SignSelector;
+import nl.rutgerkok.blocklocker.Translator;
 import nl.rutgerkok.blocklocker.group.CombinedGroupSystem;
 import nl.rutgerkok.blocklocker.group.GroupSystem;
 import nl.rutgerkok.blocklocker.impl.blockfinder.BlockFinder;
@@ -75,6 +83,11 @@ BlockLockerPlugin {
     public CombinedGroupSystem getGroupSystems() {
         Preconditions.checkState(combinedGroupSystem != null);
         return combinedGroupSystem;
+    }
+
+    @Override
+    public HopperCache getHopperCache() {
+        return redstoneProtectCache;
     }
 
     /**
@@ -140,14 +153,9 @@ BlockLockerPlugin {
     public SignSelector getSignSelector() {
         return signSelector;
     }
-
     @Override
     public Translator getTranslator() {
         return translator;
-    }
-    @Override
-    public HopperCache getHopperCache() {
-        return redstoneProtectCache;
     }
 
     private void loadGroupSystems() {
@@ -258,7 +266,7 @@ BlockLockerPlugin {
         plugins.registerEvents(new BlockPlaceListener(this), this);
         plugins.registerEvents(new InteractListener(this), this);
         plugins.registerEvents(new SignChangeListener(this), this);
-        getCommand(getName().toLowerCase()).setExecutor(new BlockLockerCommand(this));
+        getCommand(getName().toLowerCase(Locale.ROOT)).setExecutor(new BlockLockerCommand(this));
     }
 
     @Override

@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -78,7 +79,7 @@ final class UUIDHandler {
     }
 
     private static class MojangWeb {
-    	
+
         private static final String BULK_UUID_LOOKUP_URL = "https://api.mojang.com/profiles/minecraft";
         private static JsonParser jsonParser = new JsonParser();
         private static final double PROFILES_PER_BULK_REQUEST = 100;
@@ -100,16 +101,16 @@ final class UUIDHandler {
             for (int i = 0; i < requests; i++) {
                 HttpURLConnection connection = createConnectionForBulkLookup();
                 List<String> sublist = names.subList(i * 100, Math.min((i + 1) * 100, names.size()));
-                
+
                 // There is probably a better way to do this
                 JsonArray json = new JsonArray();
                 sublist.stream().forEach(json::add);
                 writeBody(connection, json.toString());
-                
+
                 JsonArray array = jsonParser.parse(new InputStreamReader(connection.getInputStream())).getAsJsonArray();
                 for (JsonElement profile : array) {
                     Result result = toResult(profile.getAsJsonObject());
-                    results.put(result.name.toLowerCase(), result);
+                    results.put(result.name.toLowerCase(Locale.ROOT), result);
                 }
                 if (i != requests - 1) {
                     Thread.sleep(100L);
@@ -266,7 +267,7 @@ final class UUIDHandler {
     private static <V> Map<String, V> newPlayerNameMap(Collection<String> keys, Function<String, V> valueFunction) {
         Map<String, V> map = Maps.newHashMapWithExpectedSize(keys.size());
         for (String key : keys) {
-            map.put(key.toLowerCase(), valueFunction.apply(key));
+            map.put(key.toLowerCase(Locale.ROOT), valueFunction.apply(key));
         }
         return map;
     }
@@ -406,7 +407,7 @@ final class UUIDHandler {
         // Remove names that were found
         for (Iterator<String> it = names.iterator(); it.hasNext();) {
             String name = it.next();
-            if (newResults.containsKey(name.toLowerCase())) {
+            if (newResults.containsKey(name.toLowerCase(Locale.ROOT))) {
                 it.remove();
             }
         }
@@ -424,7 +425,7 @@ final class UUIDHandler {
         // Get as much results as possible without a web request
         for (ListIterator<String> it = namesList.listIterator(); it.hasNext();) {
             String providedName = it.next();
-            String nameLowercase = providedName.toLowerCase();
+            String nameLowercase = providedName.toLowerCase(Locale.ROOT);
 
             // Get from cache
             Result cached = uuidCache.getIfPresent(nameLowercase);

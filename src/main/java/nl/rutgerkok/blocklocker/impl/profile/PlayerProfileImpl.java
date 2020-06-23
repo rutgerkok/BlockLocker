@@ -1,6 +1,7 @@
 package nl.rutgerkok.blocklocker.impl.profile;
 
 import java.util.Date;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -57,7 +58,7 @@ class PlayerProfileImpl implements PlayerProfile {
     public String getDisplayName() {
         return displayName;
     }
-    
+
     @Override
     public JsonObject getSaveObject() {
     	JsonObject object = new JsonObject();
@@ -78,7 +79,7 @@ class PlayerProfileImpl implements PlayerProfile {
         if (uuid.isPresent()) {
             return uuid.hashCode();
         }
-        return displayName.toLowerCase().hashCode();
+        return displayName.toLowerCase(Locale.ROOT).hashCode();
     }
 
     @Override

@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -17,7 +18,7 @@ import nl.rutgerkok.blocklocker.ProtectionType;
 import nl.rutgerkok.blocklocker.impl.updater.UpdatePreference;
 
 final class Config {
-	
+
     private final static class Key {
         private final static String LANGUAGE_FILE = "languageFile",
                 PROTECTABLE_CONTAINERS = "protectableContainers",
@@ -171,7 +172,7 @@ final class Config {
         Set<AttackType> materials = EnumSet.noneOf(AttackType.class);
         for (String string : strings) {
             try {
-                materials.add(AttackType.valueOf(string.toUpperCase()));
+                materials.add(AttackType.valueOf(string.toUpperCase(Locale.ROOT)));
             } catch (IllegalArgumentException e) {
                 logger.warning("Cannot recognize attack type " + string + ", ignoring it");
                 continue;

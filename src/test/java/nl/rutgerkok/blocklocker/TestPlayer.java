@@ -1,5 +1,6 @@
 package nl.rutgerkok.blocklocker;
 
+import java.util.Locale;
 import java.util.UUID;
 
 import org.bukkit.entity.Player;
@@ -14,7 +15,7 @@ public class TestPlayer {
     }
 
     public static Player create(String name) {
-        UUID uuid = UUID.nameUUIDFromBytes(name.toLowerCase().getBytes(Charsets.UTF_8));
+        UUID uuid = UUID.nameUUIDFromBytes(name.toLowerCase(Locale.ROOT).getBytes(Charsets.UTF_8));
         return create(name, uuid);
     }
 

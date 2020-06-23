@@ -1,6 +1,7 @@
 package nl.rutgerkok.blocklocker;
 
 import java.util.List;
+import java.util.Locale;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -48,7 +49,7 @@ public abstract class Translator {
          */
         @Override
         public String toString() {
-            return name().replaceFirst("_", ".").toLowerCase();
+            return name().replaceFirst("_", ".").toLowerCase(Locale.ROOT);
         }
     }
 
