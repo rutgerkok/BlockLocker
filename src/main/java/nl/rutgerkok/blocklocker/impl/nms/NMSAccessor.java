@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Optional;
 
+import nl.rutgerkok.blocklocker.util.ServerVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.Sign;
@@ -28,7 +29,7 @@ public final class NMSAccessor implements ServerSpecific {
         }
     }
 
-    static Object enumField(Class<Enum<?>> enumClass, String name) {
+    static Object enumField(Class<?> enumClass, String name) {
         try {
             Method valueOf = getMethod(Enum.class, "valueOf", Class.class, String.class);
             return invokeStatic(valueOf, enumClass, name);
@@ -61,20 +62,6 @@ public final class NMSAccessor implements ServerSpecific {
         }
     }
 
-    /**
-     * Gets the Minecraft class version of the server, like "v1_8_R2".
-     *
-     * @return Minecraft class version.
-     */
-    private static String getMinecraftClassVersion() {
-        String serverClassName = Bukkit.getServer().getClass().getName();
-        String version = serverClassName.split("\\.")[3];
-        if (!version.startsWith("v")) {
-            throw new AssertionError("Failed to detect Minecraft version, found " + version + " in " + serverClassName);
-        }
-        return version;
-    }
-
     static Object invokeStatic(Method method, Object... parameters) {
         return call(null, method, parameters);
     }
@@ -105,15 +92,15 @@ public final class NMSAccessor implements ServerSpecific {
     final Constructor<?> ChatComponentText_new;
     final Class<?> ChatHoverable;
     final Method ChatHoverable_getChatComponent;
-    final Constructor<?> ChatHoverable_new;
+    Constructor<?> ChatHoverable_new;
     final Class<?> ChatModifier;
     final Method ChatModifier_getGetHoverEvent;
-    final Constructor<?> ChatModifier_new;
+    Constructor<?> ChatModifier_new;
     final Class<?> CraftChatMessage;
     final Method CraftChatMessage_fromComponent;
     final Class<?> CraftWorld;
     final Method CraftWorld_getHandle;
-    final Class<Enum<?>> EnumHoverAction;
+    final Class<?> EnumHoverAction;
     final Object EnumHoverAction_SHOW_TEXT;
     final Class<?> IChatBaseComponent;
     final Method IChatBaseComponent_getChatModifier;
@@ -126,7 +113,7 @@ public final class NMSAccessor implements ServerSpecific {
     private final JsonParser jsonParser = new JsonParser();
 
     public NMSAccessor() {
-        String version = getMinecraftClassVersion();
+        String version = ServerVersion.getServerVersionString();
         nmsPrefix = "net.minecraft.server." + version + ".";
         obcPrefix = "org.bukkit.craftbukkit." + version + ".";
 
@@ -135,7 +122,15 @@ public final class NMSAccessor implements ServerSpecific {
         ChatModifier = getNMSClass("ChatModifier");
         ChatHoverable = getNMSClass("ChatHoverable");
         IChatBaseComponent = getNMSClass("IChatBaseComponent");
-        EnumHoverAction = getAnyNMSEnum("EnumHoverAction", "ChatHoverable$EnumHoverAction");
+
+        if (ServerVersion.isServerVersion(ServerVersion.V1_16)){
+            EnumHoverAction = getNMSClass("ChatHoverable$EnumHoverAction");
+            EnumHoverAction_SHOW_TEXT = getField(EnumHoverAction, "SHOW_TEXT");
+        }else{
+            EnumHoverAction = getAnyNMSEnum("EnumHoverAction", "ChatHoverable$EnumHoverAction");
+            EnumHoverAction_SHOW_TEXT = enumField(EnumHoverAction, "SHOW_TEXT");
+        }
+
         TileEntitySign = getNMSClass("TileEntitySign");
         ChatComponentText = getNMSClass("ChatComponentText");
 
@@ -152,12 +147,12 @@ public final class NMSAccessor implements ServerSpecific {
 
         ChatComponentText_new = getConstructor(ChatComponentText, String.class);
         BlockPosition_new = getConstructor(BlockPosition, int.class, int.class, int.class);
-        ChatModifier_new = getConstructor(ChatModifier);
-        ChatHoverable_new = getConstructor(ChatHoverable, EnumHoverAction, IChatBaseComponent);
+
+        if (ServerVersion.isServerVersionBelow(ServerVersion.V1_16)){
+            ChatModifier_new = getConstructor(ChatModifier);
+        }
 
         TileEntitySign_lines = getField(TileEntitySign, "lines");
-
-        EnumHoverAction_SHOW_TEXT = enumField(EnumHoverAction, "SHOW_TEXT");
     }
 
     private String chatComponentToString(Object chatComponent) {
@@ -265,7 +260,15 @@ public final class NMSAccessor implements ServerSpecific {
         Object line = ((Object[]) retrieve(tileEntitySign, TileEntitySign_lines))[0];
         Object modifier = call(line, IChatBaseComponent_getChatModifier);
         if (modifier == null) {
-            modifier = newInstance(ChatModifier_new);
+            try{
+                if (ServerVersion.isServerVersion(ServerVersion.V1_16)){
+                    modifier = getField(ChatModifier, "b").get(null);
+                }else{
+                    modifier = newInstance(ChatModifier_new);
+                }
+            }catch (IllegalAccessException e){
+                e.printStackTrace();
+            }
         }
         Object chatComponentText = newInstance(ChatComponentText_new, data);
         Object hoverable = newInstance(ChatHoverable_new, EnumHoverAction_SHOW_TEXT, chatComponentText);
