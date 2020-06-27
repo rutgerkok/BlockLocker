@@ -101,7 +101,7 @@ public final class NMSAccessor implements ServerSpecific {
     final Class<?> CraftWorld;
     final Method CraftWorld_getHandle;
     final Class<?> EnumHoverAction;
-    final Object EnumHoverAction_SHOW_TEXT;
+    Object EnumHoverAction_SHOW_TEXT;
     final Class<?> IChatBaseComponent;
     final Method IChatBaseComponent_getChatModifier;
     final Method ChatModifier_setChatHoverable;
@@ -125,7 +125,11 @@ public final class NMSAccessor implements ServerSpecific {
 
         if (ServerVersion.isServerVersion(ServerVersion.V1_16)){
             EnumHoverAction = getNMSClass("ChatHoverable$EnumHoverAction");
-            EnumHoverAction_SHOW_TEXT = getField(EnumHoverAction, "SHOW_TEXT");
+            try{
+                EnumHoverAction_SHOW_TEXT = getField(EnumHoverAction, "SHOW_TEXT").get(null);
+            }catch (IllegalAccessException e){
+                e.printStackTrace();
+            }
         }else{
             EnumHoverAction = getAnyNMSEnum("EnumHoverAction", "ChatHoverable$EnumHoverAction");
             EnumHoverAction_SHOW_TEXT = enumField(EnumHoverAction, "SHOW_TEXT");
@@ -151,6 +155,7 @@ public final class NMSAccessor implements ServerSpecific {
         if (ServerVersion.isServerVersionBelow(ServerVersion.V1_16)){
             ChatModifier_new = getConstructor(ChatModifier);
         }
+        ChatHoverable_new = getConstructor(ChatHoverable, EnumHoverAction, Object.class);
 
         TileEntitySign_lines = getField(TileEntitySign, "lines");
     }
@@ -243,6 +248,16 @@ public final class NMSAccessor implements ServerSpecific {
             return Optional.empty();
         }
 
+        if (ServerVersion.isServerVersion(ServerVersion.V1_16)){
+            final Class<?> ChatSerializer = getNMSClass("IChatBaseComponent$ChatSerializer");
+
+            final Method toComponent = getMethod(ChatSerializer, "b", IChatBaseComponent);
+
+            final Object json = call(chatHoverable, ChatHoverable_getChatComponent);
+
+            return Optional.of(chatComponentToString(call(null, toComponent, json)));
+        }
+
         return Optional.of(chatComponentToString(call(chatHoverable, ChatHoverable_getChatComponent)));
     }
 
@@ -270,9 +285,16 @@ public final class NMSAccessor implements ServerSpecific {
                 e.printStackTrace();
             }
         }
+
         Object chatComponentText = newInstance(ChatComponentText_new, data);
+
+        System.out.println(EnumHoverAction_SHOW_TEXT.getClass());;
+        System.out.println(chatComponentText.getClass());
+
         Object hoverable = newInstance(ChatHoverable_new, EnumHoverAction_SHOW_TEXT, chatComponentText);
+
         call(modifier, ChatModifier_setChatHoverable, hoverable);
+
     }
 
     private Optional<?> toNmsSign(World world, int x, int y, int z) {
