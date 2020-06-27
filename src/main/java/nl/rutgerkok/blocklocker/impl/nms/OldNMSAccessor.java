@@ -3,7 +3,6 @@ package nl.rutgerkok.blocklocker.impl.nms;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.Optional;
 
 import org.bukkit.Bukkit;
@@ -16,10 +15,10 @@ import com.google.gson.JsonParser;
 
 /**
  * Implementation of methods required by
- * nl.rutgerkok.chestsignprotect.impl.NMSAccessor for Minecraft 1.16 and newer.
+ * nl.rutgerkok.chestsignprotect.impl.NMSAccessor for Minecraft 1.7.8 tot 1.15.
  *
  */
-public final class NMSAccessor implements ServerSpecific {
+public final class OldNMSAccessor implements ServerSpecific {
 
     static Object call(Object on, Method method, Object... parameters) {
         try {
@@ -28,7 +27,16 @@ public final class NMSAccessor implements ServerSpecific {
             throw new RuntimeException(e);
         }
     }
-    
+
+    static Object enumField(Class<Enum<?>> enumClass, String name) {
+        try {
+            Method valueOf = getMethod(Enum.class, "valueOf", Class.class, String.class);
+            return invokeStatic(valueOf, enumClass, name);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     static Constructor<?> getConstructor(Class<?> clazz, Class<?>... paramTypes) {
         try {
             return clazz.getConstructor(paramTypes);
@@ -43,30 +51,6 @@ public final class NMSAccessor implements ServerSpecific {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-    
-    static Object getStaticFieldValue(Class<?> clazz, String name) {
-    	try {
-			return getField(clazz, name).get(null);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		}
-    }
-    
-    static Object getStaticFieldValue(Class<?> clazz, Class<?> typeOfField) {
-    	for (Field field: clazz.getDeclaredFields()) {
-    		try {
-	    		field.setAccessible(true);
-	    		if ((field.getModifiers() & Modifier.STATIC) == Modifier.STATIC && typeOfField.isAssignableFrom(field.getType())) {
-	    			return field.get(null);
-	    		}
-    		} catch (SecurityException | IllegalAccessException e) {
-    			// Ignore, if we're only looking for public fields we can safely ignore errors on accessing private fields.
-    			// If we're accessing a private field, we'll get an error at the end of the method.
-    		}
-    		
-    	}
-    	throw new RuntimeException("No accessible static field found on " + clazz + " of type " + typeOfField);
     }
 
     static Method getMethod(Class<?> clazz, String name, Class<?>... parameterTypes) {
@@ -112,6 +96,7 @@ public final class NMSAccessor implements ServerSpecific {
     }
 
     private final String nmsPrefix;
+
     private final String obcPrefix;
 
     final Class<?> BlockPosition;
@@ -123,15 +108,12 @@ public final class NMSAccessor implements ServerSpecific {
     final Constructor<?> ChatHoverable_new;
     final Class<?> ChatModifier;
     final Method ChatModifier_getGetHoverEvent;
-    final Object ChatModifier_defaultModifier;
+    final Constructor<?> ChatModifier_new;
     final Class<?> CraftChatMessage;
     final Method CraftChatMessage_fromComponent;
     final Class<?> CraftWorld;
     final Method CraftWorld_getHandle;
-    /**
-     * Since Minecraft 1.16, this is not actually an enum anymore. Spigot didn't update the name, however.
-     */
-    final Class<?> EnumHoverAction;
+    final Class<Enum<?>> EnumHoverAction;
     final Object EnumHoverAction_SHOW_TEXT;
     final Class<?> IChatBaseComponent;
     final Method IChatBaseComponent_getChatModifier;
@@ -143,7 +125,7 @@ public final class NMSAccessor implements ServerSpecific {
     
     private final JsonParser jsonParser = new JsonParser();
 
-    public NMSAccessor() {
+    public OldNMSAccessor() {
         String version = getMinecraftClassVersion();
         nmsPrefix = "net.minecraft.server." + version + ".";
         obcPrefix = "org.bukkit.craftbukkit." + version + ".";
@@ -153,7 +135,7 @@ public final class NMSAccessor implements ServerSpecific {
         ChatModifier = getNMSClass("ChatModifier");
         ChatHoverable = getNMSClass("ChatHoverable");
         IChatBaseComponent = getNMSClass("IChatBaseComponent");
-        EnumHoverAction = getNMSClass("ChatHoverable$EnumHoverAction");
+        EnumHoverAction = getAnyNMSEnum("EnumHoverAction", "ChatHoverable$EnumHoverAction");
         TileEntitySign = getNMSClass("TileEntitySign");
         ChatComponentText = getNMSClass("ChatComponentText");
 
@@ -170,12 +152,12 @@ public final class NMSAccessor implements ServerSpecific {
 
         ChatComponentText_new = getConstructor(ChatComponentText, String.class);
         BlockPosition_new = getConstructor(BlockPosition, int.class, int.class, int.class);
-        ChatHoverable_new = getConstructor(ChatHoverable, EnumHoverAction, Object.class);
+        ChatModifier_new = getConstructor(ChatModifier);
+        ChatHoverable_new = getConstructor(ChatHoverable, EnumHoverAction, IChatBaseComponent);
 
-        ChatModifier_defaultModifier = getStaticFieldValue(ChatModifier, ChatModifier);
         TileEntitySign_lines = getField(TileEntitySign, "lines");
 
-        EnumHoverAction_SHOW_TEXT = getStaticFieldValue(EnumHoverAction, "SHOW_TEXT");
+        EnumHoverAction_SHOW_TEXT = enumField(EnumHoverAction, "SHOW_TEXT");
     }
 
     private String chatComponentToString(Object chatComponent) {
@@ -283,7 +265,7 @@ public final class NMSAccessor implements ServerSpecific {
         Object line = ((Object[]) retrieve(tileEntitySign, TileEntitySign_lines))[0];
         Object modifier = call(line, IChatBaseComponent_getChatModifier);
         if (modifier == null) {
-            modifier = ChatModifier_defaultModifier;
+            modifier = newInstance(ChatModifier_new);
         }
         Object chatComponentText = newInstance(ChatComponentText_new, data);
         Object hoverable = newInstance(ChatHoverable_new, EnumHoverAction_SHOW_TEXT, chatComponentText);

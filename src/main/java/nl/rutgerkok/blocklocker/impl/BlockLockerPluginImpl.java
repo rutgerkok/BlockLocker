@@ -45,7 +45,7 @@ import nl.rutgerkok.blocklocker.impl.group.ScoreboardGroupSystem;
 import nl.rutgerkok.blocklocker.impl.group.TownyGroupSystem;
 import nl.rutgerkok.blocklocker.impl.group.mcMMOGroupSystem;
 import nl.rutgerkok.blocklocker.impl.location.TownyLocationChecker;
-import nl.rutgerkok.blocklocker.impl.nms.CNAccessor;
+import nl.rutgerkok.blocklocker.impl.nms.OldNMSAccessor;
 import nl.rutgerkok.blocklocker.impl.nms.NMSAccessor;
 import nl.rutgerkok.blocklocker.impl.nms.ServerSpecific;
 import nl.rutgerkok.blocklocker.impl.profile.ProfileFactoryImpl;
@@ -235,8 +235,8 @@ BlockLockerPlugin {
     public void onEnable() {
         // NMS checks
         try {
-            nms = new CNAccessor();
-        } catch (ClassNotFoundException e) {
+            nms = new OldNMSAccessor();
+        } catch (Exception e) {
             try {
                 nms = new NMSAccessor();
             } catch (Throwable t) {
