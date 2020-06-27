@@ -288,9 +288,6 @@ public final class NMSAccessor implements ServerSpecific {
 
         Object chatComponentText = newInstance(ChatComponentText_new, data);
 
-        System.out.println(EnumHoverAction_SHOW_TEXT.getClass());;
-        System.out.println(chatComponentText.getClass());
-
         Object hoverable = newInstance(ChatHoverable_new, EnumHoverAction_SHOW_TEXT, chatComponentText);
 
         call(modifier, ChatModifier_setChatHoverable, hoverable);
