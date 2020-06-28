@@ -28,7 +28,7 @@ public final class NMSAccessor implements ServerSpecific {
             throw new RuntimeException(e);
         }
     }
-    
+
     static Constructor<?> getConstructor(Class<?> clazz, Class<?>... paramTypes) {
         try {
             return clazz.getConstructor(paramTypes);
@@ -43,30 +43,6 @@ public final class NMSAccessor implements ServerSpecific {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-    
-    static Object getStaticFieldValue(Class<?> clazz, String name) {
-    	try {
-			return getField(clazz, name).get(null);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		}
-    }
-    
-    static Object getStaticFieldValue(Class<?> clazz, Class<?> typeOfField) {
-    	for (Field field: clazz.getDeclaredFields()) {
-    		try {
-	    		field.setAccessible(true);
-	    		if ((field.getModifiers() & Modifier.STATIC) == Modifier.STATIC && typeOfField.isAssignableFrom(field.getType())) {
-	    			return field.get(null);
-	    		}
-    		} catch (SecurityException | IllegalAccessException e) {
-    			// Ignore, if we're only looking for public fields we can safely ignore errors on accessing private fields.
-    			// If we're accessing a private field, we'll get an error at the end of the method.
-    		}
-    		
-    	}
-    	throw new RuntimeException("No accessible static field found on " + clazz + " of type " + typeOfField);
     }
 
     static Method getMethod(Class<?> clazz, String name, Class<?>... parameterTypes) {
@@ -89,6 +65,30 @@ public final class NMSAccessor implements ServerSpecific {
             throw new AssertionError("Failed to detect Minecraft version, found " + version + " in " + serverClassName);
         }
         return version;
+    }
+
+    static Object getStaticFieldValue(Class<?> clazz, Class<?> typeOfField) {
+    	for (Field field: clazz.getDeclaredFields()) {
+    		try {
+	    		field.setAccessible(true);
+	    		if ((field.getModifiers() & Modifier.STATIC) == Modifier.STATIC && typeOfField.isAssignableFrom(field.getType())) {
+	    			return field.get(null);
+	    		}
+    		} catch (SecurityException | IllegalAccessException e) {
+    			// Ignore, if we're only looking for public fields we can safely ignore errors on accessing private fields.
+    			// If we're accessing a private field, we'll get an error at the end of the method.
+    		}
+
+    	}
+    	throw new RuntimeException("No accessible static field found on " + clazz + " of type " + typeOfField);
+    }
+
+    static Object getStaticFieldValue(Class<?> clazz, String name) {
+    	try {
+			return getField(clazz, name).get(null);
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
     }
 
     static Object invokeStatic(Method method, Object... parameters) {
@@ -119,7 +119,7 @@ public final class NMSAccessor implements ServerSpecific {
     final Class<?> ChatComponentText;
     final Constructor<?> ChatComponentText_new;
     final Class<?> ChatHoverable;
-    final Method ChatHoverable_getChatComponent;
+    final Method ChatHoverable_getContents;
     final Constructor<?> ChatHoverable_new;
     final Class<?> ChatModifier;
     final Method ChatModifier_getGetHoverEvent;
@@ -135,12 +135,15 @@ public final class NMSAccessor implements ServerSpecific {
     final Object EnumHoverAction_SHOW_TEXT;
     final Class<?> IChatBaseComponent;
     final Method IChatBaseComponent_getChatModifier;
+    final Method IChatBaseComponent_mutableCopy;
+    final Class<?> IChatMutableComponent;
+    final Method IChatMutableComponent_setChatModifier;
     final Method ChatModifier_setChatHoverable;
     final Class<?> TileEntitySign;
     final Field TileEntitySign_lines;
     final Class<?> WorldServer;
     final Method WorldServer_getTileEntity;
-    
+
     private final JsonParser jsonParser = new JsonParser();
 
     public NMSAccessor() {
@@ -153,6 +156,7 @@ public final class NMSAccessor implements ServerSpecific {
         ChatModifier = getNMSClass("ChatModifier");
         ChatHoverable = getNMSClass("ChatHoverable");
         IChatBaseComponent = getNMSClass("IChatBaseComponent");
+        IChatMutableComponent = getNMSClass("IChatMutableComponent");
         EnumHoverAction = getNMSClass("ChatHoverable$EnumHoverAction");
         TileEntitySign = getNMSClass("TileEntitySign");
         ChatComponentText = getNMSClass("ChatComponentText");
@@ -164,9 +168,11 @@ public final class NMSAccessor implements ServerSpecific {
         CraftChatMessage_fromComponent = getMethod(CraftChatMessage, "fromComponent", IChatBaseComponent);
         WorldServer_getTileEntity = getMethod(WorldServer, "getTileEntity", BlockPosition);
         IChatBaseComponent_getChatModifier = getMethod(IChatBaseComponent, "getChatModifier");
+        IChatBaseComponent_mutableCopy = getMethod(IChatBaseComponent, "mutableCopy");
+        IChatMutableComponent_setChatModifier = getMethod(IChatMutableComponent, "setChatModifier", ChatModifier);
         ChatModifier_setChatHoverable = getMethod(ChatModifier, "setChatHoverable", ChatHoverable);
         ChatModifier_getGetHoverEvent = getMethod(ChatModifier, "getHoverEvent");
-        ChatHoverable_getChatComponent = getMethod(ChatHoverable, "b");
+        ChatHoverable_getContents = getMethod(ChatHoverable, "a", EnumHoverAction);
 
         ChatComponentText_new = getConstructor(ChatComponentText, String.class);
         BlockPosition_new = getConstructor(BlockPosition, int.class, int.class, int.class);
@@ -266,7 +272,8 @@ public final class NMSAccessor implements ServerSpecific {
             return Optional.empty();
         }
 
-        return Optional.of(chatComponentToString(call(chatHoverable, ChatHoverable_getChatComponent)));
+        return Optional
+                .of(chatComponentToString(call(chatHoverable, ChatHoverable_getContents, EnumHoverAction_SHOW_TEXT)));
     }
 
     @Override
@@ -280,14 +287,18 @@ public final class NMSAccessor implements ServerSpecific {
     }
 
     private void setSecretData(Object tileEntitySign, String data) {
-        Object line = ((Object[]) retrieve(tileEntitySign, TileEntitySign_lines))[0];
+        Object[] lines = ((Object[]) retrieve(tileEntitySign, TileEntitySign_lines));
+        Object line = lines[0];
         Object modifier = call(line, IChatBaseComponent_getChatModifier);
         if (modifier == null) {
             modifier = ChatModifier_defaultModifier;
         }
         Object chatComponentText = newInstance(ChatComponentText_new, data);
         Object hoverable = newInstance(ChatHoverable_new, EnumHoverAction_SHOW_TEXT, chatComponentText);
-        call(modifier, ChatModifier_setChatHoverable, hoverable);
+        modifier = call(modifier, ChatModifier_setChatHoverable, hoverable);
+        Object mutableLine = call(line, IChatBaseComponent_mutableCopy);
+        call(mutableLine, IChatMutableComponent_setChatModifier, modifier);
+        lines[0] = mutableLine;
     }
 
     private Optional<?> toNmsSign(World world, int x, int y, int z) {
