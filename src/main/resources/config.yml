@@ -74,11 +74,13 @@ connectContainers: false
 protectableDoors:
 - acacia_door
 - birch_door
+- crimson_door
 - dark_oak_door
 - iron_door
 - jungle_door
 - oak_door
 - spruce_door
+- warped_door
 
 # All protections (except doors) that consist not only of the block listed here,
 # but also of a supporting block. This is normally the block directly below.
@@ -92,6 +94,8 @@ protectableAttachables:
 - acacia_trapdoor
 - birch_fence_gate
 - birch_trapdoor
+- crimson_fence_gate
+- crimson_trapdoor
 - dark_oak_fence_gate
 - dark_oak_trapdoor
 - iron_trapdoor
@@ -101,6 +105,8 @@ protectableAttachables:
 - oak_trapdoor
 - spruce_fence_gate
 - spruce_trapdoor
+- warped_fence_gate
+- warped_trapdoor
 
 
 
