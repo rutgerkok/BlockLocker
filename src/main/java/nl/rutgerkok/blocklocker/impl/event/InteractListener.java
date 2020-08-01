@@ -440,7 +440,7 @@ public final class InteractListener extends EventListener {
 
         Block signBlock = block.getRelative(clickedSide);
         boolean waterlogged = false;
-        if (signBlock.getType() != Material.AIR && signBlock.getType() != Material.CAVE_AIR) {
+        if (!signBlock.getType().isAir()) {
             if (signBlock.getType() != Material.WATER) {
                 return false;
             }
