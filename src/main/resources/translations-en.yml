@@ -24,6 +24,7 @@ protection:
   no_permission_for_claim: "&4You don't have permission to claim a container, sorry."
   not_nearby: "&4There is no protectable block nearby. (Shift-)right-click a container with a sign in your hand to protect it."
   selected_sign: "&6Selected a sign. Type \"/blocklocker <line number> <name>\" to edit this sign."
+  no_permission_for_interfere: "&4You don't have permission to place a block that may interfere with others, sorry."
 tag:
   everyone: "Everyone"
   timer: "Timer"
