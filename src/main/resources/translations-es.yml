@@ -2,17 +2,17 @@
 command:
   cannot_be_used_by_console: Este comando no puede ser utilizado por la consola. ¡Lo siento!
   cannot_edit_owner: '&4No puede cambiar el propietario de la protección. Destruye el cartel en su lugar.'
-  line_number_out_of_bounds: '&4Ingrese un número de línea entre 2 y 4, inclusive.'
+  line_number_out_of_bounds: '&4Ingrese un número de línea entre 2 y 4, el 1 esta en uso.'
   no_permission: '&4No tienes permiso para ejecutar este comando. ¡Lo siento!'
   no_sign_selected: '&4Debe seleccionar un cartel en uno de sus bloques protegidos primero, haciendo clic derecho.'
   player_name_too_long: '&4El nombre del jugador tiene más de 16 caracteres, lo que no cabe en el letrero. También es más largo de lo que Mojang permite que los nombres de los jugadores sean.'
-  plugin_reloaded: '&6¡Recargué los archivos de configuración!'
-  sign_no_longer_part_of_protection: '&4El signo seleccionado ya no pertenece a un bloque protegido.'
-  updated_sign: '&6Actualizado el letrero!'
+  plugin_reloaded: '&6¡Recargo los archivos de configuración!'
+  sign_no_longer_part_of_protection: '&4El letrero seleccionado ya no pertenece a un bloque protegido.'
+  updated_sign: '&6Letrero actualizado!'
 protection:
   add_more_users_sign_instead: '&4Solo puede haber un cartel [Privado] en una protección. Agregue un cartel [Más usuarios] en su lugar.'
   bypassed: '&6Acaba de pasar por alto una protección de {0}.'
-  cannot_change_sign: '&4No puede cambiar una señal cerca de un contenedor reclamado.'
+  cannot_change_sign: '&4No puede cambiar un letrero en un contenedor reclamado.'
   chest_hint: '&6Coloque un letrero en este cofre para protegerlo.'
   claimed_container: '&6Reclamó este contenedor. Nadie más puede acceder.'
   claimed_manually: '&6Creó una proteccion. Solo las personas que figuran en el letrero pueden acceder.'
@@ -26,7 +26,7 @@ protection:
 tag:
   everyone: Todos
   more_users:
-  - '[Mas Usuario]'
+  - '[Mas Usuarios]'
   - '[More Users]'
   private:
   - '[Privado]'
