@@ -10,7 +10,6 @@ public final class Permissions {
     public static final String CAN_PROTECT = "blocklocker.protect";
     public static final String CAN_RELOAD = "blocklocker.reload";
     public static final String CAN_WILDERNESS = "blocklocker.wilderness";
-    public static final String CAN_INTERFERE = "blocklocker.interfere";
 
     private static final String GROUP_PREFIX = "blocklocker.group.";
 

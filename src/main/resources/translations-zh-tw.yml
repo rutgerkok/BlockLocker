@@ -24,7 +24,6 @@ protection:
   no_permission_for_claim: "&4您沒有宣告容器擁有權的權限，抱歉。"
   not_nearby: "&4附近沒有可受保護的方塊。手持告示牌並(Shift-)右鍵點選容器來保護它。"
   selected_sign: "&6已選擇一個告示牌。輸入「/blocklocker <行號> <名稱>」來編輯告示牌。"
-  no_permission_for_interfere: "&4您沒有在其他人上鎖方塊旁放置方塊的權限，抱歉。"
 tag:
   everyone:
   - "所有人"

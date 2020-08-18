@@ -78,18 +78,8 @@ public final class BlockPlaceListener extends EventListener {
      */
     @EventHandler(ignoreCancelled = true)
     public void onBlockPlaceMayInterfereWith(BlockPlaceEvent event){
-        Block block = event.getBlock();
-        Player player = event.getPlayer();
-
-        if (player.hasPermission(Permissions.CAN_INTERFERE)) {
-            return;
-        }
-
-        if (mayInterfereWith(player, block)) {
-            String message = plugin.getTranslator().get(Translation.PROTECTION_NO_PERMISSION_FOR_INTERFERE);
-            if (!message.isEmpty()) {
-                player.sendMessage(message);
-            }
+        if (!event.getPlayer().hasPermission(Permissions.CAN_BYPASS) &&
+                mayInterfereWith(event.getPlayer(), event.getBlock())) {
             event.setCancelled(true);
         }
     }

@@ -24,7 +24,6 @@ protection:
   no_permission_for_claim: '&4你没有这样做的权限.'
   not_nearby: '&4附近没有物品被保护,你可以右击木牌来保护物品.'
   selected_sign: '&6你选择了一个木牌,输入"/blocklocker <行数> <名字>"来编辑木牌.'
-  no_permission_for_interfere: '&4你没有在其他人上锁方块旁放置方块的许可权.'
 tag:
   everyone: 
   - '所有人'
