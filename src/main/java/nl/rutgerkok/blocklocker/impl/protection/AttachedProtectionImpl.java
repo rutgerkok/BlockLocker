@@ -52,7 +52,22 @@ public final class AttachedProtectionImpl extends AbstractProtection implements 
         return new AttachedProtectionImpl(signs, blockFinder, trapDoor);
     }
 
+    private static void setBlockOpen(Block block, boolean open) {
+        BlockData blockData = block.getBlockData();
+        if (!(blockData instanceof Openable)) {
+            return;
+        }
+        Openable openable = (Openable) blockData;
+
+        if (openable.isOpen() == open) {
+            return;
+        }
+
+        openable.setOpen(open);
+        block.setBlockData(blockData);
+    }
     private final BlockFinder blockFinder;
+
     private final Block protectionBlock;
 
     private AttachedProtectionImpl(Collection<ProtectionSign> signs, BlockFinder blockFinder, Block trapDoor) {
@@ -94,22 +109,12 @@ public final class AttachedProtectionImpl extends AbstractProtection implements 
 
     @Override
     public void setOpen(boolean open, SoundCondition playSound) {
-        BlockData materialData = protectionBlock.getBlockData();
-        if (!(materialData instanceof Openable)) {
-            return;
-        }
+        setBlockOpen(protectionBlock, open);
+        Block supportingBlock = blockFinder.findSupportingBlock(protectionBlock);
+        setBlockOpen(supportingBlock, open);
 
-        Openable openable = (Openable) materialData;
-
-        if (openable.isOpen() == open) {
-            return;
-        }
-
-        openable.setOpen(open);
-        protectionBlock.setBlockData(materialData);
-
-        if (playSound == SoundCondition.ALWAYS) {
-            Sound sound = OpenBlockSound.get(materialData.getMaterial(), open);
+        if (playSound == SoundCondition.ALWAYS && isOpen() != open) {
+            Sound sound = OpenBlockSound.get(protectionBlock.getType(), open);
             protectionBlock.getWorld().playSound(protectionBlock.getLocation(), sound, 1f, 0.7f);
         }
     }
