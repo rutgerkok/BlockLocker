@@ -1,8 +1,13 @@
 package nl.rutgerkok.blocklocker.impl.event;
 
+import nl.rutgerkok.blocklocker.profile.PlayerProfile;
+import nl.rutgerkok.blocklocker.protection.Protection;
 import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.DoubleChest;
+import org.bukkit.block.data.Directional;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -13,6 +18,9 @@ import nl.rutgerkok.blocklocker.Permissions;
 import nl.rutgerkok.blocklocker.Translator.Translation;
 import nl.rutgerkok.blocklocker.impl.blockfinder.BlockFinder;
 import nl.rutgerkok.blocklocker.location.IllegalLocationException;
+import org.bukkit.inventory.InventoryHolder;
+
+import java.util.Optional;
 
 public final class BlockPlaceListener extends EventListener {
 
@@ -28,6 +36,54 @@ public final class BlockPlaceListener extends EventListener {
         }
         return false;
     }
+
+    private boolean isOwner(Player player, Block block) {
+        Optional<Protection> protection = plugin.getProtectionFinder().findProtection(block);
+        if (!protection.isPresent()) {
+            return true;
+        }
+        PlayerProfile playerProfile = plugin.getProfileFactory().fromPlayer(player);
+        return !protection.get().isOwner(playerProfile);
+    }
+
+    private boolean mayInterfereWith(Player player, Block block) {
+        if (block.getType().equals(Material.CHEST) || block.getType().equals(Material.TRAPPED_CHEST)) {
+            //Single left chest may interfere with right chest that locked by others, and vice versa.
+            for (BlockFace blockFace : BlockFinder.CARDINAL_FACES) {
+                Block nearBlock = block.getRelative(blockFace);
+                if (block.getType().equals(nearBlock.getType()) &&
+                        !(((InventoryHolder) nearBlock.getState()).getInventory().getHolder() instanceof DoubleChest) &&
+                        ((Directional) nearBlock.getBlockData()).getFacing().equals(((Directional) block.getBlockData()).getFacing()) &&
+                        isProtected(nearBlock) && isOwner(player, nearBlock)) {
+                    return true;
+                }
+            }
+        } else if (Tag.DOORS.isTagged(block.getType())) {
+            //Left door may interfere with right door that locked by others, and vice versa.
+            for (BlockFace blockFace : BlockFinder.CARDINAL_FACES) {
+                Block nearBlock = block.getRelative(blockFace);
+                if (block.getType().equals(nearBlock.getType()) && isProtected(nearBlock) && isOwner(player, nearBlock)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Prevent placed block may interfere with protected block.
+     *
+     * @param event
+     *            The block place event.
+     */
+    @EventHandler(ignoreCancelled = true)
+    public void onBlockPlaceMayInterfereWith(BlockPlaceEvent event){
+        if (!event.getPlayer().hasPermission(Permissions.CAN_BYPASS) &&
+                mayInterfereWith(event.getPlayer(), event.getBlock())) {
+            event.setCancelled(true);
+        }
+    }
+
 
     /**
      * Sends a message that the player can protect a chest.
