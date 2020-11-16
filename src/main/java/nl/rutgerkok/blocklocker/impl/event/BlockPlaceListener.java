@@ -28,13 +28,22 @@ public final class BlockPlaceListener extends EventListener {
         super(plugin);
     }
 
-    private boolean isOwner(Player player, Block block) {
-        Optional<Protection> protection = plugin.getProtectionFinder().findProtection(block);
-        if (!protection.isPresent()) {
-            return true;
-        }
-        PlayerProfile playerProfile = plugin.getProfileFactory().fromPlayer(player);
-        return !protection.get().isOwner(playerProfile);
+    /**
+     * Returns true if there's a protection, but the player is not the owner.
+     *
+     * @param player
+     *            The player.
+     * @param block
+     *            A block that's part of the protection.
+     * @return True if there is a protection, but the player is not the owner. False
+     *         otherwise. Still returns false if the player is allowed, but not the
+     *         owner.
+     */
+    private Optional<Protection> getProtectionBySomeoneElse(Player player, Block block) {
+        return plugin.getProtectionFinder().findProtection(block).filter(protection -> {
+            PlayerProfile playerProfile = plugin.getProfileFactory().fromPlayer(player);
+            return !protection.isOwner(playerProfile);
+        });
     }
 
     /**
@@ -47,15 +56,19 @@ public final class BlockPlaceListener extends EventListener {
     public void onBlockPlace(BlockPlaceEvent event) {
         Player player = event.getPlayer();
 
-        if (willInterfereWith(player, event.getBlockPlaced())) {
+        Optional<Protection> interferingProtection = willInterfereWith(player, event.getBlockPlaced());
+        if (interferingProtection.isPresent()) {
             // Not allowed to place a block here, would interfere with an existing
             // protection
             if (!event.getPlayer().hasPermission(Permissions.CAN_BYPASS)) {
-                plugin.getTranslator().sendMessage(player, Translation.PROTECTION_NO_ACCESS);
+                plugin.getTranslator().sendMessage(player, Translation.PROTECTION_NO_ACCESS, interferingProtection.get()
+                        .getOwnerDisplayName());
                 event.setCancelled(true);
                 return;
             } else {
-                plugin.getTranslator().sendMessage(player, Translation.PROTECTION_BYPASSED);
+                plugin.getTranslator().sendMessage(player, Translation.PROTECTION_BYPASSED, interferingProtection.get()
+                        .getOwnerDisplayName());
+                return;
             }
         }
 
@@ -80,36 +93,56 @@ public final class BlockPlaceListener extends EventListener {
         }
     }
 
-    private boolean willInterfereWith(Player player, Block block) {
+    private Optional<Protection> willInterfereWith(Player player, Block block) {
         if (block.getType().equals(Material.CHEST) || block.getType().equals(Material.TRAPPED_CHEST)) {
             // Single left chest may interfere with right chest that locked by others, and
             // vice versa
             if (player.isSneaking()) {
-                return false; // If a player is sneaking, the chest will not connect, so it's safe
+                return Optional.empty(); // If a player is sneaking, the chest will not connect, so it's safe
             }
-            for (BlockFace blockFace : BlockFinder.CARDINAL_FACES) {
-                Block nearBlock = block.getRelative(blockFace);
-                if (block.getType().equals(nearBlock.getType()) &&
-                        !(((InventoryHolder) nearBlock.getState()).getInventory().getHolder() instanceof DoubleChest) &&
-                        ((Directional) nearBlock.getBlockData()).getFacing()
-                                .equals(((Directional) block.getBlockData()).getFacing())
-                        &&
-                        isProtected(nearBlock) && isOwner(player, nearBlock)) {
-                    return true;
+            for (BlockFace searchFace : BlockFinder.CARDINAL_FACES) {
+                Block nearBlock = block.getRelative(searchFace);
+
+                if (block.getType() != nearBlock.getType()) {
+                    continue;
+                }
+                BlockFace faceOfNearBlock = ((Directional) nearBlock.getBlockData()).getFacing();
+                BlockFace faceOfBlock = ((Directional) block.getBlockData()).getFacing();
+                boolean alreadyADoubleChest = (((InventoryHolder) nearBlock
+                        .getState()).getInventory().getHolder() instanceof DoubleChest);
+                if (alreadyADoubleChest) {
+                    continue;
+                }
+
+                // You are allowed to place two NORTH facing chests in adjacent blocks, provided
+                // they are behind each other
+                boolean areSiblings = (faceOfNearBlock == faceOfBlock) && faceOfBlock != searchFace
+                        && faceOfBlock != searchFace.getOppositeFace();
+
+                if (!areSiblings) {
+                    continue;
+                }
+
+                Optional<Protection> protectionBySomeoneElse = getProtectionBySomeoneElse(player, nearBlock);
+                if (protectionBySomeoneElse.isPresent()) {
+                    return protectionBySomeoneElse;
                 }
             }
         } else if (Tag.DOORS.isTagged(block.getType())) {
             // Left door may interfere with right door that locked by others, and vice
             // versa
-            for (BlockFace blockFace : BlockFinder.CARDINAL_FACES) {
-                Block nearBlock = block.getRelative(blockFace);
-                if (block.getType().equals(nearBlock.getType()) && isProtected(nearBlock)
-                        && isOwner(player, nearBlock)) {
-                    return true;
+            for (BlockFace searchFace : BlockFinder.CARDINAL_FACES) {
+                Block nearBlock = block.getRelative(searchFace);
+                if (block.getType() != nearBlock.getType()) {
+                    continue;
+                }
+                Optional<Protection> protectionBySomeoneElse = getProtectionBySomeoneElse(player, nearBlock);
+                if (protectionBySomeoneElse.isPresent()) {
+                    return protectionBySomeoneElse;
                 }
             }
         }
-        return false;
+        return Optional.empty();
     }
 
 }
