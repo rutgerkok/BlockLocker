@@ -1,16 +1,18 @@
 package nl.rutgerkok.blocklocker.impl;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
-import org.bukkit.Material;
+import org.bukkit.block.Block;
 
 import nl.rutgerkok.blocklocker.AttackType;
 import nl.rutgerkok.blocklocker.ChestSettings;
+import nl.rutgerkok.blocklocker.ProtectableBlocksSettings;
 import nl.rutgerkok.blocklocker.ProtectionType;
 import nl.rutgerkok.blocklocker.SignType;
 import nl.rutgerkok.blocklocker.Translator;
@@ -22,10 +24,11 @@ class ChestSettingsImpl implements ChestSettings {
 
     private final Config config;
     private final Translator translator;
+    private final List<ProtectableBlocksSettings> extraProtectables = new ArrayList<>();
 
     ChestSettingsImpl(Translator translator, Config config) {
-        this.translator = translator;
-        this.config = config;
+        this.translator = Objects.requireNonNull(translator, "translator");
+        this.config = Objects.requireNonNull(config, "config");
     }
 
     @Override
@@ -34,20 +37,30 @@ class ChestSettingsImpl implements ChestSettings {
     }
 
     @Override
-    public boolean canProtect(Material material) {
-        return config.canProtect(material);
+    public boolean canProtect(Block block) {
+        if (config.canProtect(block)) {
+            return true;
+        }
+        if (!this.extraProtectables.isEmpty()) {
+            for (ProtectableBlocksSettings extra : this.extraProtectables) {
+                if (extra.canProtect(block)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @Override
-    public boolean canProtect(ProtectionType type, Material material) {
-        return config.canProtect(type, material);
-    }
-
-    @Override
-    public boolean canProtect(Set<ProtectionType> types, Material material) {
-        for (ProtectionType type : types) {
-            if (canProtect(type, material)) {
-                return true;
+    public boolean canProtect(ProtectionType type, Block block) {
+        if (config.canProtect(type, block)) {
+            return true;
+        }
+        if (!this.extraProtectables.isEmpty()) {
+            for (ProtectableBlocksSettings extra : this.extraProtectables) {
+                if (extra.canProtect(type, block)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -74,22 +87,27 @@ class ChestSettingsImpl implements ChestSettings {
     }
 
     @Override
-    public String getFancyLocalizedHeader(SignType signType, String header) {
-    	List<String> headers = translator.getAll(getTranslationKey(signType));
+    public List<ProtectableBlocksSettings> getExtraProtectables() {
+        return this.extraProtectables;
+    }
 
-    	for (String head : headers) {
-    		if (head.equalsIgnoreCase(header)) {
-    			return header;
-    		}
-    	}
-    	
+    @Override
+    public String getFancyLocalizedHeader(SignType signType, String header) {
+        List<String> headers = translator.getAll(getTranslationKey(signType));
+
+        for (String head : headers) {
+            if (head.equalsIgnoreCase(header)) {
+                return header;
+            }
+        }
+
         return translator.get(getTranslationKey(signType));
     }
 
     @Override
-    public Optional<ProtectionType> getProtectionType(Material material) {
+    public Optional<ProtectionType> getProtectionType(Block block) {
         for (ProtectionType type : PROTECTION_TYPES) {
-            if (config.canProtect(type, material)) {
+            if (canProtect(type, block)) {
                 return Optional.of(type);
             }
         }

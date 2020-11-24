@@ -199,7 +199,7 @@ public final class InteractListener extends EventListener {
         }
 
         // Open (double/trap/fence) doors manually
-        boolean clickedMainBlock = plugin.getChestSettings().canProtect(clickedBlock.getType());
+        boolean clickedMainBlock = plugin.getChestSettings().canProtect(clickedBlock);
         if (protection.canBeOpened() && !isSneakPlacing(player) && clickedMainBlock) {
             event.setCancelled(true);
 

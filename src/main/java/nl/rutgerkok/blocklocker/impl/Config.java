@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import nl.rutgerkok.blocklocker.AttackType;
@@ -91,13 +92,13 @@ final class Config {
     /**
      * Gets whether the material can be protected by any type.
      *
-     * @param material
-     *            Material to check.
+     * @param block
+     *            Block to check.
      * @return True if the material can be protected by the given type, false
      *         otherwise.
      */
-    boolean canProtect(Material material) {
-        return protectableMaterialsSet.contains(material);
+    boolean canProtect(Block block) {
+        return protectableMaterialsSet.contains(block.getType());
     }
 
     /**
@@ -106,18 +107,18 @@ final class Config {
      * @param type
      *            Protection type that must be checked for being able to protect
      *            this type.
-     * @param material
-     *            Material to check.
+     * @param block
+     *            Block to check.
      *
      * @return True if the material can be protected by the given type, false
      *         otherwise.
      */
-    boolean canProtect(ProtectionType type, Material material) {
+    boolean canProtect(ProtectionType type, Block block) {
         Set<Material> materials = this.protectableMaterialsMap.get(type);
         if (materials == null) {
             return false;
         }
-        return materials.contains(material);
+        return materials.contains(block.getType());
     }
 
     /**

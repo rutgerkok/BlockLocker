@@ -8,6 +8,8 @@ import nl.rutgerkok.blocklocker.Permissions;
 /**
  * Used to check if protections can be created at the given location.
  *
+ * @see ProtectableBlockSettings For making a block protectable in the first
+ *      place.
  */
 public interface LocationChecker {
 

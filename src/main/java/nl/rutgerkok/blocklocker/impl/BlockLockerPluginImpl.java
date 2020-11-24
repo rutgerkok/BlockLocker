@@ -24,6 +24,7 @@ import nl.rutgerkok.blocklocker.BlockLockerPlugin;
 import nl.rutgerkok.blocklocker.ChestSettings;
 import nl.rutgerkok.blocklocker.HopperCache;
 import nl.rutgerkok.blocklocker.ProfileFactory;
+import nl.rutgerkok.blocklocker.ProtectableBlocksSettings;
 import nl.rutgerkok.blocklocker.ProtectionFinder;
 import nl.rutgerkok.blocklocker.ProtectionUpdater;
 import nl.rutgerkok.blocklocker.SignParser;
@@ -45,16 +46,15 @@ import nl.rutgerkok.blocklocker.impl.group.ScoreboardGroupSystem;
 import nl.rutgerkok.blocklocker.impl.group.TownyGroupSystem;
 import nl.rutgerkok.blocklocker.impl.group.mcMMOGroupSystem;
 import nl.rutgerkok.blocklocker.impl.location.TownyLocationChecker;
-import nl.rutgerkok.blocklocker.impl.nms.OldNMSAccessor;
 import nl.rutgerkok.blocklocker.impl.nms.NMSAccessor;
+import nl.rutgerkok.blocklocker.impl.nms.OldNMSAccessor;
 import nl.rutgerkok.blocklocker.impl.nms.ServerSpecific;
 import nl.rutgerkok.blocklocker.impl.profile.ProfileFactoryImpl;
 import nl.rutgerkok.blocklocker.impl.updater.Updater;
 import nl.rutgerkok.blocklocker.location.CombinedLocationChecker;
 import nl.rutgerkok.blocklocker.location.LocationChecker;
 
-public class BlockLockerPluginImpl extends JavaPlugin implements
-BlockLockerPlugin {
+public class BlockLockerPluginImpl extends JavaPlugin implements BlockLockerPlugin {
     private ChestSettings chestSettings;
     private CombinedGroupSystem combinedGroupSystem;
     private Config config;
@@ -69,10 +69,10 @@ BlockLockerPlugin {
     private HopperCache redstoneProtectCache;
 
     @Override
-	public <E extends Event> E callEvent(E event) {
-		this.getServer().getPluginManager().callEvent(event);
-		return event;
-	}
+    public <E extends Event> E callEvent(E event) {
+        this.getServer().getPluginManager().callEvent(event);
+        return event;
+    }
 
     @Override
     public ChestSettings getChestSettings() {
@@ -148,11 +148,11 @@ BlockLockerPlugin {
     public SignParser getSignParser() {
         return signParser;
     }
-
     @Override
     public SignSelector getSignSelector() {
         return signSelector;
     }
+
     @Override
     public Translator getTranslator() {
         return translator;
@@ -273,6 +273,7 @@ BlockLockerPlugin {
     public void reload() {
         Collection<GroupSystem> keepGroupSystems = this.combinedGroupSystem.getReloadSurvivors();
         Collection<LocationChecker> keepLocationCheckers = this.combinedLocationChecker.getReloadSurvivors();
+        Collection<ProtectableBlocksSettings> keepProtectables = this.chestSettings.getExtraProtectables();
 
         reloadConfig();
         loadServices();
@@ -280,6 +281,7 @@ BlockLockerPlugin {
         // Add back external systems from before the reload
         keepGroupSystems.forEach(this.combinedGroupSystem::addSystem);
         keepLocationCheckers.forEach(this.combinedLocationChecker::addChecker);
+        this.chestSettings.getExtraProtectables().addAll(keepProtectables);
     }
 
     @Override

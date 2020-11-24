@@ -14,7 +14,7 @@ import nl.rutgerkok.blocklocker.location.CombinedLocationChecker;
  */
 public interface BlockLockerPlugin {
 
-	/**
+    /**
 	 * Calls the given event, allowing other plugins to react to this event.
 	 *
 	 * @param <E> The type of the event.

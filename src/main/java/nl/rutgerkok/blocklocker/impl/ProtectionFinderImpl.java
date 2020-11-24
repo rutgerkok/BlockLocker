@@ -59,7 +59,7 @@ class ProtectionFinderImpl implements ProtectionFinder {
     }
 
     private Optional<Block> findProtectableForNonSignBlock(Block attachedBlock) {
-        if (settings.canProtect(attachedBlock.getType())) {
+        if (settings.canProtect(attachedBlock)) {
             return Optional.of(attachedBlock);
         }
 
@@ -90,10 +90,10 @@ class ProtectionFinderImpl implements ProtectionFinder {
         // Search above and below that block for doors and attachables
         for (BlockFace doorFace : BlockFinder.VERTICAL_FACES) {
             Block blockUpDown = supportingBlock.getRelative(doorFace);
-            if (settings.canProtect(ProtectionType.DOOR, blockUpDown.getType())) {
+            if (settings.canProtect(ProtectionType.DOOR, blockUpDown)) {
                 return Optional.of(blockUpDown);
             }
-            if (settings.canProtect(ProtectionType.ATTACHABLE, blockUpDown.getType())) {
+            if (settings.canProtect(ProtectionType.ATTACHABLE, blockUpDown)) {
                 if (this.blockFinder.findSupportingBlock(blockUpDown).equals(supportingBlock)) {
                     return Optional.of(blockUpDown);
                 }
@@ -103,7 +103,7 @@ class ProtectionFinderImpl implements ProtectionFinder {
         // Search around for attachables
         for (BlockFace trapDoorFace : BlockFinder.CARDINAL_FACES) {
             Block blockNext = supportingBlock.getRelative(trapDoorFace);
-            if (settings.canProtect(ProtectionType.ATTACHABLE, blockNext.getType())) {
+            if (settings.canProtect(ProtectionType.ATTACHABLE, blockNext)) {
                 if (this.blockFinder.findSupportingBlock(blockNext).equals(supportingBlock)) {
                     return Optional.of(blockNext);
                 }
@@ -178,7 +178,7 @@ class ProtectionFinderImpl implements ProtectionFinder {
     }
 
     private Optional<Protection> findProtectionForProtectionBlock(Block protectionBlock) {
-        Optional<ProtectionType> protectionType = settings.getProtectionType(protectionBlock.getType());
+        Optional<ProtectionType> protectionType = settings.getProtectionType(protectionBlock);
         if (!protectionType.isPresent()) {
             return Optional.empty();
         }
@@ -231,7 +231,7 @@ class ProtectionFinderImpl implements ProtectionFinder {
      * @return The created protection.
      */
     private Optional<Protection> findProtectionForProtectionBlock(Block protectionBlock, ProtectionSign sign) {
-        Optional<ProtectionType> protectionType = settings.getProtectionType(protectionBlock.getType());
+        Optional<ProtectionType> protectionType = settings.getProtectionType(protectionBlock);
         if (!protectionType.isPresent()) {
             return Optional.empty();
         }
