@@ -103,16 +103,18 @@ If you solely use these methods, your plugin will work with *all* versions of Bl
 Use the class `BlockLockerAPIv2` instead of `BlockLockerAPI`. There are no differences between version 2 and version 1 yet, except that the API now uses `java.util.Optional` instead of the older `com.google.common.base.Optional`.
 
 ### More advanced functionality
+To block placement of protection signs in certain areas, you can listen to the `PlayerProtectionCreateEvent` of BlockLocker or the `BlockPlaceEvent` of Bukkit. This works even for auto-placed signs.
+
 I have kept the number of methods in BlockLockerAPI small, as each method will need
 to be around in all future versions of BlockLocker. If you need to do something more
 advanced, you need to venture outside the class. Keep in mind that your plugin might
-break in the future.
+break in the future. Here are some things that you can do.
 
 Here's an example for checking whether redstone is allowed in the protection:
 
 ```java
 private boolean isRedstoneAllowed(Block block) {
-    BlockLockerPlugin plugin = BlockLockerAPI.getPlugin();
+    BlockLockerPlugin plugin = BlockLockerAPIv2.getPlugin();
     Optional<Protection> protection = plugin.getProtectionFinder().findProtection(block);
     if (!protection.isPresent()) {
         // Not protected, so redstone is allowed to change things here
@@ -122,6 +124,38 @@ private boolean isRedstoneAllowed(Block block) {
     // Will return true when [Redstone] or [Everyone] is on one of the signs
     return protection.get().isAllowed(redstoneProfile);
 }
+```
+
+Here's an example of how to add a custom group system:
+
+```java
+BlockLockerAPIv2.getPlugin().getGroupSystems().addSystem(new GroupSystem() {
+
+            @Override
+            public boolean isInGroup(Player player, String groupName) {
+                // TODO Auto-generated method stub
+                return false;
+            }});
+```
+
+Here's an example of how to add another block type as a protectable type:
+
+```java
+    BlockLockerAPIv2.getPlugin().getChestSettings().getExtraProtectables().add(new ProtectableBlocksSettings() {
+
+            @Override
+            public boolean canProtect(Block block) {
+                // Return whether the block can be protected by ANY of the protection types (CONTAINER, DOOR, etc.)
+		// Must be consistent with the method below
+                return false;
+            }
+
+            @Override
+            public boolean canProtect(ProtectionType type, Block block) {
+                // Return whether the block can be protected by the given protection types (CONTAINER, DOOR, etc.)
+		// Must be consistent with the method above
+                return false;
+            }});
 ```
 
 If you believe that a method should be added to BlockLockerAPI, please contact me.
