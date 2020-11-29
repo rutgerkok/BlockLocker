@@ -53,8 +53,8 @@ Add the following repository to your `pom.xml` file:
 
 ```xml
 <repository>
-	<id>rutger-repo</id>
-	<url>http://www.rutgerkok.nl/repo</url>
+	<id>codemc-repo</id>
+	<url>https://repo.codemc.org/repository/maven-public/</url>
 </repository>
 ```
 
@@ -64,7 +64,7 @@ Add the following file:
 <dependency>
 	<groupId>nl.rutgerkok</groupId>
 	<artifactId>blocklocker</artifactId>
-	<version>0.1</version> <!-- or 1.7, see below -->
+	<version>1.9/version>
 	<scope>provided</scope>
 </dependency>
 ```
@@ -97,7 +97,7 @@ isProtected(Block block)
 
 You can view the complete class, along with documentation, [here](https://github.com/rutgerkok/BlockLocker/blob/master/src/main/java/nl/rutgerkok/blocklocker/BlockLockerAPI.java).
 
-If you solely use these methods, your plugin will work with *all* versions of BlockLocker from the future and past.
+If you solely use these methods, your plugin will work with *all* versions of BlockLocker from the past.
 
 ### The BlockLockerAPI - version 2
 Use the class `BlockLockerAPIv2` instead of `BlockLockerAPI`. There are no differences between version 2 and version 1 yet, except that the API now uses `java.util.Optional` instead of the older `com.google.common.base.Optional`.
@@ -158,5 +158,4 @@ Here's an example of how to add another block type as a protectable type:
             }});
 ```
 
-If you believe that a method should be added to BlockLockerAPI, please contact me.
-(See my Github profile for my e-mail.)
+If you believe that a method should be added to BlockLockerAPI, please create a Github issue in this repository.
