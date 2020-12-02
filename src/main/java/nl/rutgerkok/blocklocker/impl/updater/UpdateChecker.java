@@ -19,7 +19,7 @@ import org.bukkit.plugin.Plugin;
  */
 final class UpdateChecker {
 
-    private static final String UPDATE_URL = "http://rutgerkok.nl/tools/updater/blocklocker.php";
+    private static final String UPDATE_URL = "https://rutgerkok.nl/tools/updater/blocklocker.php";
 
     private final JsonParser jsonParser = new JsonParser();
 
