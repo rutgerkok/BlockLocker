@@ -64,7 +64,7 @@ Add the following file:
 <dependency>
 	<groupId>nl.rutgerkok</groupId>
 	<artifactId>blocklocker</artifactId>
-	<version>1.9/version>
+	<version>1.9</version>
 	<scope>provided</scope>
 </dependency>
 ```
