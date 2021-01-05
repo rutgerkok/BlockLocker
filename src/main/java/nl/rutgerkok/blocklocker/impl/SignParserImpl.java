@@ -41,6 +41,16 @@ class SignParserImpl implements SignParser {
         this.chestSettings = chestSettings;
     }
 
+    private int countProfileLines(String[] linesOnSign) {
+        int count = 0;
+        for (int i = 1; i < linesOnSign.length; i++) {
+            if (linesOnSign[i].length() > 0) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     @Override
     public Optional<SignType> getSignType(Sign sign) {
         String header = sign.getLine(0);
@@ -72,36 +82,54 @@ class SignParserImpl implements SignParser {
      *
      * @param location
      *            The location of the sign.
-     * @param header
-     *            The header on the sign.
-     * @param list
-     *            The profile collection to add all profiles to.
+     * @param jsonSign
+     *            The hidden JSON stored on the sign.
+     * @param linesOnSign
+     *            The displayed lines stored on the sign.
      * @return The parsed sign, if the sign is actually a protection sign.
      */
-    private Optional<ProtectionSign> parseAdvancedSign(Location location, String header, Iterable<JsonObject> list) {
-        SignType signType = getSignTypeOrNull(header);
+    private Optional<ProtectionSign> parseAdvancedSign(Location location, JsonSign jsonSign, String[] linesOnSign) {
+        SignType signType = getSignTypeOrNull(jsonSign.getFirstLine());
         if (signType == null) {
             return Optional.empty();
         }
 
-        List<Profile> profiles = new ArrayList<Profile>();
-        for (JsonObject object : list) {
-            Optional<Profile> profile = profileFactory.fromSavedObject(object);
-            if (profile.isPresent()) {
-                profiles.add(profile.get());
+        List<Profile> profiles = new ArrayList<>();
+        int lineNumber = 1; // Starts as one, as line 0 contains the sign header`
+        for (JsonObject object : jsonSign) {
+            Optional<Profile> oProfile = profileFactory.fromSavedObject(object);
+            if (oProfile.isPresent()) {
+                Profile profile = oProfile.get();
+
+                String lineOnSign = linesOnSign[lineNumber];
+                if (!profile.getDisplayName().equals(lineOnSign)) {
+                    // JSON data doesn't match sign contents, so it must be corrupt or outdated
+                    // Therefore, ignore the data
+                    return parseSimpleSign(location, linesOnSign);
+                }
+
+                profiles.add(profile);
             }
+            lineNumber++;
         }
 
-        return Optional.<ProtectionSign> of(new ProtectionSignImpl(location, signType, profiles));
+        if (countProfileLines(linesOnSign) > profiles.size()) {
+            // JSON data is incomplete, therefore corrupt or outdated
+            // Therefore, ignore the data
+            return parseSimpleSign(location, linesOnSign);
+        }
+
+        return Optional.<ProtectionSign>of(new ProtectionSignImpl(location, signType, profiles));
     }
 
     @Override
     public Optional<ProtectionSign> parseSign(Block sign) {
         JsonSign foundTextData = nms.getJsonData(sign.getWorld(), sign.getX(), sign.getY(), sign.getZ());
+        String[] lines = ((Sign) sign.getState()).getLines();
         if (foundTextData.hasData()) {
-            return parseAdvancedSign(sign.getLocation(), foundTextData.getFirstLine(), foundTextData);
+            return parseAdvancedSign(sign.getLocation(), foundTextData, lines);
         } else {
-            return parseSimpleSign(sign.getLocation(), ((Sign)sign.getState()).getLines());
+            return parseSimpleSign(sign.getLocation(), lines);
         }
     }
 
@@ -127,7 +155,7 @@ class SignParserImpl implements SignParser {
             return Optional.empty();
         }
 
-        List<Profile> profiles = new ArrayList<Profile>();
+        List<Profile> profiles = new ArrayList<>();
         for (int i = 1; i < lines.length; i++) {
             String name = lines[i].trim();
             profiles.add(profileFactory.fromDisplayText(name));
@@ -137,7 +165,7 @@ class SignParserImpl implements SignParser {
         // advanced signs
         return Optional.<ProtectionSign> of(new ProtectionSignImpl(location, signType, profiles));
     }
-    
+
     @Override
     public void saveSign(ProtectionSign sign) {
         // Find sign
@@ -150,7 +178,7 @@ class SignParserImpl implements SignParser {
 
         // Update sign, both visual and using raw JSON
         Sign signState = (Sign) blockState;
-        
+
         signState.setLine(0, chestSettings.getFancyLocalizedHeader(sign.getType(), signState.getLine(0)));
 
         JsonArray jsonArray = new JsonArray();
