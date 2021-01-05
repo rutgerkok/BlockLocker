@@ -184,7 +184,7 @@ public class BlockDestroyListener extends EventListener {
             return;
         }
 
-        if (isProtectedForRedstone(event.getBlock())) {
+        if (isRedstoneDenied(event.getBlock())) {
             event.setNewCurrent(event.getOldCurrent());
         }
     }

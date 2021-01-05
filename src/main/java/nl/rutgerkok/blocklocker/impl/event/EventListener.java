@@ -44,7 +44,7 @@ abstract class EventListener implements Listener {
         return plugin.getProtectionFinder().findProtection(block).isPresent();
     }
 
-    boolean isProtectedForRedstone(Block block) {
+    boolean isRedstoneDenied(Block block) {
         HopperCache.CacheFlag flag = plugin.getHopperCache().getIsRedstoneAllowed(block);
         if (flag != HopperCache.CacheFlag.MISS_CACHE) {
             return flag == HopperCache.CacheFlag.PROTECTED;
@@ -55,9 +55,9 @@ abstract class EventListener implements Listener {
                 return false;
             }
             Profile redstone = plugin.getProfileFactory().fromRedstone();
-            boolean protecting = !protection.get().isAllowed(redstone);
-            plugin.getHopperCache().setIsRedstoneAllowed(block, protecting);
-            return protecting;
+            boolean denied = !protection.get().isAllowed(redstone);
+            plugin.getHopperCache().setIsRedstoneAllowed(block, denied);
+            return denied;
         }
     }
 }
