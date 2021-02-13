@@ -87,10 +87,7 @@ public final class BlockPlaceListener extends EventListener {
             return; // Cannot place protection here, so don't show hint
         }
 
-        String message = plugin.getTranslator().get(Translation.PROTECTION_CHEST_HINT);
-        if (!message.isEmpty()) {
-            player.sendMessage(message);
-        }
+        plugin.getTranslator().sendMessage(player, Translation.PROTECTION_CHEST_HINT);
     }
 
     private Optional<Protection> willInterfereWith(Player player, Block block) {
