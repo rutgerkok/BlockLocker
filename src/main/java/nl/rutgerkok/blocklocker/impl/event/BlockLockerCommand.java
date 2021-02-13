@@ -88,7 +88,12 @@ public final class BlockLockerCommand implements TabExecutor {
         try {
             lineNumber = Integer.parseInt(args[0]);
         } catch (NumberFormatException e) {
-            return false;
+            if (args[0].equals("~")) {
+                // Place on first available line, or else the last line
+                lineNumber = selectedSign.get().getLine(2).isEmpty() ? 3 : 4;
+            } else {
+                return false;
+            }
         }
         if (lineNumber < 2 || lineNumber > 4) {
             plugin.getTranslator().sendMessage(player, Translation.COMMAND_LINE_NUMBER_OUT_OF_BOUNDS);

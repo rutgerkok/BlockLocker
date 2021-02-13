@@ -1,5 +1,7 @@
 package nl.rutgerkok.blocklocker.impl.event;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -31,6 +33,9 @@ import org.bukkit.inventory.PlayerInventory;
 
 import com.google.common.collect.ImmutableSet;
 
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
 import nl.rutgerkok.blocklocker.AttackType;
 import nl.rutgerkok.blocklocker.BlockLockerPlugin;
 import nl.rutgerkok.blocklocker.Permissions;
@@ -38,6 +43,7 @@ import nl.rutgerkok.blocklocker.ProtectionSign;
 import nl.rutgerkok.blocklocker.SignType;
 import nl.rutgerkok.blocklocker.Translator.Translation;
 import nl.rutgerkok.blocklocker.event.PlayerProtectionCreateEvent;
+import nl.rutgerkok.blocklocker.impl.TextComponents;
 import nl.rutgerkok.blocklocker.location.IllegalLocationException;
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;
 import nl.rutgerkok.blocklocker.profile.Profile;
@@ -187,7 +193,7 @@ public final class InteractListener extends EventListener {
             if ((isOwner || player.hasPermission(Permissions.CAN_BYPASS)) && !usedOffHand) {
                 Sign sign = (Sign) clickedBlock.getState();
                 plugin.getSignSelector().setSelectedSign(player, sign);
-                plugin.getTranslator().sendMessage(player, Translation.PROTECTION_SELECTED_SIGN);
+                sendSelectedSignMessage(player);
             }
             return;
         }
@@ -217,7 +223,7 @@ public final class InteractListener extends EventListener {
     }
 
     private void handleDisallowed(PlayerInteractEvent event, Protection protection, boolean clickedSign,
-                                  boolean usedOffHand) {
+            boolean usedOffHand) {
         event.setCancelled(true);
 
         if (usedOffHand) {
@@ -227,11 +233,11 @@ public final class InteractListener extends EventListener {
 
         Player player = event.getPlayer();
         if (clickedSign) {
-            plugin.getTranslator().sendMessage(player, Translation.PROTECTION_IS_CLAIMED_BY,
-                    protection.getOwnerDisplayName());
+            plugin.getTranslator()
+                    .sendMessage(player, Translation.PROTECTION_IS_CLAIMED_BY, protection.getOwnerDisplayName());
         } else {
-            plugin.getTranslator().sendMessage(player, Translation.PROTECTION_NO_ACCESS,
-                    protection.getOwnerDisplayName());
+            plugin.getTranslator()
+                    .sendMessage(player, Translation.PROTECTION_NO_ACCESS, protection.getOwnerDisplayName());
         }
     }
 
@@ -407,6 +413,44 @@ public final class InteractListener extends EventListener {
             return;
         }
         plugin.runLater(() -> protection.setOpen(false, SoundCondition.ALWAYS), openSeconds * 20);
+    }
+
+    private void sendSelectedSignMessage(Player player) {
+        String message = plugin.getTranslator().get(Translation.PROTECTION_SELECTED_SIGN);
+
+        List<BaseComponent> textComponent = new ArrayList<>();
+        while (true) {
+            int firstOpenBracket = message.indexOf("[");
+            if (firstOpenBracket == -1) {
+                // No new opening bracket
+                TextComponents.addLegacyText(textComponent, message);
+                break;
+            }
+
+            // Add everything up to the closing bracket
+            TextComponents.addLegacyText(textComponent, message.substring(0, firstOpenBracket));
+
+            // Check what's after the opening bracket
+            String remainingMessage = message.substring(firstOpenBracket);
+            int closeBracketIndex = remainingMessage.indexOf("]");
+            if (closeBracketIndex == -1) {
+                TextComponents.addLegacyText(textComponent, remainingMessage);
+                break;
+            }
+
+            // Add this part as link
+            String linkText = remainingMessage.substring(0, closeBracketIndex + 1);
+            String textOnLine = ChatColor.stripColor(linkText);
+            TextComponents.addLegacyText(textComponent, linkText, part -> {
+                        part.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                                "/blocklocker:blocklocker ~ " + textOnLine));
+                            });
+
+            // Next!
+            message = remainingMessage.substring(closeBracketIndex + 1);
+        }
+
+        player.spigot().sendMessage(textComponent.toArray(new BaseComponent[textComponent.size()]));
     }
 
     private Material toWallSign(Material signMaterial) {
