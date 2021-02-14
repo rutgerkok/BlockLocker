@@ -4,11 +4,12 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import nl.rutgerkok.blocklocker.Permissions;
+import nl.rutgerkok.blocklocker.ProtectableBlocksSettings;
 
 /**
  * Used to check if protections can be created at the given location.
  *
- * @see ProtectableBlockSettings For making a block protectable in the first
+ * @see ProtectableBlocksSettings For making a block protectable in the first
  *      place.
  */
 public interface LocationChecker {
