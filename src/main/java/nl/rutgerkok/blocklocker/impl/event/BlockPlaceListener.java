@@ -1,6 +1,9 @@
 package nl.rutgerkok.blocklocker.impl.event;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 import org.bukkit.Material;
 import org.bukkit.Tag;
@@ -14,9 +17,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.InventoryHolder;
 
-import nl.rutgerkok.blocklocker.BlockLockerPlugin;
 import nl.rutgerkok.blocklocker.Permissions;
 import nl.rutgerkok.blocklocker.Translator.Translation;
+import nl.rutgerkok.blocklocker.impl.BlockLockerPluginImpl;
 import nl.rutgerkok.blocklocker.impl.blockfinder.BlockFinder;
 import nl.rutgerkok.blocklocker.location.IllegalLocationException;
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;
@@ -24,7 +27,9 @@ import nl.rutgerkok.blocklocker.protection.Protection;
 
 public final class BlockPlaceListener extends EventListener {
 
-    public BlockPlaceListener(BlockLockerPlugin plugin) {
+    private final Set<UUID> doNotSendChestHintPlayerIds = new HashSet<>();
+
+    public BlockPlaceListener(BlockLockerPluginImpl plugin) {
         super(plugin);
     }
 
@@ -87,7 +92,30 @@ public final class BlockPlaceListener extends EventListener {
             return; // Cannot place protection here, so don't show hint
         }
 
+        sendChestHint(player);
+    }
+
+    /**
+     * Sends a chest hint. Includes a simple spam limiter.
+     *
+     * @param player
+     *            The player.
+     */
+    private void sendChestHint(Player player) {
+        UUID playerId = player.getUniqueId();
+        if (this.doNotSendChestHintPlayerIds.contains(playerId)) {
+            return;
+        }
         plugin.getTranslator().sendMessage(player, Translation.PROTECTION_CHEST_HINT);
+
+        // Temporarily suppress chest hint (120 seconds)
+        this.doNotSendChestHintPlayerIds.add(playerId);
+        plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+            // Note: we only keep a reference to the player id, not the entire player
+            // object, which might be replaced
+            this.doNotSendChestHintPlayerIds
+                    .remove(playerId);
+        }, 20 * 120);
     }
 
     private Optional<Protection> willInterfereWith(Player player, Block block) {

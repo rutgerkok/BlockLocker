@@ -9,18 +9,18 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.SignChangeEvent;
 
-import nl.rutgerkok.blocklocker.BlockLockerPlugin;
 import nl.rutgerkok.blocklocker.Permissions;
 import nl.rutgerkok.blocklocker.SignType;
 import nl.rutgerkok.blocklocker.Translator.Translation;
 import nl.rutgerkok.blocklocker.event.PlayerProtectionCreateEvent;
+import nl.rutgerkok.blocklocker.impl.BlockLockerPluginImpl;
 import nl.rutgerkok.blocklocker.location.IllegalLocationException;
 import nl.rutgerkok.blocklocker.profile.Profile;
 import nl.rutgerkok.blocklocker.protection.Protection;
 
 public class SignChangeListener extends EventListener {
 
-    public SignChangeListener(BlockLockerPlugin plugin) {
+    public SignChangeListener(BlockLockerPluginImpl plugin) {
         super(plugin);
     }
 

@@ -8,17 +8,17 @@ import org.apache.commons.lang.Validate;
 import org.bukkit.block.Block;
 import org.bukkit.event.Listener;
 
-import nl.rutgerkok.blocklocker.BlockLockerPlugin;
 import nl.rutgerkok.blocklocker.HopperCache;
 import nl.rutgerkok.blocklocker.SearchMode;
+import nl.rutgerkok.blocklocker.impl.BlockLockerPluginImpl;
 import nl.rutgerkok.blocklocker.profile.Profile;
 import nl.rutgerkok.blocklocker.protection.Protection;
 
 abstract class EventListener implements Listener {
 
-    final BlockLockerPlugin plugin;
+    final BlockLockerPluginImpl plugin;
 
-    EventListener(BlockLockerPlugin plugin) {
+    EventListener(BlockLockerPluginImpl plugin) {
         Validate.notNull(plugin);
         this.plugin = plugin;
     }

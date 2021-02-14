@@ -28,16 +28,16 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 
 import nl.rutgerkok.blocklocker.AttackType;
-import nl.rutgerkok.blocklocker.BlockLockerPlugin;
 import nl.rutgerkok.blocklocker.Permissions;
 import nl.rutgerkok.blocklocker.ProtectionSign;
 import nl.rutgerkok.blocklocker.Translator.Translation;
+import nl.rutgerkok.blocklocker.impl.BlockLockerPluginImpl;
 import nl.rutgerkok.blocklocker.profile.Profile;
 import nl.rutgerkok.blocklocker.protection.Protection;
 
 public class BlockDestroyListener extends EventListener {
 
-    public BlockDestroyListener(BlockLockerPlugin plugin) {
+    public BlockDestroyListener(BlockLockerPluginImpl plugin) {
         super(plugin);
     }
 
@@ -104,6 +104,21 @@ public class BlockDestroyListener extends EventListener {
     }
 
     @EventHandler(ignoreCancelled = true)
+    public void onBlockExplodeEvent(BlockExplodeEvent event) {
+        // Generally caused by a Bed, but when the event is triggered the bed is no longer there so we can't check that
+        AttackType attackType = AttackType.BLOCK_EXPLOSION;
+        if (plugin.getChestSettings().allowDestroyBy(attackType)) {
+            return;
+        }
+        for (Iterator<Block> it = event.blockList().iterator(); it.hasNext();) {
+            Block block = it.next();
+            if (isProtected(block)) {
+                it.remove();
+            }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
     public void onBlockPistonExtend(BlockPistonExtendEvent event) {
         if (plugin.getChestSettings().allowDestroyBy(AttackType.PISTON)) {
             return;
@@ -152,21 +167,6 @@ public class BlockDestroyListener extends EventListener {
                 attackType = AttackType.GHAST;
             }
         }
-        if (plugin.getChestSettings().allowDestroyBy(attackType)) {
-            return;
-        }
-        for (Iterator<Block> it = event.blockList().iterator(); it.hasNext();) {
-            Block block = it.next();
-            if (isProtected(block)) {
-                it.remove();
-            }
-        }
-    }
-
-    @EventHandler(ignoreCancelled = true)
-    public void onBlockExplodeEvent(BlockExplodeEvent event) {
-        // Generally caused by a Bed, but when the event is triggered the bed is no longer there so we can't check that
-        AttackType attackType = AttackType.BLOCK_EXPLOSION;
         if (plugin.getChestSettings().allowDestroyBy(attackType)) {
             return;
         }
