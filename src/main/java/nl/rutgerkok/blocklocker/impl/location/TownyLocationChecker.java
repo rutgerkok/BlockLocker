@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.palmergames.bukkit.towny.Towny;
-import com.palmergames.bukkit.towny.object.TownyUniverse;
+import com.palmergames.bukkit.towny.TownyAPI;
 
 import nl.rutgerkok.blocklocker.Translator.Translation;
 import nl.rutgerkok.blocklocker.location.IllegalLocationException;
@@ -29,7 +29,7 @@ public final class TownyLocationChecker implements LocationChecker {
 
     @Override
     public void checkLocation(Player player, Block block) throws IllegalLocationException {
-        if (TownyUniverse.isWilderness(block)) {
+        if (TownyAPI.getInstance().isWilderness(block)) {
             throw new IllegalLocationException(Translation.PROTECTION_IN_WILDERNESS);
         }
     }

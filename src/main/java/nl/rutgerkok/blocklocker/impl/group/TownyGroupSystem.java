@@ -64,7 +64,7 @@ public final class TownyGroupSystem extends GroupSystem {
     @Override
     public boolean isInGroup(Player player, String groupName) {
         try {
-            Resident resident = TownyUniverse.getDataSource().getResident(player.getName());
+            Resident resident = TownyUniverse.getInstance().getResident(player.getName());
             Town town = resident.getTown();
             if (town.getName().equalsIgnoreCase(groupName)) {
                 return true;
