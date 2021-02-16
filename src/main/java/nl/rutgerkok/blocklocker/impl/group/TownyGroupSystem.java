@@ -1,16 +1,16 @@
 package nl.rutgerkok.blocklocker.impl.group;
 
-import nl.rutgerkok.blocklocker.group.GroupSystem;
-
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.palmergames.bukkit.towny.Towny;
+import com.palmergames.bukkit.towny.TownyUniverse;
 import com.palmergames.bukkit.towny.exceptions.NotRegisteredException;
 import com.palmergames.bukkit.towny.object.Nation;
 import com.palmergames.bukkit.towny.object.Resident;
 import com.palmergames.bukkit.towny.object.Town;
-import com.palmergames.bukkit.towny.object.TownyUniverse;
+
+import nl.rutgerkok.blocklocker.group.GroupSystem;
 
 /**
  * Group system hooking into the Factions plugin by MassiveCraft.
@@ -35,10 +35,10 @@ public final class TownyGroupSystem extends GroupSystem {
     @Override
     public boolean isGroupLeader(Player player, String groupName) {
         try {
-            Resident resident = TownyUniverse.getDataSource().getResident(player.getName());
+            Resident resident = TownyUniverse.getInstance().getResident(player.getUniqueId());
             Town town = resident.getTown();
             if (town.getName().equalsIgnoreCase(groupName)) {
-                if (town.isMayor(resident) || town.hasAssistant(resident)) {
+                if (town.isMayor(resident) || resident.hasTownRank("assistant")) {
                     return true;
                 }
             }
