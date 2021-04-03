@@ -77,11 +77,6 @@ public final class DoorProtectionImpl extends AbstractProtection implements Door
     }
 
     @Override
-    public void setOpen(boolean open) {
-        door.setOpen(open, SoundCondition.NEVER);
-    }
-
-    @Override
     public void setOpen(boolean open, SoundCondition playSound) {
         door.setOpen(open, playSound);
     }

@@ -117,11 +117,6 @@ public final class ContainerProtectionImpl extends AbstractProtection implements
     }
 
     @Override
-    public void setOpen(boolean open) {
-        setOpen(open, SoundCondition.NEVER);
-    }
-
-    @Override
     public void setOpen(boolean open, SoundCondition playSound) {
         boolean changed = false;
         Block aBlock = null;

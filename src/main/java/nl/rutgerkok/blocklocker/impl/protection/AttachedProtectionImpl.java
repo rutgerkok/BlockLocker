@@ -103,11 +103,6 @@ public final class AttachedProtectionImpl extends AbstractProtection implements 
     }
 
     @Override
-    public void setOpen(boolean open) {
-        setOpen(open, SoundCondition.NEVER);
-    }
-
-    @Override
     public void setOpen(boolean open, SoundCondition playSound) {
         setBlockOpen(protectionBlock, open);
         Block supportingBlock = blockFinder.findSupportingBlock(protectionBlock);

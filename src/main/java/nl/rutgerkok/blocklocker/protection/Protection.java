@@ -109,7 +109,7 @@ public interface Protection {
     /**
      * Gets whether the door is currently opened. If only parts of the door are
      * open, the result of this method is undefined.
-     * 
+     *
      * @return Whether the door is currently opened.
      */
     boolean isOpen();
@@ -131,7 +131,9 @@ public interface Protection {
      *            True to open the door, false otherwise.
      * @see #setOpen(boolean, SoundCondition) Control over sound playing.
      */
-    void setOpen(boolean open);
+    default void setOpen(boolean open) {
+        setOpen(open, SoundCondition.NEVER);
+    }
 
     /**
      * Opens or closes the door, as specified.
