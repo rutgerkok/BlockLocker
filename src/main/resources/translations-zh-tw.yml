@@ -1,4 +1,4 @@
-# Translations file for the Traditional Chinese language. Retranslations by by Flandre_tw.
+# Translations file for the Traditional Chinese language. Retranslations by Flandre_tw.
 command:
   cannot_be_used_by_console: "該指令無法在控制台執行。"
   cannot_edit_owner: "&4你無法修改方塊保護的擁有者，只能破壞告示牌再放上進行修改。"
