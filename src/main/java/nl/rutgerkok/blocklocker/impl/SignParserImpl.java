@@ -6,16 +6,17 @@ import java.util.Optional;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.event.block.SignChangeEvent;
-
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
 import nl.rutgerkok.blocklocker.ChestSettings;
 import nl.rutgerkok.blocklocker.ProtectionSign;
+import nl.rutgerkok.blocklocker.SecretSignEntry;
 import nl.rutgerkok.blocklocker.SignParser;
 import nl.rutgerkok.blocklocker.SignType;
 import nl.rutgerkok.blocklocker.impl.nms.ServerSpecific;
@@ -29,6 +30,10 @@ import nl.rutgerkok.blocklocker.profile.Profile;
  *
  */
 class SignParserImpl implements SignParser {
+
+    private static final NamespacedKey HEADER_KEY = NbtSecretSignEntry.key("header");
+    private static final NamespacedKey[] PROFILE_KEYS = { NbtSecretSignEntry.key("profile_1"),
+            NbtSecretSignEntry.key("profile_2"), NbtSecretSignEntry.key("profile_3") };
 
     private final ChestSettings chestSettings;
     private final ServerSpecific nms;
@@ -77,6 +82,33 @@ class SignParserImpl implements SignParser {
         return getSignType(sign).isPresent();
     }
 
+    private Optional<ProtectionSign> parseAdvancedSign(Sign sign) {
+        PersistentDataContainer data = sign.getPersistentDataContainer();
+
+        // Get sign type
+        if (!data.has(HEADER_KEY, PersistentDataType.STRING)) {
+            return Optional.empty();
+        }
+        String signTypeString = data.get(HEADER_KEY, PersistentDataType.STRING);
+        SignType type;
+        try {
+            type = SignType.valueOf(signTypeString);
+        } catch (IllegalArgumentException e) {
+            return Optional.empty();
+        }
+
+        // Get profiles
+        List<Profile> profiles = new ArrayList<>();
+        for (NamespacedKey profileKey : PROFILE_KEYS) {
+            NbtSecretSignEntry entry = data.get(profileKey, NbtSecretSignEntry.TAG_TYPE);
+            if (entry != null) {
+                profileFactory.fromSavedObject(entry).ifPresent(profiles::add);
+            }
+        }
+
+        return Optional.of(new ProtectionSignImpl(sign.getLocation(), type, profiles));
+    }
+
     /**
      * Used for signs where the hidden text was found.
      *
@@ -88,15 +120,15 @@ class SignParserImpl implements SignParser {
      *            The displayed lines stored on the sign.
      * @return The parsed sign, if the sign is actually a protection sign.
      */
-    private Optional<ProtectionSign> parseAdvancedSign(Location location, JsonSign jsonSign, String[] linesOnSign) {
+    private Optional<ProtectionSign> parseOldAdvancedSign(Location location, JsonSign jsonSign, String[] linesOnSign) {
         SignType signType = getSignTypeOrNull(jsonSign.getFirstLine());
         if (signType == null) {
             return Optional.empty();
         }
 
         List<Profile> profiles = new ArrayList<>();
-        int lineNumber = 1; // Starts as one, as line 0 contains the sign header`
-        for (JsonObject object : jsonSign) {
+        int lineNumber = 1; // Starts as one, as line 0 contains the sign header
+        for (SecretSignEntry object : jsonSign) {
             Optional<Profile> oProfile = profileFactory.fromSavedObject(object);
             if (oProfile.isPresent()) {
                 Profile profile = oProfile.get();
@@ -124,13 +156,23 @@ class SignParserImpl implements SignParser {
 
     @Override
     public Optional<ProtectionSign> parseSign(Block sign) {
-        JsonSign foundTextData = nms.getJsonData(sign.getWorld(), sign.getX(), sign.getY(), sign.getZ());
-        String[] lines = ((Sign) sign.getState()).getLines();
-        if (foundTextData.hasData()) {
-            return parseAdvancedSign(sign.getLocation(), foundTextData, lines);
-        } else {
-            return parseSimpleSign(sign.getLocation(), lines);
+        Sign signState = (Sign) sign.getState();
+
+        // Try modern method
+        Optional<ProtectionSign> parsedSign = parseAdvancedSign(signState);
+        if (parsedSign.isPresent()) {
+            return parsedSign;
         }
+
+        // Try old, hacky method
+        JsonSign foundTextData = nms.getJsonData(sign.getWorld(), sign.getX(), sign.getY(), sign.getZ());
+        String[] lines = signState.getLines();
+        if (foundTextData.hasData()) {
+            return parseOldAdvancedSign(sign.getLocation(), foundTextData, lines);
+        }
+
+        // Try plain sign, written by the user
+        return parseSimpleSign(sign.getLocation(), lines);
     }
 
     @Override
@@ -181,18 +223,20 @@ class SignParserImpl implements SignParser {
 
         signState.setLine(0, chestSettings.getFancyLocalizedHeader(sign.getType(), signState.getLine(0)));
 
-        JsonArray jsonArray = new JsonArray();
-        int i = 1; // Start at 1 to avoid overwriting the header
+        PersistentDataContainer data = signState.getPersistentDataContainer();
+        int i = 0;
         for (Profile profile : sign.getProfiles()) {
-            signState.setLine(i, profile.getDisplayName());
-            jsonArray.add(profile.getSaveObject());
+            signState.setLine(i + 1, profile.getDisplayName());
+
+            NbtSecretSignEntry signEntry = new NbtSecretSignEntry(
+                    data.getAdapterContext().newPersistentDataContainer());
+            profile.getSaveObject(signEntry);
+            data.set(PROFILE_KEYS[i], NbtSecretSignEntry.TAG_TYPE, signEntry);
             i++;
         }
 
-        // Save the text and JSON
-        // (JSON after text, to avoid text overwriting the JSON)
+        // Save the text and secret data
         signState.update();
-        nms.setJsonData(signState, jsonArray);
     }
 
 }

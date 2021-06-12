@@ -8,8 +8,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
-import com.google.gson.JsonObject;
-
+import nl.rutgerkok.blocklocker.SecretSignEntry;
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;
 import nl.rutgerkok.blocklocker.profile.Profile;
 
@@ -60,13 +59,11 @@ class PlayerProfileImpl implements PlayerProfile {
     }
 
     @Override
-    public JsonObject getSaveObject() {
-    	JsonObject object = new JsonObject();
-        object.addProperty(NAME_KEY, displayName);
+    public void getSaveObject(SecretSignEntry entry) {
+        entry.setString(NAME_KEY, displayName);
         if (uuid.isPresent()) {
-            object.addProperty(UUID_KEY, uuid.get().toString());
+            entry.setUniqueId(UUID_KEY, uuid.get());
         }
-        return object;
     }
 
     @Override

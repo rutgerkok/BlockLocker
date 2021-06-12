@@ -3,20 +3,23 @@ package nl.rutgerkok.blocklocker.impl.nms;
 import java.util.Iterator;
 import java.util.Optional;
 
+import org.bukkit.World;
+import org.bukkit.block.Sign;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterators;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import org.bukkit.World;
-import org.bukkit.block.Sign;
+import nl.rutgerkok.blocklocker.SecretSignEntry;
+import nl.rutgerkok.blocklocker.impl.JsonSecretSignEntry;
 
 public interface ServerSpecific {
 
     /**
      * Holds the JSON data on a sign.
      */
-    public static class JsonSign implements Iterable<JsonObject> {
+    public static class JsonSign implements Iterable<SecretSignEntry> {
         public static final JsonSign EMPTY = new JsonSign("", new JsonArray());
 
         private final String firstLine;
@@ -46,8 +49,8 @@ public interface ServerSpecific {
         }
 
         @Override
-        public Iterator<JsonObject> iterator() {
-            return Iterators.filter(jsonData.iterator(), JsonObject.class);
+        public Iterator<SecretSignEntry> iterator() {
+            return Iterators.transform(Iterators.filter(jsonData.iterator(), JsonObject.class), JsonSecretSignEntry::new);
         }
     }
 

@@ -15,6 +15,7 @@ import com.google.gson.JsonObject;
 import nl.rutgerkok.blocklocker.ProfileFactory;
 import nl.rutgerkok.blocklocker.Translator.Translation;
 import nl.rutgerkok.blocklocker.group.CombinedGroupSystem;
+import nl.rutgerkok.blocklocker.impl.JsonSecretSignEntry;
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;
 import nl.rutgerkok.blocklocker.profile.Profile;
 
@@ -70,10 +71,11 @@ public class TestPlayerProfile {
         UUID uuid = UUID.randomUUID();
         ProfileFactory factory = getProfileFactory();
         Profile profile = factory.fromNameAndUniqueId(name, Optional.of(uuid));
-        JsonObject object = profile.getSaveObject();
+        JsonSecretSignEntry object = new JsonSecretSignEntry(new JsonObject());
+        profile.getSaveObject(object);
 
-        assertEquals(name, object.get(PlayerProfileImpl.NAME_KEY).getAsString());
-        assertEquals(uuid.toString(), object.get(PlayerProfileImpl.UUID_KEY).getAsString());
+        assertEquals(name, object.getString(PlayerProfileImpl.NAME_KEY).get());
+        assertEquals(uuid, object.getUniqueId(PlayerProfileImpl.UUID_KEY).get());
     }
 
     @Test
@@ -87,7 +89,8 @@ public class TestPlayerProfile {
     }
 
     private void testRoundtrip(ProfileFactoryImpl factory, Profile profile) {
-        JsonObject object = profile.getSaveObject();
+        JsonSecretSignEntry object = new JsonSecretSignEntry(new JsonObject());
+        profile.getSaveObject(object);
         Profile newProfile = factory.fromSavedObject(object).get();
         assertEquals(profile, newProfile);
     }
@@ -107,9 +110,10 @@ public class TestPlayerProfile {
         String name = "test";
         ProfileFactoryImpl factory = getProfileFactory();
         Profile profile = factory.fromDisplayText(name);
-        JsonObject object = profile.getSaveObject();
+        JsonSecretSignEntry object = new JsonSecretSignEntry(new JsonObject());
+        profile.getSaveObject(object);
 
-        assertEquals(name, object.get(PlayerProfileImpl.NAME_KEY).getAsString());
-        assertFalse(object.has(PlayerProfileImpl.UUID_KEY));
+        assertEquals(name, object.getString(PlayerProfileImpl.NAME_KEY).get());
+        assertFalse(object.getUniqueId(PlayerProfileImpl.UUID_KEY).isPresent());
     }
 }

@@ -9,8 +9,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import com.google.common.base.Preconditions;
-import com.google.gson.JsonObject;
 
+import nl.rutgerkok.blocklocker.SecretSignEntry;
 import nl.rutgerkok.blocklocker.group.GroupSystem;
 import nl.rutgerkok.blocklocker.profile.GroupProfile;
 import nl.rutgerkok.blocklocker.profile.PlayerProfile;
@@ -60,10 +60,8 @@ class GroupProfileImpl implements GroupProfile {
     }
 
     @Override
-    public JsonObject getSaveObject() {
-    	JsonObject object = new JsonObject();
-        object.addProperty(GROUP_KEY, groupName);
-        return object;
+    public void getSaveObject(SecretSignEntry entry) {
+        entry.setString(GROUP_KEY, groupName);
     }
 
     @Override

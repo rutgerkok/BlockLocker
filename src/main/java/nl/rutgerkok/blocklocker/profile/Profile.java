@@ -2,7 +2,7 @@ package nl.rutgerkok.blocklocker.profile;
 
 import java.util.Date;
 
-import com.google.gson.JsonObject;
+import nl.rutgerkok.blocklocker.SecretSignEntry;
 
 /**
  * Represents a profile. A profile is usually a player, but it may also be a whole group or something abstract like
@@ -21,9 +21,10 @@ public interface Profile {
     /**
      * Gets the object as it should be saved.
      *
-     * @return The object as it should be saved.
+     * @param signEntry
+     *            The entry to save to.
      */
-    JsonObject getSaveObject();
+    void getSaveObject(SecretSignEntry signEntry);
 
     /**
      * Gets whether this profile includes another profile. For example,
@@ -38,12 +39,12 @@ public interface Profile {
 
     /**
      * Gets whether this profile is expired.
-     * 
+     *
      * @param cutoffDate
      *            The cutoff date: there must be activity for this profile after
      *            the given date, or else it's considered expired.
      * @return True if the profile is expired, false otherwise.
      */
     boolean isExpired(Date cutoffDate);
-    
+
 }

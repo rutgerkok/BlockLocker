@@ -40,7 +40,7 @@ final class ProtectionNameUpdater {
     void updateNames(Protection protection) {
         for (ProtectionSign sign : protection.getSigns()) {
             // newProfileCollection is lazily initialized
-            List<Profile> newProfileCollection = new ArrayList<Profile>();
+            List<Profile> newProfileCollection = new ArrayList<>();
             List<Profile> oldProfileCollection = sign.getProfiles();
             boolean changed = false;
 

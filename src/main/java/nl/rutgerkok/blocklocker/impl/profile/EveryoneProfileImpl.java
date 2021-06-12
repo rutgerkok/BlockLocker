@@ -4,8 +4,7 @@ import java.util.Date;
 
 import org.apache.commons.lang.Validate;
 
-import com.google.gson.JsonObject;
-
+import nl.rutgerkok.blocklocker.SecretSignEntry;
 import nl.rutgerkok.blocklocker.profile.Profile;
 
 class EveryoneProfileImpl implements Profile {
@@ -42,12 +41,10 @@ class EveryoneProfileImpl implements Profile {
     public String getDisplayName() {
         return '[' + tag + ']';
     }
-    
+
     @Override
-    public JsonObject getSaveObject() {
-    	JsonObject object = new JsonObject();
-        object.addProperty(EVERYONE_KEY, true);
-        return object;
+    public void getSaveObject(SecretSignEntry entry) {
+        entry.setBoolean(EVERYONE_KEY, true);
     }
 
     /**

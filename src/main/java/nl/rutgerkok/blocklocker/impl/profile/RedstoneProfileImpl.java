@@ -3,8 +3,8 @@ package nl.rutgerkok.blocklocker.impl.profile;
 import java.util.Date;
 
 import com.google.common.base.Preconditions;
-import com.google.gson.JsonObject;
 
+import nl.rutgerkok.blocklocker.SecretSignEntry;
 import nl.rutgerkok.blocklocker.profile.Profile;
 
 class RedstoneProfileImpl implements Profile {
@@ -41,12 +41,10 @@ class RedstoneProfileImpl implements Profile {
     public String getDisplayName() {
         return '[' + tag + ']';
     }
-    
+
     @Override
-    public JsonObject getSaveObject() {
-    	JsonObject object = new JsonObject();
-        object.addProperty(REDSTONE_KEY, true);
-        return object;
+    public void getSaveObject(SecretSignEntry entry) {
+        entry.setBoolean(REDSTONE_KEY, true);
     }
 
     /**

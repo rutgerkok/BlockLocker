@@ -3,6 +3,7 @@ package nl.rutgerkok.blocklocker.impl.profile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.UUID;
 
 import org.bukkit.ChatColor;
@@ -10,10 +11,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
 import com.google.common.base.Preconditions;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
 import nl.rutgerkok.blocklocker.ProfileFactory;
+import nl.rutgerkok.blocklocker.SecretSignEntry;
 import nl.rutgerkok.blocklocker.Translator;
 import nl.rutgerkok.blocklocker.Translator.Translation;
 import nl.rutgerkok.blocklocker.group.GroupSystem;
@@ -21,7 +21,7 @@ import nl.rutgerkok.blocklocker.profile.PlayerProfile;
 import nl.rutgerkok.blocklocker.profile.Profile;
 
 public final class ProfileFactoryImpl implements ProfileFactory {
-	
+
     private final Profile everyoneProfile;
     private final List<String> everyoneTagList;
     private final GroupSystem groupSystem;
@@ -37,7 +37,7 @@ public final class ProfileFactoryImpl implements ProfileFactory {
         this.everyoneTagList = new ArrayList<>();
         this.redstoneTagList = new ArrayList<>();
         this.timerTagStart = new ArrayList<>();
-        
+
         translator.getAllWithoutColor(Translation.TAG_EVERYONE).forEach(value -> this.everyoneTagList.add("[" + value + "]"));
         translator.getAllWithoutColor(Translation.TAG_REDSTONE).forEach(value -> this.redstoneTagList.add("[" + value + "]"));
         translator.getAllWithoutColor(Translation.TAG_TIMER).forEach(value -> this.timerTagStart.add("[" + value + ":"));
@@ -127,48 +127,48 @@ public final class ProfileFactoryImpl implements ProfileFactory {
     /**
      * Converts the given profile from a saved JSON object.
      *
-     * @param json
+     * @param object
      *            The object to convert from.
      * @return The profile, if any.
      */
-    public Optional<Profile> fromSavedObject(JsonObject json) {
+    public Optional<Profile> fromSavedObject(SecretSignEntry object) {
         // Player
-        Optional<String> name = getString(json, PlayerProfileImpl.NAME_KEY);
+        Optional<String> name = object.getString(PlayerProfileImpl.NAME_KEY);
         if (name.isPresent()) {
-            Optional<UUID> uuid = getUniqueId(json, PlayerProfileImpl.UUID_KEY);
+            Optional<UUID> uuid = object.getUniqueId(PlayerProfileImpl.UUID_KEY);
             Profile profile = new PlayerProfileImpl(name.get(), uuid);
             return Optional.of(profile);
         }
 
         // [Everyone]
-        Optional<Boolean> isEveryone = getBoolean(json, EveryoneProfileImpl.EVERYONE_KEY);
+        Optional<Boolean> isEveryone = object.getBoolean(EveryoneProfileImpl.EVERYONE_KEY);
         if (isEveryone.isPresent()) {
             return Optional.of(this.everyoneProfile);
         }
 
         // [Redstone]
-        Optional<Boolean> isRedstone = getBoolean(json, RedstoneProfileImpl.REDSTONE_KEY);
+        Optional<Boolean> isRedstone = object.getBoolean(RedstoneProfileImpl.REDSTONE_KEY);
         if (isRedstone.isPresent()) {
             return Optional.of(this.redstoneProfile);
         }
 
         // Timer
-        Optional<Number> secondsOpen = getNumber(json, TimerProfileImpl.TIME_KEY);
+        OptionalInt secondsOpen = object.getInteger(TimerProfileImpl.TIME_KEY);
         if (secondsOpen.isPresent()) {
             Profile profile = new TimerProfileImpl(translator.getWithoutColor(Translation.TAG_TIMER),
-                    secondsOpen.get().intValue());
+                    secondsOpen.getAsInt());
             return Optional.of(profile);
         }
 
         // Groups
-        Optional<String> groupName = getString(json, GroupProfileImpl.GROUP_KEY);
+        Optional<String> groupName = object.getString(GroupProfileImpl.GROUP_KEY);
         if (groupName.isPresent()) {
             Profile profile = new GroupProfileImpl(groupSystem, groupName.get());
             return Optional.of(profile);
         }
 
         // Group leaders
-        groupName = getString(json, GroupLeaderProfileImpl.GROUP_LEADER_KEY);
+        groupName = object.getString(GroupLeaderProfileImpl.GROUP_LEADER_KEY);
         if (groupName.isPresent()) {
             Profile profile = new GroupLeaderProfileImpl(groupSystem, groupName.get());
             return Optional.of(profile);
@@ -177,36 +177,7 @@ public final class ProfileFactoryImpl implements ProfileFactory {
         return Optional.empty();
     }
 
-    private Optional<UUID> getUniqueId(JsonObject object, String key) {
-        JsonElement uuidObject = object.get(key);
-        
-        if (!uuidObject.isJsonPrimitive() || !uuidObject.getAsJsonPrimitive().isString()) {
-            return Optional.empty();
-        }
-        try {
-            UUID uuid = UUID.fromString(uuidObject.getAsString());
-            return Optional.of(uuid);
-        } catch (IllegalArgumentException e) {
-            return Optional.empty();
-        }
-    }
-    
-    // With Gson, there is sadly no generic implementation possible
-    
-    private Optional<String> getString(JsonObject object, String key) {
-    	if (!object.has(key)) return Optional.empty();
-        return Optional.of(object.get(key).getAsString());
-    }
-  
-    private Optional<Number> getNumber(JsonObject object, String key) {
-    	if (!object.has(key)) return Optional.empty();
-        return Optional.of(object.get(key).getAsNumber());
-    }
 
-    private Optional<Boolean> getBoolean(JsonObject object, String key) {
-    	if (!object.has(key)) return Optional.empty();
-        return Optional.of(object.get(key).getAsBoolean());
-    }
 
     private int readDigit(char digit) {
         try {
@@ -219,7 +190,7 @@ public final class ProfileFactoryImpl implements ProfileFactory {
     private Profile readTimerProfile(String text) {
     	// First decide which one to use
     	String tagStart = timerTagStart.stream().filter(tag -> StringUtil.startsWithIgnoreCase(text, tag) && text.endsWith("]")).findFirst().orElse(null);
-    	
+
         char digit = text.charAt(tagStart.length());
         if (digit == ' ') {
             // In format [Timer: X]
