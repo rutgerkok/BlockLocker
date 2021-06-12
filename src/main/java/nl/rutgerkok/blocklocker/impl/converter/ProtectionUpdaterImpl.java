@@ -14,6 +14,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.google.common.base.Preconditions;
 
 import nl.rutgerkok.blocklocker.BlockLockerPlugin;
+import nl.rutgerkok.blocklocker.ProtectionSign;
 import nl.rutgerkok.blocklocker.ProtectionUpdater;
 import nl.rutgerkok.blocklocker.protection.Protection;
 
@@ -67,8 +68,10 @@ public class ProtectionUpdaterImpl implements ProtectionUpdater {
         Preconditions.checkNotNull(protection, "protection");
 
         if (uuidHandler.isOnlineMode()) {
-            nameUpdater.updateNames(protection);
+            nameUpdater.updateNamesAndSaveFormat(protection);
             updateForMissingIds(protection);
+        } else {
+            updateForSaveFormat(protection);
         }
     }
 
@@ -83,6 +86,14 @@ public class ProtectionUpdaterImpl implements ProtectionUpdater {
         // Add it to queue
         if (!missingUniqueIds.contains(missingIds.get())) {
             missingUniqueIds.add(missingIds.get());
+        }
+    }
+
+    private void updateForSaveFormat(Protection protection) {
+        for (ProtectionSign protectionSign : protection.getSigns()) {
+            if (protectionSign.requiresResave()) {
+                plugin.getSignParser().saveSign(protectionSign);
+            }
         }
     }
 

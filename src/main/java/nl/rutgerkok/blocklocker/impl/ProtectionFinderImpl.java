@@ -268,7 +268,7 @@ class ProtectionFinderImpl implements ProtectionFinder {
 
     @Override
     public ProtectionSign newProtectionSign(Sign sign, SignType signType, Profile onFirstLine) {
-        return new ProtectionSignImpl(sign.getLocation(), signType, Collections.singletonList(onFirstLine));
+        return new ProtectionSignImpl(sign.getLocation(), signType, Collections.singletonList(onFirstLine), false);
     }
 
 }

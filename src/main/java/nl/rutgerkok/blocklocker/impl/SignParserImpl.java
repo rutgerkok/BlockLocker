@@ -106,7 +106,7 @@ class SignParserImpl implements SignParser {
             }
         }
 
-        return Optional.of(new ProtectionSignImpl(sign.getLocation(), type, profiles));
+        return Optional.of(new ProtectionSignImpl(sign.getLocation(), type, profiles, false));
     }
 
     /**
@@ -151,7 +151,9 @@ class SignParserImpl implements SignParser {
             return parseSimpleSign(location, linesOnSign);
         }
 
-        return Optional.<ProtectionSign>of(new ProtectionSignImpl(location, signType, profiles));
+        // Last argument == true: we want to save this sign in our new format
+        ProtectionSignImpl protectionSignImpl = new ProtectionSignImpl(location, signType, profiles, true);
+        return Optional.<ProtectionSign>of(protectionSignImpl);
     }
 
     @Override
@@ -173,12 +175,6 @@ class SignParserImpl implements SignParser {
 
         // Try plain sign, written by the user
         return parseSimpleSign(sign.getLocation(), lines);
-    }
-
-    @Override
-    @Deprecated
-    public Optional<ProtectionSign> parseSign(Sign sign) {
-        return parseSign(sign.getBlock());
     }
 
     /**
@@ -203,9 +199,9 @@ class SignParserImpl implements SignParser {
             profiles.add(profileFactory.fromDisplayText(name));
         }
 
-        // Last parameter true -> simple signs always need to be updated to be
-        // advanced signs
-        return Optional.<ProtectionSign> of(new ProtectionSignImpl(location, signType, profiles));
+        // Last argument == true: we want to save this sign in our own format
+        ProtectionSignImpl protectionSignImpl = new ProtectionSignImpl(location, signType, profiles, true);
+        return Optional.<ProtectionSign>of(protectionSignImpl);
     }
 
     @Override

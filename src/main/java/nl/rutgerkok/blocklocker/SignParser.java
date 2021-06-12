@@ -53,17 +53,6 @@ public interface SignParser {
     Optional<ProtectionSign> parseSign(Block signBlock);
 
     /**
-     * Parses the given sign for all names on it.
-     *
-     * @param sign
-     *            The sign to parse.
-     * @return The parsed sign.
-     * @deprecated Use {@link #parseSign(Block)} instead.
-     */
-    @Deprecated
-    Optional<ProtectionSign> parseSign(Sign sign);
-
-    /**
      * Saves the contents of the given sign to the world.
      *
      * @param sign

@@ -37,7 +37,7 @@ final class ProtectionNameUpdater {
      * @param protection
      *            The protection to update.
      */
-    void updateNames(Protection protection) {
+    void updateNamesAndSaveFormat(Protection protection) {
         for (ProtectionSign sign : protection.getSigns()) {
             // newProfileCollection is lazily initialized
             List<Profile> newProfileCollection = new ArrayList<>();
@@ -54,7 +54,7 @@ final class ProtectionNameUpdater {
                 }
             }
 
-            if (changed) {
+            if (changed || sign.requiresResave()) {
                 signParser.saveSign(sign.withProfiles(newProfileCollection));
             }
         }
