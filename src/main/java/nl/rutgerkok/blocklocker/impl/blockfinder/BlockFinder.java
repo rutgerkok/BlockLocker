@@ -34,6 +34,8 @@ public abstract class BlockFinder {
     private static final BlockFace[] SIGN_ATTACHMENT_FACES = { BlockFace.NORTH, BlockFace.EAST,
                 BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP };
     public static final BlockFace[] VERTICAL_FACES = { BlockFace.UP, BlockFace.DOWN };
+    public static final BlockFace[] NORTH_EAST_SOUTH_WEST_UP_DOWN = { BlockFace.NORTH, BlockFace.EAST,
+            BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN };
 
     /**
      * Creates a new block finder.
@@ -140,7 +142,7 @@ public abstract class BlockFinder {
         if (!(blockData instanceof Chest)) {
             return null;
         }
-    
+
         Chest chest = (Chest) blockData;
         if (chest.getType() == Type.SINGLE) {
             return null;

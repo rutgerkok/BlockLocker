@@ -119,6 +119,50 @@ public final class BlockPlaceListener extends EventListener {
     }
 
     private Optional<Protection> willInterfereWith(Player player, Block block) {
+        if (this.plugin.getChestSettings().getConnectContainers()) {
+            return willInterfereWithConnectedContainers(player, block);
+        } else {
+            return willInterfereWithStandard(player, block);
+        }
+    }
+
+    private Optional<Protection> willInterfereWithConnectedContainers(Player player, Block block) {
+        // Used for interference check when connectedContainers is on
+
+        if (block.getType().equals(Material.CHEST) || block.getType().equals(Material.TRAPPED_CHEST)) {
+            // Single left chest may interfere with right chest that locked by others, and
+            // vice versa
+            for (BlockFace searchFace : BlockFinder.NORTH_EAST_SOUTH_WEST_UP_DOWN) {
+                Block nearBlock = block.getRelative(searchFace);
+
+                if (block.getType() != nearBlock.getType()) {
+                    continue;
+                }
+
+                Optional<Protection> protectionBySomeoneElse = getProtectionBySomeoneElse(player, nearBlock);
+                if (protectionBySomeoneElse.isPresent()) {
+                    return protectionBySomeoneElse;
+                }
+            }
+        } else if (Tag.DOORS.isTagged(block.getType())) {
+            // Left door may interfere with right door that locked by others, and vice
+            // versa
+            for (BlockFace searchFace : BlockFinder.CARDINAL_FACES) {
+                Block nearBlock = block.getRelative(searchFace);
+                if (block.getType() != nearBlock.getType()) {
+                    continue;
+                }
+                Optional<Protection> protectionBySomeoneElse = getProtectionBySomeoneElse(player, nearBlock);
+                if (protectionBySomeoneElse.isPresent()) {
+                    return protectionBySomeoneElse;
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    private Optional<Protection> willInterfereWithStandard(Player player, Block block) {
+        // Used for interference check when connectedContainers is off
         if (block.getType().equals(Material.CHEST) || block.getType().equals(Material.TRAPPED_CHEST)) {
             // Single left chest may interfere with right chest that locked by others, and
             // vice versa
@@ -169,5 +213,6 @@ public final class BlockPlaceListener extends EventListener {
         }
         return Optional.empty();
     }
+
 
 }

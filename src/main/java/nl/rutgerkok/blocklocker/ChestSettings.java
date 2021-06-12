@@ -23,6 +23,12 @@ public interface ChestSettings extends ProtectableBlocksSettings {
     boolean allowDestroyBy(AttackType attackType);
 
     /**
+     * Returns whether containers of the same type require only one sign.
+     * @return True if containers are connected, false otherwise.
+     */
+    boolean getConnectContainers();
+
+    /**
      * Gets the actual date that chests must have activity after. If a chest
      * doesn't have activity after this date, it is considered expired.
      *

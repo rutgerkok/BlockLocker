@@ -82,6 +82,11 @@ class ChestSettingsImpl implements ChestSettings {
     }
 
     @Override
+    public boolean getConnectContainers() {
+        return this.config.getConnectContainers();
+    }
+
+    @Override
     public int getDefaultDoorOpenSeconds() {
         return config.getDefaultDoorOpenSeconds();
     }
