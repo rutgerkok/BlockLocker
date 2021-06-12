@@ -16,10 +16,10 @@ import com.google.gson.JsonParser;
 
 /**
  * Implementation of methods required by
- * nl.rutgerkok.chestsignprotect.impl.NMSAccessor for Minecraft 1.16 and newer.
+ * nl.rutgerkok.chestsignprotect.impl.NMSAccessor for Minecraft 1.16.
  *
  */
-public final class NMSAccessor implements ServerSpecific {
+public final class NMS116Accessor implements ServerSpecific {
 
     static Object call(Object on, Method method, Object... parameters) {
         try {
@@ -150,20 +150,20 @@ public final class NMSAccessor implements ServerSpecific {
 
     private final JsonParser jsonParser = new JsonParser();
 
-    public NMSAccessor() {
+    public NMS116Accessor() {
         String version = getMinecraftClassVersion();
-        nmsPrefix = "net.minecraft.";
+        nmsPrefix = "net.minecraft.server." + version + ".";
         obcPrefix = "org.bukkit.craftbukkit." + version + ".";
 
-        BlockPosition = getNMSClass("core.BlockPosition");
-        WorldServer = getNMSClass("server.level.WorldServer");
-        ChatModifier = getNMSClass("network.chat.ChatModifier");
-        ChatHoverable = getNMSClass("network.chat.ChatHoverable");
-        IChatBaseComponent = getNMSClass("network.chat.IChatBaseComponent");
-        IChatMutableComponent = getNMSClass("network.chat.IChatMutableComponent");
-        EnumHoverAction = getNMSClass("network.chat.ChatHoverable$EnumHoverAction");
-        TileEntitySign = getNMSClass("world.level.block.entity.TileEntitySign");
-        ChatComponentText = getNMSClass("network.chat.ChatComponentText");
+        BlockPosition = getNMSClass("BlockPosition");
+        WorldServer = getNMSClass("WorldServer");
+        ChatModifier = getNMSClass("ChatModifier");
+        ChatHoverable = getNMSClass("ChatHoverable");
+        IChatBaseComponent = getNMSClass("IChatBaseComponent");
+        IChatMutableComponent = getNMSClass("IChatMutableComponent");
+        EnumHoverAction = getNMSClass("ChatHoverable$EnumHoverAction");
+        TileEntitySign = getNMSClass("TileEntitySign");
+        ChatComponentText = getNMSClass("ChatComponentText");
 
         CraftWorld = getOBCClass("CraftWorld");
         CraftChatMessage = getOBCClass("util.CraftChatMessage");
@@ -183,9 +183,9 @@ public final class NMSAccessor implements ServerSpecific {
         ChatHoverable_new = getConstructor(ChatHoverable, EnumHoverAction, Object.class);
 
         ChatModifier_defaultModifier = getStaticFieldValue(ChatModifier, ChatModifier);
-        TileEntitySign_lines = getField(TileEntitySign, "d");
+        TileEntitySign_lines = getField(TileEntitySign, "lines");
 
-        EnumHoverAction_SHOW_TEXT = getStaticFieldValue(EnumHoverAction, "a");
+        EnumHoverAction_SHOW_TEXT = getStaticFieldValue(EnumHoverAction, "SHOW_TEXT");
     }
 
     private String chatComponentToString(Object chatComponent) {

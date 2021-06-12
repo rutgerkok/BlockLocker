@@ -47,8 +47,7 @@ import nl.rutgerkok.blocklocker.impl.group.SimpleClansGroupSystem;
 import nl.rutgerkok.blocklocker.impl.group.TownyGroupSystem;
 import nl.rutgerkok.blocklocker.impl.group.mcMMOGroupSystem;
 import nl.rutgerkok.blocklocker.impl.location.TownyLocationChecker;
-import nl.rutgerkok.blocklocker.impl.nms.NMSAccessor;
-import nl.rutgerkok.blocklocker.impl.nms.OldNMSAccessor;
+import nl.rutgerkok.blocklocker.impl.nms.NMSAccessorProvider;
 import nl.rutgerkok.blocklocker.impl.nms.ServerSpecific;
 import nl.rutgerkok.blocklocker.impl.profile.ProfileFactoryImpl;
 import nl.rutgerkok.blocklocker.impl.updater.Updater;
@@ -149,6 +148,7 @@ public class BlockLockerPluginImpl extends JavaPlugin implements BlockLockerPlug
     public SignParser getSignParser() {
         return signParser;
     }
+
     @Override
     public SignSelector getSignSelector() {
         return signSelector;
@@ -171,7 +171,7 @@ public class BlockLockerPluginImpl extends JavaPlugin implements BlockLockerPlug
             this.combinedGroupSystem.addSystem(new TownyGroupSystem());
         }
         if (mcMMOGroupSystem.isAvailable()) {
-        	this.combinedGroupSystem.addSystem(new mcMMOGroupSystem());
+            this.combinedGroupSystem.addSystem(new mcMMOGroupSystem());
         }
         if (GuildsGroupSystem.isAvailable()) {
             this.combinedGroupSystem.addSystem(new GuildsGroupSystem());
@@ -239,17 +239,12 @@ public class BlockLockerPluginImpl extends JavaPlugin implements BlockLockerPlug
     public void onEnable() {
         // NMS checks
         try {
-            nms = new OldNMSAccessor();
-        } catch (Exception e) {
-            try {
-                nms = new NMSAccessor();
-            } catch (Throwable t) {
-                getLogger().log(Level.SEVERE,
-                        "This Minecraft version is not supported. Find another version of the plugin, if available.",
-                        t);
-                Bukkit.getPluginManager().disablePlugin(this);
-                return;
-            }
+            this.nms = NMSAccessorProvider.create();
+        } catch (Throwable t) {
+            getLogger()
+                    .log(Level.SEVERE, "This Minecraft version is not supported. Find another version of the plugin, if available.", t);
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
         }
 
         loadServices();
