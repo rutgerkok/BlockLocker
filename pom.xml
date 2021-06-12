@@ -23,7 +23,7 @@
 		</repository>
 		<repository>
 			<id>rutger-repo</id>
-			<url>http://www.rutgerkok.nl/repo</url>
+			<url>https://rutgerkok.nl/repo</url>
 		</repository>
 		<repository>
 			<id>codemc-repo</id>
