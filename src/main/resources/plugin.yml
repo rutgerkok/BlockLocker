@@ -1,5 +1,5 @@
 name: ${project.name}
-version: ${project.version}
+version: "${project.version}"
 main: nl.rutgerkok.blocklocker.impl.BlockLockerPluginImpl
 author: Rutger Kok
 load: startup
