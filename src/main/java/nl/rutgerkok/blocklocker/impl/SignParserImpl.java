@@ -220,6 +220,7 @@ class SignParserImpl implements SignParser {
         signState.setLine(0, chestSettings.getFancyLocalizedHeader(sign.getType(), signState.getLine(0)));
 
         PersistentDataContainer data = signState.getPersistentDataContainer();
+        data.set(HEADER_KEY, PersistentDataType.STRING, sign.getType().toString());
         int i = 0;
         for (Profile profile : sign.getProfiles()) {
             signState.setLine(i + 1, profile.getDisplayName());
