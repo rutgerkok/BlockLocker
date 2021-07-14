@@ -2,6 +2,8 @@ package nl.rutgerkok.blocklocker.impl;
 
 import java.util.Collection;
 
+import javax.annotation.Nullable;
+
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -39,15 +41,29 @@ public final class CompleteDoor {
         return null;
     }
 
-    private static BlockFace getFaceToLeftDoor(Block bottomHalfDoorBlock) {
-        return getFaceToRightDoor(bottomHalfDoorBlock).getOppositeFace();
+    private static BlockFace getFaceOrNull(Block doorBlock) {
+        Door door = asDoorMaterialOrNull(doorBlock);
+        if (door == null) {
+            return null;
+        }
+        return door.getFacing();
     }
 
-    private static BlockFace getFaceToRightDoor(Block bottomHalfDoorBlock) {
+    @Nullable
+    private static BlockFace getFaceToLeftDoorOrNull(Block bottomHalfDoorBlock) {
+        BlockFace rightDoor = getFaceToRightDoorOrNull(bottomHalfDoorBlock);
+        if (rightDoor == null) {
+            return null;
+        }
+        return rightDoor.getOppositeFace();
+    }
+
+    @Nullable
+    private static BlockFace getFaceToRightDoorOrNull(Block bottomHalfDoorBlock) {
         Door door = asDoorMaterialOrNull(bottomHalfDoorBlock);
         if (door == null) {
-            // Not a valid door, lower half is missing, so just guess something
-            return BlockFace.SOUTH;
+            // Not a valid door, lower half is missing
+            return null;
         }
 
         switch (door.getFacing()) {
@@ -72,6 +88,14 @@ public final class CompleteDoor {
         return Hinge.UNKNOWN;
     }
 
+    @Nullable
+    private static Block getRelativeOrNull(@Nullable Block block, @Nullable  BlockFace face) {
+        if (block == null || face == null) {
+            return null;
+        }
+        return block.getRelative(face);
+    }
+
     private static boolean isTopHalf(Block doorBlock) {
         Door door = asDoorMaterialOrNull(doorBlock);
         if (door != null) {
@@ -81,14 +105,14 @@ public final class CompleteDoor {
     }
 
     private final Material doorMaterial;
-
     /** Top left block, may be null. */
     private final Block topLeftBlock;
-
     /** Top right block, may be null. */
     private final Block topRightBlock;
+
     /** Bottom left block, may be null. */
     private final Block bottomLeftBlock;
+
     /** Bottom right block, may be null. */
     private final Block bottomRightBlock;
 
@@ -100,6 +124,7 @@ public final class CompleteDoor {
      */
     public CompleteDoor(Block doorBlock) {
         doorMaterial = doorBlock.getType();
+        BlockFace doorFace = getFaceOrNull(doorBlock);
 
         Block topBlock;
         Block bottomBlock;
@@ -120,17 +145,17 @@ public final class CompleteDoor {
             topLeftBlock = asDoorBlockOrNull(topBlock);
             bottomLeftBlock = asDoorBlockOrNull(bottomBlock);
 
-            BlockFace faceToRightDoor = getFaceToRightDoor(bottomBlock);
-            topRightBlock = asDoorBlockOrNull(topBlock.getRelative(faceToRightDoor));
-            bottomRightBlock = asDoorBlockOrNull(bottomBlock.getRelative(faceToRightDoor));
+            BlockFace faceToRightDoor = getFaceToRightDoorOrNull(bottomBlock);
+            topRightBlock = asDoorBlockOrNull(getRelativeOrNull(topBlock, faceToRightDoor), Hinge.RIGHT, doorFace);
+            bottomRightBlock = asDoorBlockOrNull(getRelativeOrNull(bottomBlock, faceToRightDoor), Hinge.RIGHT, doorFace);
         } else if (hinge == Hinge.RIGHT) {
             // Hinge on the right, there may be another door on the left
             topRightBlock = asDoorBlockOrNull(topBlock);
             bottomRightBlock = asDoorBlockOrNull(bottomBlock);
 
-            BlockFace faceToLeftDoor = getFaceToLeftDoor(bottomBlock);
-            topLeftBlock = asDoorBlockOrNull(topBlock.getRelative(faceToLeftDoor));
-            bottomLeftBlock = asDoorBlockOrNull(bottomBlock.getRelative(faceToLeftDoor));
+            BlockFace faceToLeftDoor = getFaceToLeftDoorOrNull(bottomBlock);
+            topLeftBlock = asDoorBlockOrNull(getRelativeOrNull(topBlock, faceToLeftDoor), Hinge.LEFT, doorFace);
+            bottomLeftBlock = asDoorBlockOrNull(getRelativeOrNull(bottomBlock, faceToLeftDoor), Hinge.LEFT, doorFace);
         } else {
             topLeftBlock = null;
             topRightBlock = null;
@@ -142,6 +167,31 @@ public final class CompleteDoor {
     private Block asDoorBlockOrNull(Block nullableBlock) {
         if (nullableBlock != null && nullableBlock.getType() == doorMaterial) {
             return nullableBlock;
+        }
+        return null;
+    }
+
+    private @Nullable Block asDoorBlockOrNull(@Nullable Block nullableBlock, @Nullable Hinge expectedHinge,
+            @Nullable BlockFace expectedFace) {
+        if (nullableBlock != null && nullableBlock.getType() == doorMaterial) {
+            Door door = asDoorMaterialOrNull(nullableBlock);
+            if (door.getFacing() != expectedFace) {
+                return null;
+            }
+
+            switch (door.getHinge()) {
+                // Working with a different enum, so we need to translate the value here
+                case LEFT:
+                    if (expectedHinge == Hinge.LEFT) {
+                        return nullableBlock;
+                    }
+                    break;
+                case RIGHT:
+                    if (expectedHinge == Hinge.RIGHT) {
+                        return nullableBlock;
+                    }
+                    break;
+            }
         }
         return null;
     }
@@ -206,7 +256,7 @@ public final class CompleteDoor {
             }
         }
 
-        return getFaceToLeftDoor(bottomBlock);
+        return getFaceToLeftDoorOrNull(bottomBlock);
     }
 
     /**
