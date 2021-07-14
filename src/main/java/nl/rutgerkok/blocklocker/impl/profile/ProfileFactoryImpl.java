@@ -22,6 +22,8 @@ import nl.rutgerkok.blocklocker.profile.Profile;
 
 public final class ProfileFactoryImpl implements ProfileFactory {
 
+    private static final Profile EMPTY_PROFILE = new PlayerProfileImpl("", Optional.empty());
+
     private final Profile everyoneProfile;
     private final List<String> everyoneTagList;
     private final GroupSystem groupSystem;
@@ -44,6 +46,16 @@ public final class ProfileFactoryImpl implements ProfileFactory {
 
         this.everyoneProfile = new EveryoneProfileImpl(translator.get(Translation.TAG_EVERYONE));
         this.redstoneProfile = new RedstoneProfileImpl(translator.get(Translation.TAG_REDSTONE));
+    }
+
+    /**
+     * Gets an empty profile, which is equal to what
+     * {@link #fromDisplayText(String)} returns for an empty string.
+     *
+     * @return The empty profile.
+     */
+    public Profile emptyProfile() {
+        return EMPTY_PROFILE;
     }
 
     /**
@@ -124,6 +136,8 @@ public final class ProfileFactoryImpl implements ProfileFactory {
         return this.redstoneProfile;
     }
 
+
+
     /**
      * Converts the given profile from a saved JSON object.
      *
@@ -177,8 +191,6 @@ public final class ProfileFactoryImpl implements ProfileFactory {
         return Optional.empty();
     }
 
-
-
     private int readDigit(char digit) {
         try {
             return Integer.parseInt(String.valueOf(digit));
@@ -188,8 +200,10 @@ public final class ProfileFactoryImpl implements ProfileFactory {
     }
 
     private Profile readTimerProfile(String text) {
-    	// First decide which one to use
-    	String tagStart = timerTagStart.stream().filter(tag -> StringUtil.startsWithIgnoreCase(text, tag) && text.endsWith("]")).findFirst().orElse(null);
+        // First decide which one to use
+        String tagStart = timerTagStart.stream()
+                .filter(tag -> StringUtil.startsWithIgnoreCase(text, tag) && text.endsWith("]")).findFirst()
+                .orElse(null);
 
         char digit = text.charAt(tagStart.length());
         if (digit == ' ') {
