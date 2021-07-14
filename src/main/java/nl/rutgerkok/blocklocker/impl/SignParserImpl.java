@@ -83,6 +83,7 @@ class SignParserImpl implements SignParser {
     }
 
     private Optional<ProtectionSign> parseAdvancedSign(Sign sign) {
+        String[] displayedText = sign.getLines();
         PersistentDataContainer data = sign.getPersistentDataContainer();
 
         // Get sign type
@@ -99,14 +100,28 @@ class SignParserImpl implements SignParser {
 
         // Get profiles
         List<Profile> profiles = new ArrayList<>();
+        int lineNumber = 1;
+        boolean signHadDataMismatch = false; // Set to true when the display text doesn't match the stored data
         for (NamespacedKey profileKey : PROFILE_KEYS) {
             NbtSecretSignEntry entry = data.get(profileKey, NbtSecretSignEntry.TAG_TYPE);
             if (entry != null) {
-                profileFactory.fromSavedObject(entry).ifPresent(profiles::add);
+                Optional<Profile> profile = profileFactory.fromSavedObject(entry);
+                if (profile.map(Profile::getDisplayName).orElse("").equals(displayedText[lineNumber])) {
+                    // Text on sign matches, use stored profile
+                    profile.ifPresent(profiles::add);
+                } else {
+                    // Text on sign doesn't match, let it take prevalence
+                    Profile newProfile = profileFactory.fromDisplayText(displayedText[lineNumber]);
+                    profiles.add(newProfile);
+                    setProfile(data, profileKey, newProfile);
+                    signHadDataMismatch = true;
+                }
             }
+
+            lineNumber++;
         }
 
-        return Optional.of(new ProtectionSignImpl(sign.getLocation(), type, profiles, false));
+        return Optional.of(new ProtectionSignImpl(sign.getLocation(), type, profiles, signHadDataMismatch));
     }
 
     /**
@@ -224,16 +239,19 @@ class SignParserImpl implements SignParser {
         int i = 0;
         for (Profile profile : sign.getProfiles()) {
             signState.setLine(i + 1, profile.getDisplayName());
-
-            NbtSecretSignEntry signEntry = new NbtSecretSignEntry(
-                    data.getAdapterContext().newPersistentDataContainer());
-            profile.getSaveObject(signEntry);
-            data.set(PROFILE_KEYS[i], NbtSecretSignEntry.TAG_TYPE, signEntry);
+            setProfile(data, PROFILE_KEYS[i], profile);
             i++;
         }
 
         // Save the text and secret data
         signState.update();
+    }
+
+    private void setProfile(PersistentDataContainer data, NamespacedKey key, Profile profile) {
+        NbtSecretSignEntry signEntry = new NbtSecretSignEntry(
+                data.getAdapterContext().newPersistentDataContainer());
+        profile.getSaveObject(signEntry);
+        data.set(key, NbtSecretSignEntry.TAG_TYPE, signEntry);
     }
 
 }
