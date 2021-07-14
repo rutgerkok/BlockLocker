@@ -63,8 +63,10 @@ public class ProtectionUpdaterImpl implements ProtectionUpdater {
     private List<Profile> updateProfiles(ProtectionSign protectionSign) {
         List<Profile> updatedProfiles = null;
 
-        int i = 0;
+        int i = -1; // Will be 0 at first iteration
         for (Profile profile : protectionSign.getProfiles()) {
+            i++;
+
             if (!(profile instanceof PlayerProfile)) {
                 continue;
             }
@@ -78,8 +80,8 @@ public class ProtectionUpdaterImpl implements ProtectionUpdater {
                 updatedProfiles = new ArrayList<>(protectionSign.getProfiles());
             }
             updatedProfiles.set(i, updatedProfile);
-            i++;
         }
+
         return updatedProfiles;
     }
 
