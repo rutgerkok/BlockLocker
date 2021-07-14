@@ -104,18 +104,17 @@ class SignParserImpl implements SignParser {
         boolean signHadDataMismatch = false; // Set to true when the display text doesn't match the stored data
         for (NamespacedKey profileKey : PROFILE_KEYS) {
             NbtSecretSignEntry entry = data.get(profileKey, NbtSecretSignEntry.TAG_TYPE);
-            if (entry != null) {
-                Optional<Profile> profile = profileFactory.fromSavedObject(entry);
-                if (profile.map(Profile::getDisplayName).orElse("").equals(displayedText[lineNumber])) {
-                    // Text on sign matches, use stored profile
-                    profile.ifPresent(profiles::add);
-                } else {
-                    // Text on sign doesn't match, let it take prevalence
-                    Profile newProfile = profileFactory.fromDisplayText(displayedText[lineNumber]);
-                    profiles.add(newProfile);
-                    setProfile(data, profileKey, newProfile);
-                    signHadDataMismatch = true;
-                }
+            Optional<Profile> profile = entry == null ? Optional.empty() : profileFactory.fromSavedObject(entry);
+
+            if (profile.map(Profile::getDisplayName).orElse("").equals(displayedText[lineNumber])) {
+                // Text on sign matches, use stored profile
+                profile.ifPresent(profiles::add);
+            } else {
+                // Text on sign doesn't match, let it take prevalence
+                Profile newProfile = profileFactory.fromDisplayText(displayedText[lineNumber]);
+                profiles.add(newProfile);
+                setProfile(data, profileKey, newProfile);
+                signHadDataMismatch = true;
             }
 
             lineNumber++;
