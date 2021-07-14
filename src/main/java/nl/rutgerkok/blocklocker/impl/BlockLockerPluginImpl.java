@@ -33,7 +33,6 @@ import nl.rutgerkok.blocklocker.Translator;
 import nl.rutgerkok.blocklocker.group.CombinedGroupSystem;
 import nl.rutgerkok.blocklocker.group.GroupSystem;
 import nl.rutgerkok.blocklocker.impl.blockfinder.BlockFinder;
-import nl.rutgerkok.blocklocker.impl.converter.ProtectionUpdaterImpl;
 import nl.rutgerkok.blocklocker.impl.event.BlockDestroyListener;
 import nl.rutgerkok.blocklocker.impl.event.BlockLockerCommand;
 import nl.rutgerkok.blocklocker.impl.event.BlockPlaceListener;
@@ -206,7 +205,7 @@ public class BlockLockerPluginImpl extends JavaPlugin implements BlockLockerPlug
         signParser = new SignParserImpl(chestSettings, nms, profileFactory);
         BlockFinder blockFinder = BlockFinder.create(signParser, config.getConnectContainers());
         protectionFinder = new ProtectionFinderImpl(blockFinder, chestSettings);
-        protectionUpdater = new ProtectionUpdaterImpl(this);
+        protectionUpdater = new ProtectionUpdaterImpl(getServer(), signParser, profileFactory);
         signSelector = new SignSelectorImpl(this);
         redstoneProtectCache = new HopperCacheImpl(this);
     }

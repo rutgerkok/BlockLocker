@@ -13,7 +13,7 @@ public interface ProtectionUpdater {
     /**
      * Does generic cleaning for the signs on the protection at some point in the
      * near future. Fixes the missing UUIDs in the given protection, by looking them
-     * up online.
+     * up if the player is online.
      *
      * @param protection
      *            The protection to fix. If the protection was already queued for an
