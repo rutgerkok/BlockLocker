@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.bukkit.Bukkit;
 import org.bukkit.block.Sign;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -19,6 +20,7 @@ import nl.rutgerkok.blocklocker.Permissions;
 import nl.rutgerkok.blocklocker.SignType;
 import nl.rutgerkok.blocklocker.Translator.Translation;
 import nl.rutgerkok.blocklocker.protection.Protection;
+import org.bukkit.event.block.SignChangeEvent;
 
 public final class BlockLockerCommand implements TabExecutor {
 
@@ -130,6 +132,9 @@ public final class BlockLockerCommand implements TabExecutor {
             plugin.getProtectionUpdater().update(protection.get(), true);
         });
         plugin.getTranslator().sendMessage(player, Translation.COMMAND_UPDATED_SIGN);
+
+        SignChangeEvent changeEvent = new SignChangeEvent(sign.getBlock(), player, sign.getLines());
+        Bukkit.getPluginManager().callEvent(changeEvent);
 
         return true;
     }
