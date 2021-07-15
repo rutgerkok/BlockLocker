@@ -22,6 +22,7 @@ import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -200,6 +201,11 @@ public final class InteractListener extends EventListener {
 
         // Add [More Users] sign
         if (isOwner && tryPlaceSign(player, clickedBlock, event.getBlockFace(), SignType.MORE_USERS)) {
+            Sign sign = (Sign) clickedBlock.getRelative(event.getBlockFace()).getState();
+
+            SignChangeEvent changeEvent = new SignChangeEvent(sign.getBlock(), player, sign.getLines());
+            Bukkit.getPluginManager().callEvent(changeEvent);
+
             event.setCancelled(true);
             return;
         }
@@ -319,6 +325,12 @@ public final class InteractListener extends EventListener {
 
         if (!protection.isPresent()) {
             if (tryPlaceSign(event.getPlayer(), block, event.getBlockFace(), SignType.PRIVATE)) {
+
+                Sign sign = (Sign) block.getRelative(event.getBlockFace()).getState();
+
+                SignChangeEvent changeEvent = new SignChangeEvent(sign.getBlock(), player, sign.getLines());
+                Bukkit.getPluginManager().callEvent(changeEvent);
+
                 plugin.getTranslator().sendMessage(player, Translation.PROTECTION_CLAIMED_CONTAINER);
                 event.setCancelled(true);
             }
