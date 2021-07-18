@@ -5,13 +5,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.bukkit.Bukkit;
 import org.bukkit.block.Sign;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.SignChangeEvent;
 
 import com.google.common.base.Preconditions;
 
@@ -20,9 +20,12 @@ import nl.rutgerkok.blocklocker.Permissions;
 import nl.rutgerkok.blocklocker.SignType;
 import nl.rutgerkok.blocklocker.Translator.Translation;
 import nl.rutgerkok.blocklocker.protection.Protection;
-import org.bukkit.event.block.SignChangeEvent;
 
 public final class BlockLockerCommand implements TabExecutor {
+
+    private static <T> T[] copyArray(T[] original) {
+        return Arrays.copyOf(original, original.length);
+    }
 
     private final BlockLockerPlugin plugin;
 
@@ -125,16 +128,21 @@ public final class BlockLockerCommand implements TabExecutor {
             return true;
         }
 
-        // Update protection
-        sign.setLine(lineNumber - 1, name);
-        sign.update();
-        plugin.getProtectionFinder().findProtection(sign.getBlock()).ifPresent(protectio -> {
-            plugin.getProtectionUpdater().update(protection.get(), true);
-        });
-        plugin.getTranslator().sendMessage(player, Translation.COMMAND_UPDATED_SIGN);
+        // Prepare change of the sign
+        String[] newLines = copyArray(sign.getLines());
+        newLines[lineNumber - 1] = name;
 
-        SignChangeEvent changeEvent = new SignChangeEvent(sign.getBlock(), player, sign.getLines());
-        Bukkit.getPluginManager().callEvent(changeEvent);
+        // Commit the changes
+        SignChangeEvent changeEvent = new SignChangeEvent(sign.getBlock(), player, newLines);
+        plugin.callEvent(changeEvent);
+        if (!changeEvent.isCancelled()) {
+            newLines = changeEvent.getLines();
+            for (int i = 0; i < newLines.length; i++) {
+                sign.setLine(i, newLines[i]);
+            }
+            sign.update();
+            plugin.getTranslator().sendMessage(player, Translation.COMMAND_UPDATED_SIGN);
+        }
 
         return true;
     }

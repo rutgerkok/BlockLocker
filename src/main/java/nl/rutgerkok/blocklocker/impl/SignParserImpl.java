@@ -57,6 +57,17 @@ class SignParserImpl implements SignParser {
     }
 
     @Override
+    public String[] getDisplayLines(ProtectionSign sign) {
+        List<Profile> profiles = sign.getProfiles();
+        return new String[] {
+                chestSettings.getFancyLocalizedHeader(sign.getType(), "?"),
+                profiles.size() > 0 ? profiles.get(0).getDisplayName() : "",
+                profiles.size() > 1 ? profiles.get(1).getDisplayName() : "",
+                profiles.size() > 2 ? profiles.get(2).getDisplayName() : "",
+        };
+    }
+
+    @Override
     public Optional<SignType> getSignType(Sign sign) {
         String header = sign.getLine(0);
         return Optional.ofNullable(getSignTypeOrNull(header));

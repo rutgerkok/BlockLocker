@@ -14,6 +14,13 @@ import org.bukkit.event.block.SignChangeEvent;
 public interface SignParser {
 
     /**
+     * Gets the text-only display lines that should be displayed on the sign.
+     * @param sign The sign.
+     * @return The display text.
+     */
+    String[] getDisplayLines(ProtectionSign sign);
+
+    /**
      * Gets the type of the sign.
      *
      * @param sign
