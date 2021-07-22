@@ -22,6 +22,7 @@ import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -319,7 +320,6 @@ public final class InteractListener extends EventListener {
 
         if (!protection.isPresent()) {
             if (tryPlaceSign(event.getPlayer(), block, event.getBlockFace(), SignType.PRIVATE)) {
-                plugin.getTranslator().sendMessage(player, Translation.PROTECTION_CLAIMED_CONTAINER);
                 event.setCancelled(true);
             }
             return;
@@ -492,12 +492,12 @@ public final class InteractListener extends EventListener {
             waterlogged = ((Levelled) signBlock.getBlockData()).getLevel() == 0;
         }
 
-		// Fire our PlayerProtectionCreateEvent
-		if (this.plugin.callEvent(new PlayerProtectionCreateEvent(player, signBlock)).isCancelled()) {
-			return false;
-		}
+        // Fire our PlayerProtectionCreateEvent
+        if (this.plugin.callEvent(new PlayerProtectionCreateEvent(player, signBlock)).isCancelled()) {
+            return false;
+        }
 
-		// Create sign and fire Bukkit's BlockPlaceEvent for the sign to be placed
+        // Create sign and fire Bukkit's BlockPlaceEvent for the sign to be placed
         BlockState oldState = signBlock.getState();
         Waterlogged newBlockData = getSignBlockData(clickedSide, player, signMaterial);
         newBlockData.setWaterlogged(waterlogged);
@@ -512,11 +512,26 @@ public final class InteractListener extends EventListener {
         // be casted to Sign
         Sign sign = (Sign) signBlock.getState();
 
-        // Place text on it
+        // Decide what the text on the sign is going to be
         Profile profile = signType.isMainSign() ? plugin.getProfileFactory().fromPlayer(player)
                 : plugin.getProfileFactory().fromRedstone();
         ProtectionSign protectionSign = plugin.getProtectionFinder().newProtectionSign(sign, signType, profile);
-        plugin.getSignParser().saveSign(protectionSign);
+        String[] newLines = plugin.getSignParser().getDisplayLines(protectionSign);
+
+        // Test if we can place it
+        SignChangeEvent signChangeEvent = new SignChangeEvent(sign.getBlock(), player, newLines);
+        Bukkit.getPluginManager().callEvent(signChangeEvent);
+        if (signChangeEvent.isCancelled()) {
+            // Event failed, revert to old state
+            oldState.update(true); // Remove the entire sign, to avoid leaving an empty sign
+            return false; // And report as failed
+        }
+
+        // Actually write the text
+        for (int i = 0; i < newLines.length; i++) {
+            sign.setLine(i, newLines[i]);
+        }
+        sign.update();
 
         // Remove the sign from the player's hand
         removeSingleSignFromHand(player);
