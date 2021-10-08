@@ -61,11 +61,13 @@ public final class InteractListener extends EventListener {
     }
 
     private boolean allowedByBlockPlaceEvent(Block placedBlock, BlockState replacedBlockState, Block placedAgainst,
-                                             Player player) {
+            EquipmentSlot placedUsingHand, Player player) {
         Material originalMaterial = placedBlock.getType();
 
+        ItemStack itemInHand = placedUsingHand == EquipmentSlot.OFF_HAND ? player.getInventory().getItemInOffHand()
+                : player.getInventory().getItemInMainHand();
         BlockPlaceEvent placeEvent = new BlockPlaceEvent(placedBlock, replacedBlockState, placedAgainst,
-                player.getInventory().getItemInMainHand(), player, true, EquipmentSlot.HAND);
+                itemInHand, player, true, placedUsingHand);
         Bukkit.getPluginManager().callEvent(placeEvent);
 
         Material placedMaterial = placeEvent.getBlockPlaced().getType();
@@ -200,7 +202,7 @@ public final class InteractListener extends EventListener {
         }
 
         // Add [More Users] sign
-        if (isOwner && tryPlaceSign(player, clickedBlock, event.getBlockFace(), SignType.MORE_USERS)) {
+        if (isOwner && tryPlaceSign(player, clickedBlock, event.getBlockFace(), event.getHand(), SignType.MORE_USERS)) {
             event.setCancelled(true);
             return;
         }
@@ -319,7 +321,7 @@ public final class InteractListener extends EventListener {
         Optional<Protection> protection = plugin.getProtectionFinder().findProtection(block);
 
         if (!protection.isPresent()) {
-            if (tryPlaceSign(event.getPlayer(), block, event.getBlockFace(), SignType.PRIVATE)) {
+            if (tryPlaceSign(event.getPlayer(), block, event.getBlockFace(), event.getHand(), SignType.PRIVATE)) {
                 event.setCancelled(true);
             }
             return;
@@ -457,7 +459,8 @@ public final class InteractListener extends EventListener {
         return Material.valueOf(signMaterial.name().replace("_SIGN", "_WALL_SIGN"));
     }
 
-    private boolean tryPlaceSign(Player player, Block block, BlockFace clickedSide, SignType signType) {
+    private boolean tryPlaceSign(Player player, Block block, BlockFace clickedSide, EquipmentSlot hand,
+            SignType signType) {
         if (player.isSneaking() || !canBuildInMode(player.getGameMode())) {
             return false;
         }
@@ -502,7 +505,7 @@ public final class InteractListener extends EventListener {
         Waterlogged newBlockData = getSignBlockData(clickedSide, player, signMaterial);
         newBlockData.setWaterlogged(waterlogged);
         signBlock.setBlockData(newBlockData);
-        if (!allowedByBlockPlaceEvent(signBlock, oldState, block, player)) {
+        if (!allowedByBlockPlaceEvent(signBlock, oldState, block, hand, player)) {
             // Revert to old state
             oldState.update(true);
             return false;
