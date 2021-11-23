@@ -3,6 +3,7 @@ package nl.rutgerkok.blocklocker.impl;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -72,7 +73,7 @@ final class Config {
         }
 
         // Create combined set
-        protectableMaterialsSet = EnumSet.noneOf(Material.class);
+        protectableMaterialsSet = new HashSet<>();
         for (Set<Material> protectableByType : protectableMaterialsMap.values()) {
             protectableMaterialsSet.addAll(protectableByType);
         }
@@ -193,7 +194,7 @@ final class Config {
      * @return The material set.
      */
     private Set<Material> readMaterialSet(Collection<String> strings) {
-        Set<Material> materials = EnumSet.noneOf(Material.class);
+        Set<Material> materials = new HashSet<>();
         for (String string : strings) {
             Material material = Material.matchMaterial(string);
             if (material == null) {
