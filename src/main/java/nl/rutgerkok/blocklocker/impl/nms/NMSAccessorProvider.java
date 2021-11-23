@@ -13,7 +13,11 @@ public class NMSAccessorProvider {
             try {
                 return new NMS116Accessor();
             } catch (Exception e2) {
+                try {
                 return new NMSAccessor();
+                } catch (Exception e3) {
+                    return new NoNMSAccessor();
+                }
             }
         }
     }
