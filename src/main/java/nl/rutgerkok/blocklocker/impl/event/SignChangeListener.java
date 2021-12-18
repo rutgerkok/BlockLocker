@@ -29,29 +29,31 @@ public class SignChangeListener extends EventListener {
         Player player = event.getPlayer();
 
         Profile playerProfile = plugin.getProfileFactory().fromPlayer(player);
-        Optional<SignType> parsedSign = plugin.getSignParser().getSignType(event);
+        Optional<SignType> newSignType = plugin.getSignParser().getSignType(event);
+        boolean isExistingSign = this.isExistingSign(event.getBlock());
 
         // Only protection signs should be handled
-        if (!parsedSign.isPresent()) {
+        if (!newSignType.isPresent() && !isExistingSign) {
             return;
         }
 
-        // Only the owner may add signs nearby a protection
+        // Only the owner may add (or edit) signs nearby a protection
         if (!protection.isOwner(playerProfile)) {
             plugin.getTranslator().sendMessage(player, Translation.PROTECTION_CANNOT_CHANGE_SIGN);
             event.setCancelled(true);
             return;
         }
 
-
-        if (parsedSign.get().isMainSign()) {
-            if (this.isExistingSign(block)) {
+        if (newSignType.get().isMainSign()) {
+            // Edited a main sign (for an existing protection)
+            if (isExistingSign) {
                 // Make sure the owner name on the sign stays the same
                 Optional<Profile> owner = protection.getOwner();
                 if (owner.isPresent()) {
                     event.setLine(1, owner.get().getDisplayName());
                 }
             } else {
+                // Second main sign is not allowed
                 plugin.getTranslator().sendMessage(player, Translation.PROTECTION_ADD_MORE_USERS_SIGN_INSTEAD);
                 block.breakNaturally();
                 event.setCancelled(true);
