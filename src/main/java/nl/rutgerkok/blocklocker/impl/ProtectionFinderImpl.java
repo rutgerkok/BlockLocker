@@ -87,8 +87,8 @@ class ProtectionFinderImpl implements ProtectionFinder {
      * @return The protection block, if any.
      */
     private Optional<Block> findProtectableForSupportingBlock(Block supportingBlock) {
-        // Search above and below that block for doors and attachables
-        for (BlockFace doorFace : BlockFinder.VERTICAL_FACES) {
+        // Search around that block for doors and attachables
+        for (BlockFace doorFace : BlockFinder.NORTH_EAST_SOUTH_WEST_UP_DOWN) {
             Block blockUpDown = supportingBlock.getRelative(doorFace);
             if (settings.canProtect(ProtectionType.DOOR, blockUpDown)) {
                 return Optional.of(blockUpDown);
@@ -96,16 +96,6 @@ class ProtectionFinderImpl implements ProtectionFinder {
             if (settings.canProtect(ProtectionType.ATTACHABLE, blockUpDown)) {
                 if (this.blockFinder.findSupportingBlock(blockUpDown).equals(supportingBlock)) {
                     return Optional.of(blockUpDown);
-                }
-            }
-        }
-
-        // Search around for attachables
-        for (BlockFace trapDoorFace : BlockFinder.CARDINAL_FACES) {
-            Block blockNext = supportingBlock.getRelative(trapDoorFace);
-            if (settings.canProtect(ProtectionType.ATTACHABLE, blockNext)) {
-                if (this.blockFinder.findSupportingBlock(blockNext).equals(supportingBlock)) {
-                    return Optional.of(blockNext);
                 }
             }
         }
