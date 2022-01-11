@@ -48,9 +48,12 @@ public class SignChangeListener extends EventListener {
             // Edited a main sign (for an existing protection)
             if (isExistingSign) {
                 // Make sure the owner name on the sign stays the same
-                Optional<Profile> owner = protection.getOwner();
-                if (owner.isPresent()) {
-                    event.setLine(1, owner.get().getDisplayName());
+                // (except for players with the correct permission)
+                if (!player.hasPermission(Permissions.CAN_BYPASS)) {
+                    Optional<Profile> owner = protection.getOwner();
+                    if (owner.isPresent()) {
+                        event.setLine(1, owner.get().getDisplayName());
+                    }
                 }
             } else {
                 // Second main sign is not allowed
