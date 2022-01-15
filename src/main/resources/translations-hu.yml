@@ -1,0 +1,43 @@
+command:
+  cannot_be_used_by_console: Ezt a parancsot a konzol nem tudja használni. Sajnálom!
+  cannot_edit_owner: 'A védelem tulajdonosát nem változtathatod meg. Inkább semmisítsd meg a táblát.'
+  line_number_out_of_bounds: 'Kérlek, 2 és 4 közötti sorszámot adj meg.'
+  no_permission: 'nincsjog'
+  no_sign_selected: 'Először válassz ki egy olyan táblát jobb gombbal, ami egy védett blokkon van'
+  player_name_too_long: 'A játékos neve több mint 16 karakterből áll, ami nem fér el a táblán. Hosszabb is, mint amennyit a Mojang lehetővé tesz a játékosok számára.'
+  plugin_reloaded: 'A konfigurációs fájlok újratöltve!'
+  sign_no_longer_part_of_protection: 'A kiválasztott tábla már nem tartozik védett blokkhoz.'
+  updated_sign: 'A tábla frissítve!'
+protection:
+  add_more_users_sign_instead: 'Csak egy [Privát] tábla lehet egy védett blokkon. További játékosokat ha szeretnél a védelemhez adni, akkor használd a [Felhasználók] feliratot a táblát.'
+  bypassed: '{0} védelme adminisztrátori jogosulktságod miatt ignorálva.'
+  cannot_change_sign: 'Levédet blokk közelében nem módosíthatsz táblákat.'
+  chest_hint: 'Tegyél egy táblát erre a ládára, hogy megvédd azt.'
+  claimed_container: 'Sikeresen levédve. Csak Te férsz hozzá mostantól.'
+  claimed_manually: 'Sikeresen levédve. A táblán feltüntetett játékosok férnek csak hozzá.'
+  expired: 'Ennek a blokknak a védelme a tulajdonos inaktivitása miatt lejárt.'
+  in_wilderness: 'Itt nem hozhatsz létre védelmet.'
+  is_claimed_by: 'A védelem tulajdonosa {0}.'
+  no_access: 'Ezt nem használhatod. A védelem tulajdonosa {0}.'
+  no_permission_for_claim: 'nincsjog'
+  not_nearby: 'Nincs védett blokk a környékeden. Shift+jobb gomb egy tároló blokkra egy táblával a kezedben, hogy levédd azt.'
+  selected_sign: 'Tábla kiválasztva. Használd a "/blocklocker <sorszám> <név>" parancsot, hogy módosítsd a táblát. Ezeket is hozzáadhatod: [Vöröskő] vagy [Mindenki]'
+tag:
+  everyone: Mindenki
+  more_users:
+  - '[Felhasználók]'
+  - '[More Users]'
+  private:
+  - '[Privát]'
+  - '[Private]'
+  redstone:
+  - Vöröskő
+  - Redstone
+  timer:
+  - Időzítő
+  - Timer
+updater:
+  more_information: 'More information: {0}'
+  unsupported_server: 'The latest version of BlockLocker (version {0}) no longer supports this Minecraft version, only Minecraft {1}.'
+  update_available: 'An update for BlockLocker (version {0}) is available for manual download.'
+ 
