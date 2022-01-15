@@ -171,15 +171,11 @@ public final class InteractListener extends EventListener {
         }
     }
 
-    private Optional<Material> getSignInHand(Player player) {
+    private Optional<Material> getSignInHand(Player player, EquipmentSlot hand) {
         PlayerInventory inventory = player.getInventory();
-        ItemStack mainHand = inventory.getItemInMainHand();
-        if (isOfType(mainHand, Tag.SIGNS)) {
-            return Optional.of(mainHand.getType());
-        }
-        ItemStack offHand = inventory.getItemInOffHand();
-        if (isOfType(offHand, Tag.SIGNS)) {
-            return Optional.of(offHand.getType());
+        ItemStack item = hand == EquipmentSlot.OFF_HAND ? inventory.getItemInOffHand() : inventory.getItemInMainHand();
+        if (isOfType(item, Tag.SIGNS)) {
+            return Optional.of(item.getType());
         }
         return Optional.empty();
     }
@@ -464,7 +460,7 @@ public final class InteractListener extends EventListener {
         if (player.isSneaking() || !canBuildInMode(player.getGameMode())) {
             return false;
         }
-        Optional<Material> optionalSignMaterial = getSignInHand(player);
+        Optional<Material> optionalSignMaterial = getSignInHand(player, hand);
         if (!optionalSignMaterial.isPresent()) {
             return false;
         }
