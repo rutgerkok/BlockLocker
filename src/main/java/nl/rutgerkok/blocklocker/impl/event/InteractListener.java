@@ -520,10 +520,17 @@ public final class InteractListener extends EventListener {
         // Test if we can place it
         SignChangeEvent signChangeEvent = new SignChangeEvent(sign.getBlock(), player, newLines);
         Bukkit.getPluginManager().callEvent(signChangeEvent);
+
+        if (sign.getBlock().getType() != sign.getType()) {
+            // The plugin listening to the event removed/replaced the sign
+            removeSingleSignFromHand(player); // We're forced to consume the sign, to avoid item duplication
+            return false; // Report as failed
+        }
+
         if (signChangeEvent.isCancelled()) {
             // Event failed, revert to old state
             oldState.update(true); // Remove the entire sign, to avoid leaving an empty sign
-            return false; // And report as failed
+            return false; // And report as failed (player will keep the sign)
         }
 
         // Actually write the text
