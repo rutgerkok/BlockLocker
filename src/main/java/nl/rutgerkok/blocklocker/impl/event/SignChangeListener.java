@@ -38,7 +38,7 @@ public class SignChangeListener extends EventListener {
         }
 
         // Only the owner may add (or edit) signs nearby a protection
-        if (!protection.isOwner(playerProfile)) {
+        if (!protection.isOwner(playerProfile) && !player.hasPermission(Permissions.CAN_BYPASS)) {
             plugin.getTranslator().sendMessage(player, Translation.PROTECTION_CANNOT_CHANGE_SIGN);
             event.setCancelled(true);
             return;
