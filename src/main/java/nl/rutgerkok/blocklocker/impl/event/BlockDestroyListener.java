@@ -1,9 +1,12 @@
 package nl.rutgerkok.blocklocker.impl.event;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-
+import nl.rutgerkok.blocklocker.AttackType;
+import nl.rutgerkok.blocklocker.Permissions;
+import nl.rutgerkok.blocklocker.ProtectionSign;
+import nl.rutgerkok.blocklocker.Translator.Translation;
+import nl.rutgerkok.blocklocker.impl.BlockLockerPluginImpl;
+import nl.rutgerkok.blocklocker.profile.Profile;
+import nl.rutgerkok.blocklocker.protection.Protection;
 import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
@@ -27,13 +30,9 @@ import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 
-import nl.rutgerkok.blocklocker.AttackType;
-import nl.rutgerkok.blocklocker.Permissions;
-import nl.rutgerkok.blocklocker.ProtectionSign;
-import nl.rutgerkok.blocklocker.Translator.Translation;
-import nl.rutgerkok.blocklocker.impl.BlockLockerPluginImpl;
-import nl.rutgerkok.blocklocker.profile.Profile;
-import nl.rutgerkok.blocklocker.protection.Protection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
 
 public class BlockDestroyListener extends EventListener {
 
@@ -76,7 +75,7 @@ public class BlockDestroyListener extends EventListener {
         Player player = event.getPlayer();
         Profile profile = plugin.getProfileFactory().fromPlayer(player);
         if (!protection.get().isOwner(profile)) {
-            if (player.hasPermission(Permissions.CAN_BYPASS)) {
+            if (player.hasPermission(Permissions.CAN_EDIT)) {
                 String ownerName = protection.get().getOwnerDisplayName();
                 plugin.getTranslator().sendMessage(player, Translation.PROTECTION_BYPASSED, ownerName);
             } else if (isExpired(protection.get())){

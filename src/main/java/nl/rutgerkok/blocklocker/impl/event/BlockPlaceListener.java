@@ -1,10 +1,12 @@
 package nl.rutgerkok.blocklocker.impl.event;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-
+import nl.rutgerkok.blocklocker.Permissions;
+import nl.rutgerkok.blocklocker.Translator.Translation;
+import nl.rutgerkok.blocklocker.impl.BlockLockerPluginImpl;
+import nl.rutgerkok.blocklocker.impl.blockfinder.BlockFinder;
+import nl.rutgerkok.blocklocker.location.IllegalLocationException;
+import nl.rutgerkok.blocklocker.profile.PlayerProfile;
+import nl.rutgerkok.blocklocker.protection.Protection;
 import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
@@ -17,13 +19,10 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.InventoryHolder;
 
-import nl.rutgerkok.blocklocker.Permissions;
-import nl.rutgerkok.blocklocker.Translator.Translation;
-import nl.rutgerkok.blocklocker.impl.BlockLockerPluginImpl;
-import nl.rutgerkok.blocklocker.impl.blockfinder.BlockFinder;
-import nl.rutgerkok.blocklocker.location.IllegalLocationException;
-import nl.rutgerkok.blocklocker.profile.PlayerProfile;
-import nl.rutgerkok.blocklocker.protection.Protection;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 public final class BlockPlaceListener extends EventListener {
 
@@ -65,7 +64,7 @@ public final class BlockPlaceListener extends EventListener {
         if (interferingProtection.isPresent()) {
             // Not allowed to place a block here, would interfere with an existing
             // protection
-            if (!event.getPlayer().hasPermission(Permissions.CAN_BYPASS)) {
+            if (!event.getPlayer().hasPermission(Permissions.CAN_EDIT)) {
                 plugin.getTranslator().sendMessage(player, Translation.PROTECTION_NO_ACCESS, interferingProtection.get()
                         .getOwnerDisplayName());
                 event.setCancelled(true);

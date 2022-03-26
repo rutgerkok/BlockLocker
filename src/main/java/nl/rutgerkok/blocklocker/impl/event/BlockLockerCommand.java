@@ -1,10 +1,11 @@
 package nl.rutgerkok.blocklocker.impl.event;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
+import com.google.common.base.Preconditions;
+import nl.rutgerkok.blocklocker.BlockLockerPlugin;
+import nl.rutgerkok.blocklocker.Permissions;
+import nl.rutgerkok.blocklocker.SignType;
+import nl.rutgerkok.blocklocker.Translator.Translation;
+import nl.rutgerkok.blocklocker.protection.Protection;
 import org.bukkit.block.Sign;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -13,13 +14,10 @@ import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.SignChangeEvent;
 
-import com.google.common.base.Preconditions;
-
-import nl.rutgerkok.blocklocker.BlockLockerPlugin;
-import nl.rutgerkok.blocklocker.Permissions;
-import nl.rutgerkok.blocklocker.SignType;
-import nl.rutgerkok.blocklocker.Translator.Translation;
-import nl.rutgerkok.blocklocker.protection.Protection;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 public final class BlockLockerCommand implements TabExecutor {
 
@@ -123,7 +121,7 @@ public final class BlockLockerCommand implements TabExecutor {
         }
 
         // Check line number in combination with sign type
-        if (signType.get().isMainSign() && lineNumber == 2 && !player.hasPermission(Permissions.CAN_BYPASS)) {
+        if (signType.get().isMainSign() && lineNumber == 2 && !player.hasPermission(Permissions.CAN_EDIT)) {
             plugin.getTranslator().sendMessage(player, Translation.COMMAND_CANNOT_EDIT_OWNER);
             return true;
         }
