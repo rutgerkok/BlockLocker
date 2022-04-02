@@ -12,6 +12,9 @@ permissions:
   blocklocker.bypass:
     description: "Bypass someone else's protection."
     default: op
+  blocklocker.edit:
+    description: "Edit someone else's protection."
+    default: op
   blocklocker.reload:
     description: "Reload the plugin using /blocklocker reload."
     default: op

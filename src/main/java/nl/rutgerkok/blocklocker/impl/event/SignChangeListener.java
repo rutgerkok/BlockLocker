@@ -1,14 +1,5 @@
 package nl.rutgerkok.blocklocker.impl.event;
 
-import java.util.Optional;
-
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.Sign;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.block.SignChangeEvent;
-
 import nl.rutgerkok.blocklocker.Permissions;
 import nl.rutgerkok.blocklocker.SignType;
 import nl.rutgerkok.blocklocker.Translator.Translation;
@@ -17,6 +8,14 @@ import nl.rutgerkok.blocklocker.impl.BlockLockerPluginImpl;
 import nl.rutgerkok.blocklocker.location.IllegalLocationException;
 import nl.rutgerkok.blocklocker.profile.Profile;
 import nl.rutgerkok.blocklocker.protection.Protection;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Sign;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.block.SignChangeEvent;
+
+import java.util.Optional;
 
 public class SignChangeListener extends EventListener {
 
@@ -38,7 +37,7 @@ public class SignChangeListener extends EventListener {
         }
 
         // Only the owner may add (or edit) signs nearby a protection
-        if (!protection.isOwner(playerProfile) && !player.hasPermission(Permissions.CAN_BYPASS)) {
+        if (!protection.isOwner(playerProfile) && !player.hasPermission(Permissions.CAN_EDIT)) {
             plugin.getTranslator().sendMessage(player, Translation.PROTECTION_CANNOT_CHANGE_SIGN);
             event.setCancelled(true);
             return;
@@ -49,7 +48,7 @@ public class SignChangeListener extends EventListener {
             if (isExistingSign) {
                 // Make sure the owner name on the sign stays the same
                 // (except for players with the correct permission)
-                if (!player.hasPermission(Permissions.CAN_BYPASS)) {
+                if (!player.hasPermission(Permissions.CAN_EDIT)) {
                     Optional<Profile> owner = protection.getOwner();
                     if (owner.isPresent()) {
                         event.setLine(1, owner.get().getDisplayName());

@@ -1,10 +1,22 @@
 package nl.rutgerkok.blocklocker.impl.event;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
+import com.google.common.collect.ImmutableSet;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import nl.rutgerkok.blocklocker.AttackType;
+import nl.rutgerkok.blocklocker.Permissions;
+import nl.rutgerkok.blocklocker.ProtectionSign;
+import nl.rutgerkok.blocklocker.SignType;
+import nl.rutgerkok.blocklocker.Translator.Translation;
+import nl.rutgerkok.blocklocker.event.PlayerProtectionCreateEvent;
+import nl.rutgerkok.blocklocker.impl.BlockLockerPluginImpl;
+import nl.rutgerkok.blocklocker.impl.TextComponents;
+import nl.rutgerkok.blocklocker.location.IllegalLocationException;
+import nl.rutgerkok.blocklocker.profile.PlayerProfile;
+import nl.rutgerkok.blocklocker.profile.Profile;
+import nl.rutgerkok.blocklocker.protection.Protection;
+import nl.rutgerkok.blocklocker.protection.Protection.SoundCondition;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -32,24 +44,10 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import com.google.common.collect.ImmutableSet;
-
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ClickEvent;
-import nl.rutgerkok.blocklocker.AttackType;
-import nl.rutgerkok.blocklocker.Permissions;
-import nl.rutgerkok.blocklocker.ProtectionSign;
-import nl.rutgerkok.blocklocker.SignType;
-import nl.rutgerkok.blocklocker.Translator.Translation;
-import nl.rutgerkok.blocklocker.event.PlayerProtectionCreateEvent;
-import nl.rutgerkok.blocklocker.impl.BlockLockerPluginImpl;
-import nl.rutgerkok.blocklocker.impl.TextComponents;
-import nl.rutgerkok.blocklocker.location.IllegalLocationException;
-import nl.rutgerkok.blocklocker.profile.PlayerProfile;
-import nl.rutgerkok.blocklocker.profile.Profile;
-import nl.rutgerkok.blocklocker.protection.Protection;
-import nl.rutgerkok.blocklocker.protection.Protection.SoundCondition;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 public final class InteractListener extends EventListener {
 
@@ -189,7 +187,7 @@ public final class InteractListener extends EventListener {
 
         // Select signs
         if (clickedSign) {
-            if ((isOwner || player.hasPermission(Permissions.CAN_BYPASS)) && !usedOffHand) {
+            if ((isOwner || player.hasPermission(Permissions.CAN_EDIT)) && !usedOffHand) {
                 Sign sign = (Sign) clickedBlock.getState();
                 plugin.getSignSelector().setSelectedSign(player, sign);
                 sendSelectedSignMessage(player);
