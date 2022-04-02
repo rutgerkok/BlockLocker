@@ -29,6 +29,6 @@ tag:
   private: ["[Privat]", "[Private]"]
   more_users: ["[Mehr Benutzer]", "[More Users]"]
 updater:
-  more_information: "&Mehr Informationen: {0}"
+  more_information: "&6Mehr Informationen: {0}"
   unsupported_server: "&4Die neueste Version von ${project.name} (Version {0}) unterstützt diese Minecraft-Version nicht mehr, sondern nur noch Minecraft {1}."
   update_available: "&6Eine Aktualisierung für ${project.name} (Version {0}) steht zum manuellen Herunterladen bereit."
