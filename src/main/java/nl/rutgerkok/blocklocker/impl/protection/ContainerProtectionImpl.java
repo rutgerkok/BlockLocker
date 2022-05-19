@@ -124,6 +124,9 @@ public final class ContainerProtectionImpl extends AbstractProtection implements
             changed |= setBlockOpen(block, open);
             aBlock = block;
         }
+        if (aBlock == null) {
+            return;
+        }
 
         if (changed && playSound == SoundCondition.ALWAYS) {
             Sound sound = OpenBlockSound.get(aBlock.getType(), open);
