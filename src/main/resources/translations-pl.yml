@@ -1,0 +1,34 @@
+command:
+  cannot_be_used_by_console: Ta komenda nie może być użyta przez konsolę. Przepraszam!
+  cannot_edit_owner: '&4Nie możesz zmienić właściciela tego zabezpieczenia. Zniszcz tabliczkę.'
+  line_number_out_of_bounds: '&4Proszę wpisać numer wiersza z przedziału od 2 do 4 włącznie.'
+  no_permission: '&4Nie masz uprawnień do wykonania tej komendy. Przepraszam!'
+  no_sign_selected: '&4Musisz najpierw wybrać tabliczke na jednym z chronionych bloków klikając go prawym przyciskiem myszy.'
+  player_name_too_long: '&4Nazwa gracza ma ponad 16 znaków, co nie mieści się na znaku. Jest też dłuższa niż zezwala na to Mojang.'
+  plugin_reloaded: '&6Załadowano ponownie pliki konfiguracyjne!'
+  sign_no_longer_part_of_protection: '&4Wybrana tabliczka nie należy już do chronionego bloku.'
+  updated_sign: '&6Zaktualizowano tabliczkę!'
+protection:
+  add_more_users_sign_instead: '&4Na danym zabezpieczeniu może być tylko jedna tabliczka [Prywatne]. Zamiast tego dodaj tabliczkę [Wiecej graczy].'
+  bypassed: '&6Właśnie ominąłeś ochronę {0}.'
+  cannot_change_sign: '&4Nie można zmienić tabliczki w pobliżu zajętego obiektu.'
+  chest_hint: '&6Postaw tabliczkę na tej skrzyni, aby ją chronić.'
+  claimed_container: '&6Zabezpieczono ten obiekt. Nikt inny nie ma do niego dostępu.'
+  claimed_manually: '&6Stworzono zabezpieczenie. Dostęp do niego mają tylko osoby wymienione na tabliczce.'
+  expired: '&6Ochrona tego bloku wygasła z powodu braku aktywności właściciela.'
+  in_wilderness: '&4Nie możesz tu stworzyć ochrony: jesteś na pustkowiu.'
+  is_claimed_by: '&6Ten blok został zajęty przez {0}.'
+  no_access: '&4Nie możesz użyć tego bloku, jest on chroniony przez {0}.'
+  no_permission_for_claim: '&4Nie masz uprawnień do zajęcia tego obiektu, przykro mi.'
+  not_nearby: '&4W pobliżu nie ma bloku, który można ochronić. (Shift-)kliknij prawym przyciskiem myszy na obiekt z tabliczką w dłoni, aby go ochronić.'
+  selected_sign: '&6Wybrano tabliczkę. Wpisz "/blocklocker <numer linii> <nazwa>", aby edytować tą tabliczkę. Ewentualnie dodaj poniższe: &n[Redstone]&r&6 &n[Wszyscy]&r&6.}'
+tag:
+  everyone: Wszyscy
+  more_users: '[Wiecej graczy]'
+  private: '[Prywatne]'
+  redstone: Redstone
+  timer: Licznik
+updater:
+  more_information: '&6Więcej informacji: {0}'
+  unsupported_server: '&4Najnowsza wersja BlockLockera (wersja {0}) już nie obsługuje tej wersji Minecrafta, tylko Minecrafta {1}.'
+  update_available: '&6Aktualizacja dla pluginu BlockLocker (wersja {0}) jest dostępna do ręcznego pobrania.'
