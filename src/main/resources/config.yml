@@ -82,6 +82,7 @@ protectableDoors:
 - dark_oak_door
 - iron_door
 - jungle_door
+- mangrove_door
 - oak_door
 - spruce_door
 - warped_door
@@ -105,6 +106,8 @@ protectableAttachables:
 - iron_trapdoor
 - jungle_fence_gate
 - jungle_trapdoor
+- mangrove_fence_gate
+- mangrove_trapdoor
 - oak_fence_gate
 - oak_trapdoor
 - spruce_fence_gate
