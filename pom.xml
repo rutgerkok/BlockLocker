@@ -5,7 +5,7 @@
 
 	<groupId>nl.rutgerkok</groupId>
 	<artifactId>blocklocker</artifactId>
-	<version>1.10.5-SNAPSHOT</version>
+	<version>1.11</version>
 	<packaging>jar</packaging>
 
 	<name>BlockLocker</name>
