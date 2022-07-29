@@ -54,7 +54,7 @@ public final class AttachedProtectionImpl extends AbstractProtection implements 
 
     private static void setBlockOpen(Block block, boolean open) {
         BlockData blockData = block.getBlockData();
-        if (!(blockData instanceof Openable)) {
+        if (!isFunctionalOpenable(blockData)) {
             return;
         }
         Openable openable = (Openable) blockData;
@@ -84,7 +84,7 @@ public final class AttachedProtectionImpl extends AbstractProtection implements 
 
     @Override
     public boolean canBeOpened() {
-        return protectionBlock.getBlockData() instanceof Openable;
+        return isFunctionalOpenable(protectionBlock.getBlockData());
     }
 
     @Override
@@ -96,7 +96,7 @@ public final class AttachedProtectionImpl extends AbstractProtection implements 
     @Override
     public boolean isOpen() {
         BlockData materialData = protectionBlock.getBlockData();
-        if (materialData instanceof Openable) {
+        if (isFunctionalOpenable(materialData)) {
             return ((Openable) materialData).isOpen();
         }
         return false;

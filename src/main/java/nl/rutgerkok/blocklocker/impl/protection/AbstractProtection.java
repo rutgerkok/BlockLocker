@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.lang.Validate;
+import org.bukkit.Material;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Openable;
 
 import com.google.common.collect.Lists;
 
@@ -20,14 +23,34 @@ import nl.rutgerkok.blocklocker.protection.Protection;
  */
 abstract class AbstractProtection implements Protection {
 
+    /**
+     * Checks if the instance is of {@link Openable} that will open correctly when
+     * you call {@link Openable#setOpen(boolean)}. For barrels, opening them using
+     * {@link Openable#setOpen(boolean)} won't show the inventory, so those
+     * shouldn't be considered openable.
+     *
+     * @param blockData
+     *            The block data.
+     * @return True if the block data is openable in a way that is functional.
+     */
+    protected static boolean isFunctionalOpenable(BlockData blockData) {
+        if (!(blockData instanceof Openable)) {
+            return false;
+        }
+        if (blockData.getMaterial() == Material.BARREL) {
+            return false; // Barrels are openable in Bukkit since 1.19, but then the inventory won't show up
+        }
+        return true;
+    }
     private Optional<Collection<Profile>> allAllowed = Optional.empty();
     private Optional<Profile> owner = Optional.empty();
+
     private Optional<Collection<ProtectionSign>> allSigns = Optional.empty();
 
     /**
      * Constructor for creating the protection with all signs already looked up.
      * Collection may not be empty.
-     * 
+     *
      * @param signs
      *            All signs.
      */
@@ -40,7 +63,7 @@ abstract class AbstractProtection implements Protection {
      * Constructor for creating the protection with just a single sign looked
      * up. Not all signs are found yet. If it turns out that all signs are
      * needed, {@link #fetchSigns()} will be called.
-     * 
+     *
      * @param sign
      *            A sign attached to the protection.
      */

@@ -74,7 +74,7 @@ public final class ContainerProtectionImpl extends AbstractProtection implements
     @Override
     public boolean canBeOpened() {
         for (Block block : blocks) {
-            if (block.getBlockData() instanceof Openable) {
+            if (isFunctionalOpenable(block.getBlockData())) {
                 return true;
             }
             // Only try first block, as all blocks should be of the same type
@@ -92,16 +92,17 @@ public final class ContainerProtectionImpl extends AbstractProtection implements
     public boolean isOpen() {
         for (Block block : blocks) {
             BlockData materialData = block.getBlockData();
-            if (materialData instanceof Openable) {
+            if (isFunctionalOpenable(materialData)) {
                 return ((Openable) materialData).isOpen();
             }
         }
         return false;
     }
 
+
     private boolean setBlockOpen(Block block, boolean open) {
         BlockData materialData = block.getBlockData();
-        if (!(materialData instanceof Openable)) {
+        if (!isFunctionalOpenable(materialData)) {
             return false;
         }
 
