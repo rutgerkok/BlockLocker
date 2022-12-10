@@ -9,15 +9,15 @@ import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
 import nl.rutgerkok.blocklocker.group.GroupSystem;
 
 /**
- * Group system hooking into the Factions plugin by MassiveCraft.
+ * Group system hooking into the SimpleClans plugin.
  *
  */
 public final class SimpleClansGroupSystem extends GroupSystem {
 
     /**
-     * Tests if the Factions plugin is installed.
+     * Tests if the SimpleClans plugin is installed.
      *
-     * @return True if the factions plugin is installed, false otherwise.
+     * @return True if the SimpleClans plugin is installed, false otherwise.
      */
     public static boolean isAvailable() {
         try {
@@ -46,11 +46,10 @@ public final class SimpleClansGroupSystem extends GroupSystem {
     public boolean isInGroup(Player player, String groupName) {
         SimpleClans simpleClans = JavaPlugin.getPlugin(SimpleClans.class);
         ClanPlayer clanPlayer = simpleClans.getClanManager().getClanPlayer(player.getUniqueId());
-        Clan clan = clanPlayer.getClan();
-        if (clan == null) {
+        if (clanPlayer == null) {
             return false;
         }
-        return clan.getName().equalsIgnoreCase(groupName);
+        return clanPlayer.getClan().getName().equalsIgnoreCase(groupName);
     }
 
     @Override
