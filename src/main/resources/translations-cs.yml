@@ -1,0 +1,47 @@
+# Translations file for the Czech language ([the] Czech Republic) by PetyXbron
+command:
+  cannot_be_used_by_console: "Tento příkaz nelze býti použit konzolí. Promiň!"
+  cannot_edit_owner: "&4Nemůžeš změnit majitele zabezpečení Místo toho znič ceduli."
+  line_number_out_of_bounds: "&4Zadej prosím číslo řádku od 2 po 4."
+  no_sign_selected: "&4Nejdříve musíš vybrat cedulku jednoho z tvých zabezpečených bloků pravým klikem na myši."
+  no_permission: "&4Nemáš právo použít tenhle příkaz. Promiň!"
+  player_name_too_long: "&4Jméno hráče obsahuje více než 16 znaků, což se nevejde na cedulku. Je také delší, než limit u přezdívek hráčů Mojang."
+  plugin_reloaded: "&6Znovu-načteny konfigurační soubory!"
+  sign_no_longer_part_of_protection: "&4Vybraná cedulka již nespadá pod zabezpečený blok."
+  updated_sign: "&6Cedulka aktualizována!"
+protection:
+  add_more_users_sign_instead: "&4Na zabezpečeném bloku může být pouze jedna [Private] cedulka. Místo toho přidej [More Users] cedulku."
+  bypassed: "&6Právě jsi obešel zabezpečení hráče {0}."
+  can_only_add_protection_sign: "&4Na zabezpečeném bloku může být pouze jedna [Private] a nula nebo více [More Users] cedulek. Jiné cedulky nejsou povoleny."
+  cannot_change_sign: "&4Nemůžeš změnit cedulku poblíž zabezpečeného bloku."
+  chest_hint: "&6Umísti na tuhle bednu cedulku k zabezpečení před ostatními hráči."
+  claimed_container: "&6Blok zabezpečen. Nikdo jiný k ní teď nemá přístup."
+  claimed_manually: "&6Block zabezpečen. Přístup k němu mají pouze hráči uvedeni na cedulce."
+  expired: "&6Zabezpečení tohoto bloku vypršela kvůli nečinnosti vlastníka."
+  in_wilderness: "&4Zde nemůžeš vytvořit zabezpečení bloku: nacházíš se v divočině."
+  is_claimed_by: "&6Tento blok je zabezpečen hráčem {0}."
+  no_access: "&4Tento blok nemůžeš použít, protože je zabezpečen hráčem {0}."
+  no_permission_for_claim: "&4Nemáš oprávnění k zabezpečení bloku, promiň."
+  not_nearby: "&4Ve tvé blízkosti se nenachází žádný zabezpečitelný blok. Použij (shift a) pravé tlačítko na myši s cedulkou v ruce k jejímu položení a zabezpečení bloku."
+  selected_sign: "&6Cedulka zvolena. Chceš-li upravit tuto cedulku, použij \"/blocklocker <řádek> <jméno>\". Případně přidej (klikem): &n[Redstone]&r&6 &n[Všichni]&r&6."
+tag:
+  everyone:
+    - "Everyone"
+    - "Všichni"
+  timer:
+    - "Timer"
+    - "Časovač"
+  redstone:
+    - "Redstone"
+    - "Rudit"
+  private:
+    - "[Private]"
+    - "[Soukromé]"
+  more_users:
+    - "[More Users]"
+    - "[Více uživatelů]"
+updater:
+  more_information: "&6Více informací: {0}"
+  unsupported_server: "&4Nejnovější verze ${project.name} (verze {0}) již nepodporuje tuto verzi Minecraftu, pouze Minecraft {1}."
+  update_available: "&6Aktualizace pro ${project.name} (verze {0}) je k dispozici pro ruční stáhnutí a instalaci."
+  updated_automatically: "&6Je k dispozici nová aktualizace pro ${project.name} (verze {0}). Po restartování serveru se automaticky nainstaluje."
