@@ -23,7 +23,6 @@ protection:
   no_access: "&4You cannot use this block, it is protected by {0}."
   no_permission_for_claim: "&4You don't have permission to claim a container, sorry."
   not_nearby: "&4There is no protectable block nearby. (Shift-)right-click a container with a sign in your hand to protect it."
-  selected_sign: "&6Selected a sign. Type \"/blocklocker <line number> <name>\" to edit this sign. Or alternatively, add these: &n[Redstone]&r&6 &n[Everyone]&r&6."
 tag:
   everyone: "Everyone"
   timer: "Timer"

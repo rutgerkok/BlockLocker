@@ -22,7 +22,6 @@ protection:
   no_access: '&4Dit blok is beschermd door {0}, je kunt er niet bij.'
   no_permission_for_claim: '&4Je hebt geen toestemming om beschermingsbordjes op te hangen, sorry.'
   not_nearby: '&4Er is hier geen blok dat beschermd kan worden. (Shift-)rechtsklik een containerblok met een bordje in je hand om het te beschermen.'
-  selected_sign: '&6Bordje geselecteerd. Typ "/blocklocker <line number> <name>" om het te bewerken, of voeg deze toe: &n[Redstone]&r&6 &n[Everyone]&r&6.'
 tag:
   everyone: Everyone
   more_users: 

@@ -97,6 +97,7 @@ class SignParserImpl implements SignParser {
         String[] displayedText = sign.getLines();
         PersistentDataContainer data = sign.getPersistentDataContainer();
 
+
         // Get sign type
         if (!data.has(HEADER_KEY, PersistentDataType.STRING)) {
             return Optional.empty();
@@ -108,6 +109,10 @@ class SignParserImpl implements SignParser {
         } catch (IllegalArgumentException e) {
             return Optional.empty();
         }
+
+        // Check header
+        String header = sign.getLine(0);
+        boolean headerMismatch = !chestSettings.getFancyLocalizedHeader(type, header).equals(header);
 
         // Get profiles
         List<Profile> profiles = new ArrayList<>();
@@ -131,7 +136,8 @@ class SignParserImpl implements SignParser {
             lineNumber++;
         }
 
-        return Optional.of(new ProtectionSignImpl(sign.getLocation(), type, profiles, signHadDataMismatch));
+        return Optional
+                .of(new ProtectionSignImpl(sign.getLocation(), type, profiles, signHadDataMismatch || headerMismatch));
     }
 
     /**

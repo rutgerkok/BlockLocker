@@ -51,7 +51,8 @@ public class SignChangeListener extends EventListener {
 
         // If a sign type was already specified, don't allow changing it
         if (oldSignType.isPresent() && !oldSignType.equals(newSignType)) {
-            event.setLine(0, ChatColor.stripColor(plugin.getChestSettings().getFancyLocalizedHeader(newSignType.get(), event.getLine(0))));
+            event.setLine(0, ChatColor.stripColor(plugin.getChestSettings()
+                    .getFancyLocalizedHeader(oldSignType.get(), event.getLine(0))));
         }
 
         // Only the owner may add (or edit) signs nearby a protection

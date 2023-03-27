@@ -1,29 +1,21 @@
 package nl.rutgerkok.blocklocker.impl.event;
 
-import com.google.common.base.Preconditions;
-import nl.rutgerkok.blocklocker.BlockLockerPlugin;
-import nl.rutgerkok.blocklocker.Permissions;
-import nl.rutgerkok.blocklocker.SignType;
-import nl.rutgerkok.blocklocker.Translator.Translation;
-import nl.rutgerkok.blocklocker.protection.Protection;
-import org.bukkit.block.Sign;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.TabExecutor;
-import org.bukkit.entity.Player;
-import org.bukkit.event.block.SignChangeEvent;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import com.google.common.base.Preconditions;
+
+import nl.rutgerkok.blocklocker.BlockLockerPlugin;
+import nl.rutgerkok.blocklocker.Permissions;
+import nl.rutgerkok.blocklocker.Translator.Translation;
 
 public final class BlockLockerCommand implements TabExecutor {
-
-    private static <T> T[] copyArray(T[] original) {
-        return Arrays.copyOf(original, original.length);
-    }
 
     private final BlockLockerPlugin plugin;
 
@@ -40,7 +32,7 @@ public final class BlockLockerCommand implements TabExecutor {
         if (args[0].equalsIgnoreCase("reload")) {
             return reloadCommand(sender);
         }
-        return signChangeCommand(sender, args);
+        return false;
     }
 
     @Override
@@ -69,80 +61,6 @@ public final class BlockLockerCommand implements TabExecutor {
         return true;
     }
 
-    private boolean signChangeCommand(CommandSender sender, String[] args) {
-        if (!(sender instanceof Player)) {
-            plugin.getTranslator().sendMessage(sender, Translation.COMMAND_CANNOT_BE_USED_BY_CONSOLE);
-            return true;
-        }
 
-        Player player = (Player) sender;
-        Optional<Sign> selectedSign = plugin.getSignSelector().getSelectedSign(player);
-        if (!selectedSign.isPresent()) {
-            plugin.getTranslator().sendMessage(player, Translation.COMMAND_NO_SIGN_SELECTED);
-            return true;
-        }
-
-        if (args.length > 2) {
-            return false;
-        }
-
-        // Parse line number
-        int lineNumber;
-        try {
-            lineNumber = Integer.parseInt(args[0]);
-        } catch (NumberFormatException e) {
-            if (args[0].equals("~")) {
-                // Place on first available line, or else the last line
-                lineNumber = selectedSign.get().getLine(2).isEmpty() ? 3 : 4;
-            } else {
-                return false;
-            }
-        }
-        if (lineNumber < 2 || lineNumber > 4) {
-            plugin.getTranslator().sendMessage(player, Translation.COMMAND_LINE_NUMBER_OUT_OF_BOUNDS);
-            return true;
-        }
-
-        // Parse name
-        String name = args.length > 1 ? args[1] : "";
-        if (name.length() > 25) {
-            plugin.getTranslator().sendMessage(player, Translation.COMMAND_PLAYER_NAME_TOO_LONG);
-            return true;
-        }
-
-        // Check protection
-        Sign sign = selectedSign.get();
-        Optional<SignType> signType = plugin.getSignParser().getSignType(sign);
-        Optional<Protection> protection = plugin.getProtectionFinder().findProtection(sign.getBlock());
-
-        if (!protection.isPresent() || !signType.isPresent()) {
-            plugin.getTranslator().sendMessage(player, Translation.COMMAND_SIGN_NO_LONGER_PART_OF_PROTECTION);
-            return true;
-        }
-
-        // Check line number in combination with sign type
-        if (signType.get().isMainSign() && lineNumber == 2 && !player.hasPermission(Permissions.CAN_EDIT)) {
-            plugin.getTranslator().sendMessage(player, Translation.COMMAND_CANNOT_EDIT_OWNER);
-            return true;
-        }
-
-        // Prepare change of the sign
-        String[] newLines = copyArray(sign.getLines());
-        newLines[lineNumber - 1] = name;
-
-        // Commit the changes
-        SignChangeEvent changeEvent = new SignChangeEvent(sign.getBlock(), player, newLines);
-        plugin.callEvent(changeEvent);
-        if (!changeEvent.isCancelled()) {
-            newLines = changeEvent.getLines();
-            for (int i = 0; i < newLines.length; i++) {
-                sign.setLine(i, newLines[i]);
-            }
-            sign.update();
-            plugin.getTranslator().sendMessage(player, Translation.COMMAND_UPDATED_SIGN);
-        }
-
-        return true;
-    }
 
 }

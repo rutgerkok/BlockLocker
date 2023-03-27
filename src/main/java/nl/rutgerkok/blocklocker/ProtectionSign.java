@@ -41,8 +41,8 @@ public interface ProtectionSign {
     SignType getType();
 
     /**
-     * Returns true if this sign is saved in an outdated way (plain text, old hacky
-     * format) and would require a resave.
+     * Returns true if this sign is saved in an outdated way (plain text, missing
+     * header color/wrong casing) and would require a resave.
      *
      * @return Whether the sign requires a resaves.
      */

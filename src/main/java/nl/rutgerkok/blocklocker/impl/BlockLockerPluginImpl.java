@@ -28,7 +28,6 @@ import nl.rutgerkok.blocklocker.ProtectableBlocksSettings;
 import nl.rutgerkok.blocklocker.ProtectionFinder;
 import nl.rutgerkok.blocklocker.ProtectionUpdater;
 import nl.rutgerkok.blocklocker.SignParser;
-import nl.rutgerkok.blocklocker.SignSelector;
 import nl.rutgerkok.blocklocker.Translator;
 import nl.rutgerkok.blocklocker.group.CombinedGroupSystem;
 import nl.rutgerkok.blocklocker.group.GroupSystem;
@@ -62,7 +61,6 @@ public class BlockLockerPluginImpl extends JavaPlugin implements BlockLockerPlug
     private ProtectionFinderImpl protectionFinder;
     private ProtectionUpdater protectionUpdater;
     private SignParser signParser;
-    private SignSelector signSelector;
     private Translator translator;
     private CombinedLocationChecker combinedLocationChecker;
     private HopperCache redstoneProtectCache;
@@ -149,11 +147,6 @@ public class BlockLockerPluginImpl extends JavaPlugin implements BlockLockerPlug
     }
 
     @Override
-    public SignSelector getSignSelector() {
-        return signSelector;
-    }
-
-    @Override
     public Translator getTranslator() {
         return translator;
     }
@@ -206,7 +199,6 @@ public class BlockLockerPluginImpl extends JavaPlugin implements BlockLockerPlug
         BlockFinder blockFinder = BlockFinder.create(signParser, config.getConnectContainers());
         protectionFinder = new ProtectionFinderImpl(blockFinder, chestSettings);
         protectionUpdater = new ProtectionUpdaterImpl(getServer(), signParser, profileFactory);
-        signSelector = new SignSelectorImpl(this);
         redstoneProtectCache = new HopperCacheImpl(this);
     }
 

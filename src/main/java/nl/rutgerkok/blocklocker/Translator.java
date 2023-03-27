@@ -34,7 +34,6 @@ public abstract class Translator {
         PROTECTION_NO_ACCESS,
         PROTECTION_NO_PERMISSION_FOR_CLAIM,
         PROTECTION_NOT_NEARBY,
-        PROTECTION_SELECTED_SIGN,
         TAG_EVERYONE,
         TAG_MORE_USERS,
         TAG_PRIVATE,

@@ -89,14 +89,6 @@ public interface BlockLockerPlugin {
     SignParser getSignParser();
 
     /**
-     * Gets the sign selector, that holds the currently selected signs of all
-     * players.
-     *
-     * @return The sign selector.
-     */
-    SignSelector getSignSelector();
-
-    /**
      * Gets the translator, used to translate messages.
      *
      * @return The translator.

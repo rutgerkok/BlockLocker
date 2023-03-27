@@ -1,22 +1,8 @@
 package nl.rutgerkok.blocklocker.impl.event;
 
-import com.google.common.collect.ImmutableSet;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ClickEvent;
-import nl.rutgerkok.blocklocker.AttackType;
-import nl.rutgerkok.blocklocker.Permissions;
-import nl.rutgerkok.blocklocker.ProtectionSign;
-import nl.rutgerkok.blocklocker.SignType;
-import nl.rutgerkok.blocklocker.Translator.Translation;
-import nl.rutgerkok.blocklocker.event.PlayerProtectionCreateEvent;
-import nl.rutgerkok.blocklocker.impl.BlockLockerPluginImpl;
-import nl.rutgerkok.blocklocker.impl.TextComponents;
-import nl.rutgerkok.blocklocker.location.IllegalLocationException;
-import nl.rutgerkok.blocklocker.profile.PlayerProfile;
-import nl.rutgerkok.blocklocker.profile.Profile;
-import nl.rutgerkok.blocklocker.protection.Protection;
-import nl.rutgerkok.blocklocker.protection.Protection.SoundCondition;
+import java.util.Optional;
+import java.util.Set;
+
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -44,10 +30,20 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import com.google.common.collect.ImmutableSet;
+
+import nl.rutgerkok.blocklocker.AttackType;
+import nl.rutgerkok.blocklocker.Permissions;
+import nl.rutgerkok.blocklocker.ProtectionSign;
+import nl.rutgerkok.blocklocker.SignType;
+import nl.rutgerkok.blocklocker.Translator.Translation;
+import nl.rutgerkok.blocklocker.event.PlayerProtectionCreateEvent;
+import nl.rutgerkok.blocklocker.impl.BlockLockerPluginImpl;
+import nl.rutgerkok.blocklocker.location.IllegalLocationException;
+import nl.rutgerkok.blocklocker.profile.PlayerProfile;
+import nl.rutgerkok.blocklocker.profile.Profile;
+import nl.rutgerkok.blocklocker.protection.Protection;
+import nl.rutgerkok.blocklocker.protection.Protection.SoundCondition;
 
 public final class InteractListener extends EventListener {
 
@@ -189,8 +185,7 @@ public final class InteractListener extends EventListener {
         if (clickedSign) {
             if ((isOwner || player.hasPermission(Permissions.CAN_EDIT)) && !usedOffHand) {
                 Sign sign = (Sign) clickedBlock.getState();
-                plugin.getSignSelector().setSelectedSign(player, sign);
-                sendSelectedSignMessage(player);
+                player.openSign(sign);
             }
             return;
         }
@@ -409,44 +404,6 @@ public final class InteractListener extends EventListener {
             return;
         }
         plugin.runLater(() -> protection.setOpen(false, SoundCondition.ALWAYS), openSeconds * 20);
-    }
-
-    private void sendSelectedSignMessage(Player player) {
-        String message = plugin.getTranslator().get(Translation.PROTECTION_SELECTED_SIGN);
-
-        List<BaseComponent> textComponent = new ArrayList<>();
-        while (true) {
-            int firstOpenBracket = message.indexOf("[");
-            if (firstOpenBracket == -1) {
-                // No new opening bracket
-                TextComponents.addLegacyText(textComponent, message);
-                break;
-            }
-
-            // Add everything up to the closing bracket
-            TextComponents.addLegacyText(textComponent, message.substring(0, firstOpenBracket));
-
-            // Check what's after the opening bracket
-            String remainingMessage = message.substring(firstOpenBracket);
-            int closeBracketIndex = remainingMessage.indexOf("]");
-            if (closeBracketIndex == -1) {
-                TextComponents.addLegacyText(textComponent, remainingMessage);
-                break;
-            }
-
-            // Add this part as link
-            String linkText = remainingMessage.substring(0, closeBracketIndex + 1);
-            String textOnLine = ChatColor.stripColor(linkText);
-            TextComponents.addLegacyText(textComponent, linkText, part -> {
-                        part.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
-                                "/blocklocker:blocklocker ~ " + textOnLine));
-                            });
-
-            // Next!
-            message = remainingMessage.substring(closeBracketIndex + 1);
-        }
-
-        player.spigot().sendMessage(textComponent.toArray(new BaseComponent[textComponent.size()]));
     }
 
     private Material toWallSign(Material signMaterial) {
