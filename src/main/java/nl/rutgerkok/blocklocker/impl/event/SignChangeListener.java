@@ -1,5 +1,16 @@
 package nl.rutgerkok.blocklocker.impl.event;
 
+
+import java.util.Optional;
+
+import org.bukkit.ChatColor;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Sign;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.block.SignChangeEvent;
+
 import nl.rutgerkok.blocklocker.Permissions;
 import nl.rutgerkok.blocklocker.SignType;
 import nl.rutgerkok.blocklocker.Translator.Translation;
@@ -8,19 +19,21 @@ import nl.rutgerkok.blocklocker.impl.BlockLockerPluginImpl;
 import nl.rutgerkok.blocklocker.location.IllegalLocationException;
 import nl.rutgerkok.blocklocker.profile.Profile;
 import nl.rutgerkok.blocklocker.protection.Protection;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.Sign;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.block.SignChangeEvent;
 
-import java.util.Optional;
 
 public class SignChangeListener extends EventListener {
 
     public SignChangeListener(BlockLockerPluginImpl plugin) {
         super(plugin);
+    }
+
+
+    private Optional<SignType> getExistingSignType(Block block) {
+        BlockState blockState = block.getState();
+        if (blockState instanceof Sign) {
+            return plugin.getSignParser().getSignType((Sign) blockState);
+        }
+        return Optional.empty();
     }
 
     private void handleSignNearbyProtection(SignChangeEvent event, Protection protection) {
@@ -29,11 +42,16 @@ public class SignChangeListener extends EventListener {
 
         Profile playerProfile = plugin.getProfileFactory().fromPlayer(player);
         Optional<SignType> newSignType = plugin.getSignParser().getSignType(event);
-        boolean isExistingSign = this.isExistingSign(event.getBlock());
+        Optional<SignType> oldSignType = this.getExistingSignType(event.getBlock());
 
         // Only protection signs should be handled
-        if (!newSignType.isPresent() && !isExistingSign) {
+        if (!newSignType.isPresent() && !oldSignType.isPresent()) {
             return;
+        }
+
+        // If a sign type was already specified, don't allow changing it
+        if (oldSignType.isPresent() && !oldSignType.equals(newSignType)) {
+            event.setLine(0, ChatColor.stripColor(plugin.getChestSettings().getFancyLocalizedHeader(newSignType.get(), event.getLine(0))));
         }
 
         // Only the owner may add (or edit) signs nearby a protection
@@ -43,9 +61,9 @@ public class SignChangeListener extends EventListener {
             return;
         }
 
-        if (newSignType.get().isMainSign()) {
+        if (newSignType.filter(SignType::isMainSign).isPresent()) {
             // Edited a main sign (for an existing protection)
-            if (isExistingSign) {
+            if (oldSignType.isPresent()) {
                 // Make sure the owner name on the sign stays the same
                 // (except for players with the correct permission)
                 if (!player.hasPermission(Permissions.CAN_EDIT)) {
@@ -113,12 +131,12 @@ public class SignChangeListener extends EventListener {
             return;
         }
 
-		// Check event
-		if (this.plugin.callEvent(new PlayerProtectionCreateEvent(event.getPlayer(), block)).isCancelled()) {
-			block.breakNaturally();
-			event.setCancelled(true);
-			return;
-		}
+        // Check event
+        if (this.plugin.callEvent(new PlayerProtectionCreateEvent(event.getPlayer(), block)).isCancelled()) {
+            block.breakNaturally();
+            event.setCancelled(true);
+            return;
+        }
 
         // Make sure the owner name is on the second line
         event.setLine(1, event.getPlayer().getName());
@@ -128,14 +146,6 @@ public class SignChangeListener extends EventListener {
 
         // Send confirmation
         plugin.getTranslator().sendMessage(player, Translation.PROTECTION_CLAIMED_MANUALLY);
-    }
-
-    private boolean isExistingSign(Block block) {
-        BlockState blockState = block.getState();
-        if (blockState instanceof Sign) {
-            return plugin.getSignParser().hasValidHeader((Sign) blockState);
-        }
-        return false;
     }
 
     @EventHandler(ignoreCancelled = true)
