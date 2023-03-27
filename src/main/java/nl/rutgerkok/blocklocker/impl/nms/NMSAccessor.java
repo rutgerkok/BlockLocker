@@ -148,8 +148,6 @@ public final class NMSAccessor implements ServerSpecific {
     final Class<?> WorldServer;
     final Method WorldServer_getTileEntity;
 
-    private final JsonParser jsonParser = new JsonParser();
-
     public NMSAccessor() {
         String version = getMinecraftClassVersion();
         nmsPrefix = "net.minecraft.";
@@ -226,8 +224,8 @@ public final class NMSAccessor implements ServerSpecific {
         Object firstLineObj = ((Object[]) retrieve(nmsSign.get(), TileEntitySign_lines))[0];
         String firstLine = firstLineObj == null ? "" : chatComponentToString(firstLineObj);
 
-        // Parse and sanitize the sting
-        JsonElement data = jsonParser.parse(secretData.get());
+        // Parse and sanitize the string
+        JsonElement data = JsonParser.parseString(secretData.get());
         if (data.isJsonArray()) {
             return new JsonSign(firstLine, data.getAsJsonArray());
         }

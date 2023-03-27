@@ -7,11 +7,11 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 
+import org.bukkit.plugin.Plugin;
+
 import com.google.common.base.Charsets;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
-import org.bukkit.plugin.Plugin;
 
 /**
  * Checks whether an update is available.
@@ -20,8 +20,6 @@ import org.bukkit.plugin.Plugin;
 final class UpdateChecker {
 
     private static final String UPDATE_URL = "https://rutgerkok.nl/tools/updater/blocklocker.php";
-
-    private final JsonParser jsonParser = new JsonParser();
 
     /**
      * Checks online for updates. Blocking method.
@@ -41,7 +39,7 @@ final class UpdateChecker {
         UserAgent.setFor(plugin, connection);
 
         try (InputStream stream = connection.getInputStream()) {
-            JsonObject object = jsonParser.parse(new InputStreamReader(stream, Charsets.UTF_8)).getAsJsonObject();
+            JsonObject object = JsonParser.parseReader(new InputStreamReader(stream, Charsets.UTF_8)).getAsJsonObject();
             return new UpdateCheckResult(object);
         } catch (IOException e) {
             // Just rethrow, don't wrap

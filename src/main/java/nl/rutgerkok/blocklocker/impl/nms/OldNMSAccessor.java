@@ -122,8 +122,6 @@ public final class OldNMSAccessor implements ServerSpecific {
     final Field TileEntitySign_lines;
     final Class<?> WorldServer;
     final Method WorldServer_getTileEntity;
-    
-    private final JsonParser jsonParser = new JsonParser();
 
     public OldNMSAccessor() {
         String version = getMinecraftClassVersion();
@@ -199,7 +197,7 @@ public final class OldNMSAccessor implements ServerSpecific {
         String firstLine = firstLineObj == null ? "" : chatComponentToString(firstLineObj);
 
         // Parse and sanitize the sting
-        JsonElement data = jsonParser.parse(secretData.get());
+        JsonElement data = JsonParser.parseString(secretData.get());
         if (data.isJsonArray()) {
             return new JsonSign(firstLine, data.getAsJsonArray());
         }
