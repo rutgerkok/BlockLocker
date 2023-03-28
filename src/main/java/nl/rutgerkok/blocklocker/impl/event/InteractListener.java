@@ -183,7 +183,7 @@ public final class InteractListener extends EventListener {
 
         // Select signs
         if (clickedSign) {
-            if ((isOwner || player.hasPermission(Permissions.CAN_EDIT)) && !usedOffHand) {
+            if ((isOwner || player.hasPermission(Permissions.CAN_EDIT)) && !usedOffHand && !player.isSneaking()) {
                 Sign sign = (Sign) clickedBlock.getState();
                 player.openSign(sign);
             }

@@ -53,6 +53,7 @@ public class SignChangeListener extends EventListener {
         if (oldSignType.isPresent() && !oldSignType.equals(newSignType)) {
             event.setLine(0, ChatColor.stripColor(plugin.getChestSettings()
                     .getFancyLocalizedHeader(oldSignType.get(), event.getLine(0))));
+            newSignType = oldSignType;
         }
 
         // Only the owner may add (or edit) signs nearby a protection
@@ -69,7 +70,11 @@ public class SignChangeListener extends EventListener {
                 // (except for players with the correct permission)
                 if (!player.hasPermission(Permissions.CAN_EDIT)) {
                     Optional<Profile> owner = protection.getOwner();
-                    if (owner.isPresent()) {
+                    if (owner.isPresent() && !event.getLine(1).equals(owner.get().getDisplayName())) {
+                        if (!event.getLine(1).strip().equals(owner.get().getDisplayName().strip())) {
+                            // Only notify for visible name changes
+                            plugin.getTranslator().sendMessage(player, Translation.COMMAND_CANNOT_EDIT_OWNER);
+                        }
                         event.setLine(1, owner.get().getDisplayName());
                     }
                 }
