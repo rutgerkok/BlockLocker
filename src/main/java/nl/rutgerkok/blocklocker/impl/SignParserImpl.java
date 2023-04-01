@@ -16,11 +16,8 @@ import org.bukkit.persistence.PersistentDataType;
 
 import nl.rutgerkok.blocklocker.ChestSettings;
 import nl.rutgerkok.blocklocker.ProtectionSign;
-import nl.rutgerkok.blocklocker.SecretSignEntry;
 import nl.rutgerkok.blocklocker.SignParser;
 import nl.rutgerkok.blocklocker.SignType;
-import nl.rutgerkok.blocklocker.impl.nms.ServerSpecific;
-import nl.rutgerkok.blocklocker.impl.nms.ServerSpecific.JsonSign;
 import nl.rutgerkok.blocklocker.impl.profile.ProfileFactoryImpl;
 import nl.rutgerkok.blocklocker.profile.Profile;
 
@@ -36,24 +33,11 @@ class SignParserImpl implements SignParser {
             NbtSecretSignEntry.key("profile_2"), NbtSecretSignEntry.key("profile_3") };
 
     private final ChestSettings chestSettings;
-    private final ServerSpecific nms;
     private final ProfileFactoryImpl profileFactory;
 
-    SignParserImpl(ChestSettings chestSettings, ServerSpecific nms,
-            ProfileFactoryImpl profileFactory) {
-        this.nms = nms;
+    SignParserImpl(ChestSettings chestSettings, ProfileFactoryImpl profileFactory) {
         this.profileFactory = profileFactory;
         this.chestSettings = chestSettings;
-    }
-
-    private int countProfileLines(String[] linesOnSign) {
-        int count = 0;
-        for (int i = 1; i < linesOnSign.length; i++) {
-            if (linesOnSign[i].length() > 0) {
-                count++;
-            }
-        }
-        return count;
     }
 
     @Override
@@ -140,53 +124,6 @@ class SignParserImpl implements SignParser {
                 .of(new ProtectionSignImpl(sign.getLocation(), type, profiles, signHadDataMismatch || headerMismatch));
     }
 
-    /**
-     * Used for signs where the hidden text was found.
-     *
-     * @param location
-     *            The location of the sign.
-     * @param jsonSign
-     *            The hidden JSON stored on the sign.
-     * @param linesOnSign
-     *            The displayed lines stored on the sign.
-     * @return The parsed sign, if the sign is actually a protection sign.
-     */
-    private Optional<ProtectionSign> parseOldAdvancedSign(Location location, JsonSign jsonSign, String[] linesOnSign) {
-        SignType signType = getSignTypeOrNull(jsonSign.getFirstLine());
-        if (signType == null) {
-            return Optional.empty();
-        }
-
-        List<Profile> profiles = new ArrayList<>();
-        int lineNumber = 1; // Starts as one, as line 0 contains the sign header
-        for (SecretSignEntry object : jsonSign) {
-            Optional<Profile> oProfile = profileFactory.fromSavedObject(object);
-            if (oProfile.isPresent()) {
-                Profile profile = oProfile.get();
-
-                String lineOnSign = linesOnSign[lineNumber];
-                if (!profile.getDisplayName().equals(lineOnSign)) {
-                    // JSON data doesn't match sign contents, so it must be corrupt or outdated
-                    // Therefore, ignore the data
-                    return parseSimpleSign(location, linesOnSign);
-                }
-
-                profiles.add(profile);
-            }
-            lineNumber++;
-        }
-
-        if (countProfileLines(linesOnSign) > profiles.size()) {
-            // JSON data is incomplete, therefore corrupt or outdated
-            // Therefore, ignore the data
-            return parseSimpleSign(location, linesOnSign);
-        }
-
-        // Last argument == true: we want to save this sign in our new format
-        ProtectionSignImpl protectionSignImpl = new ProtectionSignImpl(location, signType, profiles, true);
-        return Optional.<ProtectionSign>of(protectionSignImpl);
-    }
-
     @Override
     public Optional<ProtectionSign> parseSign(Block sign) {
         Sign signState = (Sign) sign.getState();
@@ -197,14 +134,8 @@ class SignParserImpl implements SignParser {
             return parsedSign;
         }
 
-        // Try old, hacky method
-        JsonSign foundTextData = nms.getJsonData(sign.getWorld(), sign.getX(), sign.getY(), sign.getZ());
-        String[] lines = signState.getLines();
-        if (foundTextData.hasData()) {
-            return parseOldAdvancedSign(sign.getLocation(), foundTextData, lines);
-        }
-
         // Try plain sign, written by the user
+        String[] lines = signState.getLines();
         return parseSimpleSign(sign.getLocation(), lines);
     }
 

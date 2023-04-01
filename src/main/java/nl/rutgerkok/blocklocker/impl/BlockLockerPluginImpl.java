@@ -45,8 +45,6 @@ import nl.rutgerkok.blocklocker.impl.group.SimpleClansGroupSystem;
 import nl.rutgerkok.blocklocker.impl.group.TownyGroupSystem;
 import nl.rutgerkok.blocklocker.impl.group.mcMMOGroupSystem;
 import nl.rutgerkok.blocklocker.impl.location.TownyLocationChecker;
-import nl.rutgerkok.blocklocker.impl.nms.NMSAccessorProvider;
-import nl.rutgerkok.blocklocker.impl.nms.ServerSpecific;
 import nl.rutgerkok.blocklocker.impl.profile.ProfileFactoryImpl;
 import nl.rutgerkok.blocklocker.impl.updater.Updater;
 import nl.rutgerkok.blocklocker.location.CombinedLocationChecker;
@@ -56,7 +54,6 @@ public class BlockLockerPluginImpl extends JavaPlugin implements BlockLockerPlug
     private ChestSettings chestSettings;
     private CombinedGroupSystem combinedGroupSystem;
     private Config config;
-    private ServerSpecific nms;
     private ProfileFactoryImpl profileFactory;
     private ProtectionFinderImpl protectionFinder;
     private ProtectionUpdater protectionUpdater;
@@ -195,7 +192,7 @@ public class BlockLockerPluginImpl extends JavaPlugin implements BlockLockerPlug
         // Parsers and finders
         profileFactory = new ProfileFactoryImpl(combinedGroupSystem, translator);
         chestSettings = new ChestSettingsImpl(translator, config);
-        signParser = new SignParserImpl(chestSettings, nms, profileFactory);
+        signParser = new SignParserImpl(chestSettings, profileFactory);
         BlockFinder blockFinder = BlockFinder.create(signParser, config.getConnectContainers());
         protectionFinder = new ProtectionFinderImpl(blockFinder, chestSettings);
         protectionUpdater = new ProtectionUpdaterImpl(getServer(), signParser, profileFactory);
@@ -228,16 +225,6 @@ public class BlockLockerPluginImpl extends JavaPlugin implements BlockLockerPlug
 
     @Override
     public void onEnable() {
-        // NMS checks
-        try {
-            this.nms = NMSAccessorProvider.create();
-        } catch (Throwable t) {
-            getLogger()
-                    .log(Level.SEVERE, "This Minecraft version is not supported. Find another version of the plugin, if available.", t);
-            Bukkit.getPluginManager().disablePlugin(this);
-            return;
-        }
-
         loadServices();
 
         // Events
