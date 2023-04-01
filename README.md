@@ -1,7 +1,7 @@
 BlockLocker
 ===========
 
-[![Build Status](https://github.com/rutgerkok/BlockLocker/actions/workflows/build.yml)](https://img.shields.io/github/actions/workflow/status/rutgerkok/BlockLocker/build.yml?branch=master) [![Download at SpigotMC.org](https://img.shields.io/badge/download-SpigotMC.org-orange.svg)](http://www.spigotmc.org/resources/blocklocker.3268/)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/rutgerkok/BlockLocker/build.yml?branch=master)](https://github.com/rutgerkok/BlockLocker/actions/workflows/build.yml) [![Download at SpigotMC.org](https://img.shields.io/badge/download-SpigotMC.org-orange.svg)](http://www.spigotmc.org/resources/blocklocker.3268/)
 [![Latest release](https://img.shields.io/github/release/rutgerkok/BlockLocker.svg)](https://github.com/rutgerkok/BlockLocker/releases)
 [![Commits since latest release](https://img.shields.io/github/commits-since/rutgerkok/BlockLocker/latest.svg)](https://github.com/rutgerkok/BlockLocker/releases)
 
