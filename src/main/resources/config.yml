@@ -79,7 +79,9 @@ connectContainers: false
 # http://minecraft.gamepedia.com/Data_values#Door
 protectableDoors:
 - acacia_door
+- bamboo_door
 - birch_door
+- cherry_door
 - crimson_door
 - dark_oak_door
 - iron_door
@@ -99,8 +101,12 @@ protectableDoors:
 protectableAttachables:
 - acacia_fence_gate
 - acacia_trapdoor
+- bamboo_fence_gate
+- bamboo_trapdoor
 - birch_fence_gate
 - birch_trapdoor
+- cherry_fence_gate
+- cherry_trapdoor
 - crimson_fence_gate
 - crimson_trapdoor
 - dark_oak_fence_gate
