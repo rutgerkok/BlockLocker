@@ -75,7 +75,7 @@ public class BlockDestroyListener extends EventListener {
         Player player = event.getPlayer();
         Profile profile = plugin.getProfileFactory().fromPlayer(player);
         if (!protection.get().isOwner(profile)) {
-            if (player.hasPermission(Permissions.CAN_EDIT)) {
+            if (player.hasPermission(Permissions.CAN_ADMIN)) {
                 String ownerName = protection.get().getOwnerDisplayName();
                 plugin.getTranslator().sendMessage(player, Translation.PROTECTION_BYPASSED, ownerName);
             } else if (isExpired(protection.get())){

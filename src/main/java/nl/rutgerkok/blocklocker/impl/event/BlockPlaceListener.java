@@ -64,7 +64,7 @@ public final class BlockPlaceListener extends EventListener {
         if (interferingProtection.isPresent()) {
             // Not allowed to place a block here, would interfere with an existing
             // protection
-            if (!event.getPlayer().hasPermission(Permissions.CAN_EDIT)) {
+            if (!event.getPlayer().hasPermission(Permissions.CAN_ADMIN)) {
                 plugin.getTranslator().sendMessage(player, Translation.PROTECTION_NO_ACCESS, interferingProtection.get()
                         .getOwnerDisplayName());
                 event.setCancelled(true);

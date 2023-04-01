@@ -57,7 +57,7 @@ public class SignChangeListener extends EventListener {
         }
 
         // Only the owner may add (or edit) signs nearby a protection
-        if (!protection.isOwner(playerProfile) && !player.hasPermission(Permissions.CAN_EDIT)) {
+        if (!protection.isOwner(playerProfile) && !player.hasPermission(Permissions.CAN_ADMIN)) {
             plugin.getTranslator().sendMessage(player, Translation.PROTECTION_CANNOT_CHANGE_SIGN);
             event.setCancelled(true);
             return;
@@ -68,7 +68,7 @@ public class SignChangeListener extends EventListener {
             if (oldSignType.isPresent()) {
                 // Make sure the owner name on the sign stays the same
                 // (except for players with the correct permission)
-                if (!player.hasPermission(Permissions.CAN_EDIT)) {
+                if (!player.hasPermission(Permissions.CAN_ADMIN)) {
                     Optional<Profile> owner = protection.getOwner();
                     if (owner.isPresent() && !event.getLine(1).equals(owner.get().getDisplayName())) {
                         if (!event.getLine(1).strip().equals(owner.get().getDisplayName().strip())) {

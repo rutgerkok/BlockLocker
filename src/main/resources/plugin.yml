@@ -10,10 +10,10 @@ permissions:
     description: "Protect containers and doors."
     default: true
   blocklocker.bypass:
-    description: "Bypass someone else's protection."
+    description: "Bypass someone else's protection, but don't allow destroying it."
     default: op
-  blocklocker.edit:
-    description: "Edit someone else's protection."
+  blocklocker.admin:
+    description: "Edit someone's protection signs, or remove the protection entirely."
     default: op
   blocklocker.reload:
     description: "Reload the plugin using /blocklocker reload."
