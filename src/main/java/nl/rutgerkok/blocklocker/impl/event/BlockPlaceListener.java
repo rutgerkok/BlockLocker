@@ -1,12 +1,10 @@
 package nl.rutgerkok.blocklocker.impl.event;
 
-import nl.rutgerkok.blocklocker.Permissions;
-import nl.rutgerkok.blocklocker.Translator.Translation;
-import nl.rutgerkok.blocklocker.impl.BlockLockerPluginImpl;
-import nl.rutgerkok.blocklocker.impl.blockfinder.BlockFinder;
-import nl.rutgerkok.blocklocker.location.IllegalLocationException;
-import nl.rutgerkok.blocklocker.profile.PlayerProfile;
-import nl.rutgerkok.blocklocker.protection.Protection;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+
 import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
@@ -19,10 +17,13 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.InventoryHolder;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import nl.rutgerkok.blocklocker.Permissions;
+import nl.rutgerkok.blocklocker.Translator.Translation;
+import nl.rutgerkok.blocklocker.impl.BlockLockerPluginImpl;
+import nl.rutgerkok.blocklocker.impl.blockfinder.BlockFinder;
+import nl.rutgerkok.blocklocker.location.IllegalLocationException;
+import nl.rutgerkok.blocklocker.profile.PlayerProfile;
+import nl.rutgerkok.blocklocker.protection.Protection;
 
 public final class BlockPlaceListener extends EventListener {
 
@@ -102,18 +103,21 @@ public final class BlockPlaceListener extends EventListener {
      */
     private void sendChestHint(Player player) {
         UUID playerId = player.getUniqueId();
-        if (this.doNotSendChestHintPlayerIds.contains(playerId)) {
-            return;
-        }
-        plugin.getTranslator().sendMessage(player, Translation.PROTECTION_CHEST_HINT);
+        synchronized (this.doNotSendChestHintPlayerIds) {
+            if (this.doNotSendChestHintPlayerIds.contains(playerId)) {
+                return;
+            }
+            plugin.getTranslator().sendMessage(player, Translation.PROTECTION_CHEST_HINT);
 
-        // Temporarily suppress chest hint (120 seconds)
-        this.doNotSendChestHintPlayerIds.add(playerId);
-        plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+            // Temporarily suppress chest hint (120 seconds)
+            this.doNotSendChestHintPlayerIds.add(playerId);
+        }
+        plugin.runLaterGlobally(() -> {
             // Note: we only keep a reference to the player id, not the entire player
             // object, which might be replaced
-            this.doNotSendChestHintPlayerIds
-                    .remove(playerId);
+            synchronized (this.doNotSendChestHintPlayerIds) {
+                this.doNotSendChestHintPlayerIds.remove(playerId);
+            }
         }, 20 * 120);
     }
 

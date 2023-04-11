@@ -2,6 +2,7 @@ package nl.rutgerkok.blocklocker;
 
 import java.util.logging.Logger;
 
+import org.bukkit.block.Block;
 import org.bukkit.event.Event;
 
 import nl.rutgerkok.blocklocker.group.CombinedGroupSystem;
@@ -103,18 +104,36 @@ public interface BlockLockerPlugin {
     /**
      * Runs a task the next tick on the server thread.
      *
+     * @param block
+     *            Used to run the task in the region of the block (when using the
+     *            Folia server).
      * @param runnable
      *            The task.
      */
-    void runLater(Runnable runnable);
+    void runLater(Block block, Runnable runnable);
 
     /**
      * Runs a task in the given amount of ticks on the server thread.
+     *
+     * @param block
+     *            Used to run the task in the region of the block (when using the
+     *            Folia server).
+     * @param runnable
+     *            The task.
+     * @param ticks
+     *            In how many ticks the method needs to run.
+     */
+    void runLater(Block block, Runnable runnable, int ticks);
+
+    /**
+     * Runs a task on the server thread. On Folia, this thread only controls things
+     * that don't belong to a specific region, like weather and time.
      *
      * @param runnable
      *            The task.
      * @param ticks
      *            In how many ticks the method needs to run.
      */
-    void runLater(Runnable runnable, int ticks);
+    void runLaterGlobally(Runnable runnable, int ticks);
+
 }

@@ -5,6 +5,7 @@ author: Rutger Kok
 load: startup
 api-version: 1.18
 softdepend: [Guilds, Factions, mcMMO, Towny]
+folia-supported: true
 permissions:
   blocklocker.protect:
     description: "Protect containers and doors."

@@ -1,8 +1,8 @@
 package nl.rutgerkok.blocklocker;
 
 import java.util.Date;
-import java.util.UUID;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -31,7 +31,6 @@ public final class BlockLockerAPIv2 {
      *            The block.
      * @return The owner, or empty if the block is not protected.
      */
-    @SuppressWarnings("deprecation")
     public static Optional<OfflinePlayer> getOwner(Block block) {
         Optional<Protection> protection = getPlugin().getProtectionFinder().findProtection(block);
         if (!protection.isPresent()) {

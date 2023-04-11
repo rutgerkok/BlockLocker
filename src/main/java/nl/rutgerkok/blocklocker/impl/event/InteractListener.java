@@ -403,13 +403,15 @@ public final class InteractListener extends EventListener {
         if (openSeconds <= 0) {
             return;
         }
-        plugin.runLater(() -> protection.setOpen(false, SoundCondition.ALWAYS), openSeconds * 20);
+        plugin.runLater(protection
+                .getSomeProtectedBlock(), () -> protection.setOpen(false, SoundCondition.ALWAYS), openSeconds * 20);
     }
 
     private Material toWallSign(Material signMaterial) {
         return Material.valueOf(signMaterial.name().replace("_SIGN", "_WALL_SIGN"));
     }
 
+    @SuppressWarnings("deprecation")
     private boolean tryPlaceSign(Player player, Block block, BlockFace clickedSide, EquipmentSlot hand,
             SignType signType) {
         if (player.isSneaking() || !canBuildInMode(player.getGameMode())) {

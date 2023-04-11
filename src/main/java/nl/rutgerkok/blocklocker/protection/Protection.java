@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Optional;
 
+import org.bukkit.block.Block;
+
 import nl.rutgerkok.blocklocker.ProtectionSign;
 import nl.rutgerkok.blocklocker.profile.Profile;
 
@@ -48,6 +50,14 @@ public interface Protection {
      * @see #isAllowed(Profile)
      */
     Collection<Profile> getAllowed();
+
+    /**
+     * Gets the location of the protection. Returns one of the blocks in the
+     * protection (if there are multiple blocks), and not one of the signs.
+     *
+     * @return The location.
+     */
+    Block getSomeProtectedBlock();
 
     /**
      * Gets the amount of seconds the door should stay open, before closing

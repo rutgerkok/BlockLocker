@@ -92,6 +92,7 @@ class PlayerProfileImpl implements PlayerProfile {
         return displayName.equalsIgnoreCase(otherProfile.getDisplayName());
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public boolean isExpired(Date cutoffDate) {
 

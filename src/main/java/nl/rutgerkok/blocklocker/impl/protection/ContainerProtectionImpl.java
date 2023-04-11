@@ -69,6 +69,10 @@ public final class ContainerProtectionImpl extends AbstractProtection implements
         super(mainSign);
         this.blocks = blocks;
         this.blockFinder = blockFinder;
+
+        if (this.blocks.isEmpty()) {
+            throw new IllegalArgumentException("Blocks list is empty");
+        }
     }
 
     @Override
@@ -89,6 +93,14 @@ public final class ContainerProtectionImpl extends AbstractProtection implements
     }
 
     @Override
+    public Block getSomeProtectedBlock() {
+        for (Block block : this.blocks) {
+            return block;
+        }
+        throw new AssertionError("Block list was empty, this should have been checked in the constructor");
+    }
+
+    @Override
     public boolean isOpen() {
         for (Block block : blocks) {
             BlockData materialData = block.getBlockData();
@@ -98,7 +110,6 @@ public final class ContainerProtectionImpl extends AbstractProtection implements
         }
         return false;
     }
-
 
     private boolean setBlockOpen(Block block, boolean open) {
         BlockData materialData = block.getBlockData();

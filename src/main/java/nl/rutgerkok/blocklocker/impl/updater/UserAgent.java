@@ -10,10 +10,6 @@ import org.bukkit.plugin.Plugin;
  */
 final class UserAgent {
 
-    private UserAgent() {
-
-    }
-
     /**
      * Sets the correct user agent as used by this plugin on the request.
      *
@@ -23,7 +19,12 @@ final class UserAgent {
      *            The request to set the user agent on.
      */
     static void setFor(Plugin plugin, URLConnection connection) {
+        @SuppressWarnings("deprecation")
         String agent = "Mozilla/5.0 (" + plugin.getName() + "/" + plugin.getDescription().getVersion() + ")";
         connection.setRequestProperty("User-Agent", agent);
+    }
+
+    private UserAgent() {
+
     }
 }

@@ -53,10 +53,12 @@ class SignParserImpl implements SignParser {
 
     @Override
     public Optional<SignType> getSignType(Sign sign) {
+        @SuppressWarnings("deprecation")
         String header = sign.getLine(0);
         return Optional.ofNullable(getSignTypeOrNull(header));
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public Optional<SignType> getSignType(SignChangeEvent event) {
         return Optional.ofNullable(getSignTypeOrNull(event.getLine(0)));
@@ -78,6 +80,7 @@ class SignParserImpl implements SignParser {
     }
 
     private Optional<ProtectionSign> parseAdvancedSign(Sign sign) {
+        @SuppressWarnings("deprecation")
         String[] displayedText = sign.getLines();
         PersistentDataContainer data = sign.getPersistentDataContainer();
 
@@ -95,6 +98,7 @@ class SignParserImpl implements SignParser {
         }
 
         // Check header
+        @SuppressWarnings("deprecation")
         String header = sign.getLine(0);
         boolean headerMismatch = !chestSettings.getFancyLocalizedHeader(type, header).equals(header);
 
@@ -135,6 +139,7 @@ class SignParserImpl implements SignParser {
         }
 
         // Try plain sign, written by the user
+        @SuppressWarnings("deprecation")
         String[] lines = signState.getLines();
         return parseSimpleSign(sign.getLocation(), lines);
     }
@@ -166,6 +171,7 @@ class SignParserImpl implements SignParser {
         return Optional.<ProtectionSign>of(protectionSignImpl);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void saveSign(ProtectionSign sign) {
         // Find sign

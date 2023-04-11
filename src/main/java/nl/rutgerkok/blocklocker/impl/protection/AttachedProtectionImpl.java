@@ -94,6 +94,11 @@ public final class AttachedProtectionImpl extends AbstractProtection implements 
     }
 
     @Override
+    public Block getSomeProtectedBlock() {
+        return protectionBlock;
+    }
+
+    @Override
     public boolean isOpen() {
         BlockData materialData = protectionBlock.getBlockData();
         if (isFunctionalOpenable(materialData)) {

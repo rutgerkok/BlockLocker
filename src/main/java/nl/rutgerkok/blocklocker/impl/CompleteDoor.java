@@ -260,6 +260,27 @@ public final class CompleteDoor {
     }
 
     /**
+     * Returns one of the two (or four) door blocks.
+     *
+     * @return One of the two (or four) blocks.
+     */
+    public Block getSomeDoorBlock() {
+        if (this.bottomLeftBlock != null) {
+            return this.bottomLeftBlock;
+        }
+        if (this.bottomRightBlock != null) {
+            return this.bottomRightBlock;
+        }
+        if (this.topLeftBlock != null) {
+            return this.topLeftBlock;
+        }
+        if (this.topRightBlock != null) {
+            return this.topRightBlock;
+        }
+        throw new IllegalStateException("All four door blocks where null, this should not be possible");
+    }
+
+    /**
      * Gets whether the door is currently open. The result is undefined if the
      * door is half-open, half-closed.
      *

@@ -2,6 +2,8 @@ package nl.rutgerkok.blocklocker.impl.protection;
 
 import java.util.Collection;
 
+import org.bukkit.block.Block;
+
 import nl.rutgerkok.blocklocker.ProtectionSign;
 import nl.rutgerkok.blocklocker.impl.CompleteDoor;
 import nl.rutgerkok.blocklocker.impl.blockfinder.BlockFinder;
@@ -24,7 +26,7 @@ public final class DoorProtectionImpl extends AbstractProtection implements Door
      *            The block finder.
      * @param door
      *            The door.
-     * 
+     *
      * @return The door protection object.
      */
     public static Protection fromDoorWithSign(ProtectionSign sign, BlockFinder blockFinder, CompleteDoor door) {
@@ -69,6 +71,11 @@ public final class DoorProtectionImpl extends AbstractProtection implements Door
     @Override
     protected Collection<ProtectionSign> fetchSigns() {
         return blockFinder.findAttachedSigns(door.getBlocksForSigns());
+    }
+
+    @Override
+    public Block getSomeProtectedBlock() {
+        return this.door.getSomeDoorBlock();
     }
 
     @Override

@@ -9,10 +9,8 @@ import java.util.regex.Pattern;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 
-import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
-
 import nl.rutgerkok.blocklocker.Translator;
+import nl.rutgerkok.blocklocker.impl.BlockLockerPluginImpl;
 import nl.rutgerkok.blocklocker.impl.updater.UpdateResult.Status;
 
 /**
@@ -26,21 +24,11 @@ public final class Updater {
      */
     private static final long CHECK_INTERVAL = 20 * 60 * 60 * 12;
 
-    private final Plugin plugin;
+    private final BlockLockerPluginImpl plugin;
     private volatile UpdatePreference preference;
-    private final BukkitRunnable task = new BukkitRunnable() {
-        @Override
-        public void run() {
-            if (preference.checkForUpdates()) {
-                updateSync();
-            } else {
-                this.cancel();
-            }
-        }
-    };
     private final Translator translator;
 
-    public Updater(UpdatePreference preference, Translator translator, Plugin plugin) {
+    public Updater(UpdatePreference preference, Translator translator, BlockLockerPluginImpl plugin) {
         this.preference = Preconditions.checkNotNull(preference);
         this.translator = Preconditions.checkNotNull(translator);
         this.plugin = Preconditions.checkNotNull(plugin);
@@ -77,12 +65,12 @@ public final class Updater {
         if (plugin.getServer().isPrimaryThread()) {
             notifyServerFromServerThread(result);
         } else {
-            plugin.getServer().getScheduler().runTask(plugin, new Runnable() {
+            plugin.runLaterGlobally(new Runnable() {
                 @Override
                 public void run() {
                     notifyServerFromServerThread(result);
                 }
-            });
+            }, 1);
         }
     }
 
@@ -109,7 +97,13 @@ public final class Updater {
         if (!preference.checkForUpdates()) {
             return;
         }
-        task.runTaskTimerAsynchronously(plugin, 1, CHECK_INTERVAL);
+        plugin.runTimerAsync(task -> {
+            if (preference.checkForUpdates()) {
+                updateSync();
+            } else {
+                task.cancel();
+            }
+        }, CHECK_INTERVAL);
     }
 
     private void updateInstallSync(UpdateCheckResult result) throws IOException {
