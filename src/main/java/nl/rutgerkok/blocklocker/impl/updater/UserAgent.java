@@ -19,7 +19,6 @@ final class UserAgent {
      *            The request to set the user agent on.
      */
     static void setFor(Plugin plugin, URLConnection connection) {
-        @SuppressWarnings("deprecation")
         String agent = "Mozilla/5.0 (" + plugin.getName() + "/" + plugin.getDescription().getVersion() + ")";
         connection.setRequestProperty("User-Agent", agent);
     }

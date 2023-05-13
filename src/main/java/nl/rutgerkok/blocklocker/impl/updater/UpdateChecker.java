@@ -31,7 +31,6 @@ final class UpdateChecker {
      *             If an IO error occurs.
      */
     public UpdateCheckResult checkForUpdatesSync(Plugin plugin) throws IOException {
-        @SuppressWarnings("deprecation")
         String currentVersionEncoded = URLEncoder.encode(plugin.getDescription().getVersion(), "UTF-8");
         URL url = new URL(UPDATE_URL + "?version=" + currentVersionEncoded);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();

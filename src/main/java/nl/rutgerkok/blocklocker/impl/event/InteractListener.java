@@ -411,7 +411,6 @@ public final class InteractListener extends EventListener {
         return Material.valueOf(signMaterial.name().replace("_SIGN", "_WALL_SIGN"));
     }
 
-    @SuppressWarnings("deprecation")
     private boolean tryPlaceSign(Player player, Block block, BlockFace clickedSide, EquipmentSlot hand,
             SignType signType) {
         if (player.isSneaking() || !canBuildInMode(player.getGameMode())) {

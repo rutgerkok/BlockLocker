@@ -26,11 +26,12 @@ public final class BlockLockerAPIv2 {
 
     /**
      * Gets the owner of the given block.
-     * 
+     *
      * @param block
      *            The block.
      * @return The owner, or empty if the block is not protected.
      */
+    @SuppressWarnings("deprecation")
     public static Optional<OfflinePlayer> getOwner(Block block) {
         Optional<Protection> protection = getPlugin().getProtectionFinder().findProtection(block);
         if (!protection.isPresent()) {
@@ -54,7 +55,7 @@ public final class BlockLockerAPIv2 {
 
     /**
      * Gets the display name of the owner of the block.
-     * 
+     *
      * @param block
      *            The block.
      * @return The display name, or {@code Optional.empty()} if the block isn't
@@ -83,7 +84,7 @@ public final class BlockLockerAPIv2 {
 
     /**
      * Checks if the player is allowed in the protection.
-     * 
+     *
      * @param player
      *            The player to check.
      * @param block
@@ -132,7 +133,7 @@ public final class BlockLockerAPIv2 {
     /**
      * Gets whether the player is the owner of the protection. Only owners are
      * allowed to destroy the protection.
-     * 
+     *
      * @param player
      *            The player.
      * @param block

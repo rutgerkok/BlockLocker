@@ -8,7 +8,6 @@ import java.io.Reader;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 
@@ -17,11 +16,9 @@ import org.bukkit.block.Block;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.Event;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
-import org.jetbrains.annotations.NotNull;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
@@ -67,7 +64,7 @@ public class BlockLockerPluginImpl extends JavaPlugin implements BlockLockerPlug
     private SignParser signParser;
     private Translator translator;
     private CombinedLocationChecker combinedLocationChecker;
-
+    private SchedulerSupport schedulerSupport;
     private HopperCache redstoneProtectCache;
 
     @Override
@@ -186,6 +183,9 @@ public class BlockLockerPluginImpl extends JavaPlugin implements BlockLockerPlug
     }
 
     private void loadServices() {
+        // Scheduler
+        schedulerSupport = new SchedulerSupport(this);
+
         // Configuration
         saveDefaultConfig();
         config = new Config(getLogger(), getConfig());
@@ -271,26 +271,17 @@ public class BlockLockerPluginImpl extends JavaPlugin implements BlockLockerPlug
 
     @Override
     public void runLater(Block block, Runnable runnable) {
-        getServer().getRegionScheduler().run(this, block.getLocation(), task -> {
-            runnable.run();
-        });
-        // getServer().getScheduler().runTask(this, runnable);
+        schedulerSupport.runLater(block, runnable);
     }
 
     @Override
     public void runLater(Block block, Runnable runnable, int ticks) {
-        getServer().getRegionScheduler()
-                .runDelayed(this, block.getWorld(), block.getX() >> 4, block.getZ() >> 4, task -> {
-            runnable.run();
-        }, ticks);
-        // getServer().getScheduler().runTaskLater(this, runnable, ticks);
+        schedulerSupport.runLater(block, runnable, ticks);
     }
 
     @Override
     public void runLaterGlobally(Runnable runnable, int ticks) {
-        getServer().getGlobalRegionScheduler().runDelayed(this, task -> {
-            runnable.run();
-        }, ticks);
+        schedulerSupport.runLaterGlobally(runnable, ticks);
     }
 
     /**
@@ -302,41 +293,7 @@ public class BlockLockerPluginImpl extends JavaPlugin implements BlockLockerPlug
      *            The check interval in ticks.
      */
     public void runTimerAsync(Consumer<BukkitTask> task, long checkInterval) {
-        getServer().getAsyncScheduler().runAtFixedRate(this, foliaTask -> {
-            task.accept(new BukkitTask() {
-
-                @Override
-                public void cancel() {
-                    foliaTask.cancel();
-                }
-
-                @Override
-                public @NotNull Plugin getOwner() {
-                    return foliaTask.getOwningPlugin();
-                }
-
-                @Override
-                public int getTaskId() {
-                    throw new UnsupportedOperationException();
-                }
-
-                @Override
-                public boolean isCancelled() {
-                    return foliaTask.isCancelled();
-                }
-
-                @Override
-                public boolean isSync() {
-                    return false;
-                }
-            });
-        }, 1, checkInterval * 50, TimeUnit.MILLISECONDS);
-
-        /*
-         * BukkitTask[] bukkitTask = new BukkitTask[1]; bukkitTask[0] =
-         * getServer().getScheduler().runTaskTimerAsynchronously(this, () -> {
-         * task.accept(bukkitTask[0]::cancel); }, 1, checkInterval);
-         */
+        schedulerSupport.runTimerAsync(task, checkInterval);
     }
 
 }

@@ -36,7 +36,6 @@ public class SignChangeListener extends EventListener {
         return Optional.empty();
     }
 
-    @SuppressWarnings("deprecation")
     private void handleSignNearbyProtection(SignChangeEvent event, Protection protection) {
         Block block = event.getBlock();
         Player player = event.getPlayer();
@@ -94,7 +93,6 @@ public class SignChangeListener extends EventListener {
         updateBlockForUniqueIdsSoon(block);
     }
 
-    @SuppressWarnings("deprecation")
     private void handleSignNotNearbyProtection(SignChangeEvent event) {
         Optional<SignType> parsedSign = plugin.getSignParser().getSignType(event);
         if (!parsedSign.isPresent()) {
