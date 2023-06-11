@@ -14,7 +14,7 @@ import nl.rutgerkok.blocklocker.profile.Profile;
 
 final class ProtectionSignImpl implements ProtectionSign {
 
-    private static final int MAX_PROFILES = 3;
+    private static final int MAX_PROFILES = 6;
     private final SignType signType;
     private final List<Profile> profiles;
     private final Location location;

@@ -15,6 +15,8 @@ import org.bukkit.block.Sign;
 import org.bukkit.block.data.Levelled;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.block.data.type.WallSign;
+import org.bukkit.block.sign.Side;
+import org.bukkit.block.sign.SignSide;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
@@ -474,7 +476,7 @@ public final class InteractListener extends EventListener {
         String[] newLines = plugin.getSignParser().getDisplayLines(protectionSign);
 
         // Test if we can place it
-        SignChangeEvent signChangeEvent = new SignChangeEvent(sign.getBlock(), player, newLines);
+        SignChangeEvent signChangeEvent = new SignChangeEvent(sign.getBlock(), player, newLines, Side.FRONT);
         Bukkit.getPluginManager().callEvent(signChangeEvent);
 
         if (sign.getBlock().getType() != sign.getType()) {
@@ -490,8 +492,9 @@ public final class InteractListener extends EventListener {
         }
 
         // Actually write the text
+        SignSide frontSide = sign.getSide(Side.FRONT);
         for (int i = 0; i < newLines.length; i++) {
-            sign.setLine(i, newLines[i]);
+            frontSide.setLine(i, newLines[i]);
         }
         sign.update();
 

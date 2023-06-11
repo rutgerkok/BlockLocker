@@ -7,6 +7,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
+import org.bukkit.block.sign.Side;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.SignChangeEvent;
@@ -28,10 +29,10 @@ public class SignChangeListener extends EventListener {
     }
 
 
-    private Optional<SignType> getExistingSignType(Block block) {
+    private Optional<SignType> getExistingSignType(Block block, Side side) {
         BlockState blockState = block.getState();
         if (blockState instanceof Sign) {
-            return plugin.getSignParser().getSignType((Sign) blockState);
+            return plugin.getSignParser().getSignType((Sign) blockState, side);
         }
         return Optional.empty();
     }
@@ -42,7 +43,7 @@ public class SignChangeListener extends EventListener {
 
         Profile playerProfile = plugin.getProfileFactory().fromPlayer(player);
         Optional<SignType> newSignType = plugin.getSignParser().getSignType(event);
-        Optional<SignType> oldSignType = this.getExistingSignType(event.getBlock());
+        Optional<SignType> oldSignType = this.getExistingSignType(event.getBlock(), event.getSide());
 
         // Only protection signs should be handled
         if (!newSignType.isPresent() && !oldSignType.isPresent()) {
@@ -81,7 +82,7 @@ public class SignChangeListener extends EventListener {
             } else {
                 // Second main sign is not allowed
                 plugin.getTranslator().sendMessage(player, Translation.PROTECTION_ADD_MORE_USERS_SIGN_INSTEAD);
-                block.breakNaturally();
+                block.breakNaturally(); // Not ideal if other side is the main sign
                 event.setCancelled(true);
                 return;
             }

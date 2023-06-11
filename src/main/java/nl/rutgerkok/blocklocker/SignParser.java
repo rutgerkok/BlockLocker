@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
+import org.bukkit.block.sign.Side;
 import org.bukkit.event.block.SignChangeEvent;
 
 /**
@@ -14,8 +15,11 @@ import org.bukkit.event.block.SignChangeEvent;
 public interface SignParser {
 
     /**
-     * Gets the text-only display lines that should be displayed on the sign.
-     * @param sign The sign.
+     * Gets the text-only display lines that should be displayed on the sign at the
+     * front.
+     *
+     * @param sign
+     *            The sign.
      * @return The display text.
      */
     String[] getDisplayLines(ProtectionSign sign);
@@ -25,9 +29,11 @@ public interface SignParser {
      *
      * @param sign
      *            The sign.
+     * @param side
+     *            The side of the sign to read.
      * @return The type of the sign.
      */
-    Optional<SignType> getSignType(Sign sign);
+    Optional<SignType> getSignType(Sign sign, Side side);
 
     /**
      * Gets the type of the sign from the {@link SignChangeEvent}. The event
