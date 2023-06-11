@@ -63,7 +63,6 @@ final class SchedulerSupport {
                     .getMethod("runAtFixedRate", Plugin.class, Consumer.class, long.class, long.class, TimeUnit.class);
             folia = true;
         } catch (NoSuchMethodException e) {
-            e.printStackTrace(System.err);
             folia = false;
         }
     }
