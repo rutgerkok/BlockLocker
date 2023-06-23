@@ -1,4 +1,4 @@
-# Translations file for the Czech language ([the] Czech Republic) by PetyXbron
+# Translations file for the Czech language. Translations by PetyXbron.
 command:
   cannot_be_used_by_console: "Tento příkaz nelze býti použit konzolí. Promiň!"
   cannot_edit_owner: "&4Nemůžeš změnit majitele zabezpečení Místo toho znič ceduli."
@@ -23,7 +23,6 @@ protection:
   no_access: "&4Tento blok nemůžeš použít, protože je zabezpečen hráčem {0}."
   no_permission_for_claim: "&4Nemáš oprávnění k zabezpečení bloku, promiň."
   not_nearby: "&4Ve tvé blízkosti se nenachází žádný zabezpečitelný blok. Použij (shift a) pravé tlačítko na myši s cedulkou v ruce k jejímu položení a zabezpečení bloku."
-  selected_sign: "&6Cedulka zvolena. Chceš-li upravit tuto cedulku, použij \"/blocklocker <řádek> <jméno>\". Případně přidej (klikem): &n[Redstone]&r&6 &n[Všichni]&r&6."
 tag:
   everyone:
     - "Everyone"
