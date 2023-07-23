@@ -1,0 +1,35 @@
+command:
+  cannot_be_used_by_console: Perintah ini tidak dapat digunakan oleh konsol. Maaf!
+  cannot_edit_owner: '&4Kamu tidak dapat mengganti pemilik proteksi. Hancurkan saja sign itu.'
+  line_number_out_of_bounds: '&4Mohon masukkan nomor baris antara 2 dan 4, inklusif.'
+  no_permission: '&4Kamu tidak punya izin untuk mengeksekusi perintah ini. Maaf!'
+  no_sign_selected: '&4Kamu harus memilih sebuah sign di salah satu blok yang kamu lindungi dulu
+    dengan mengeklik kanan itu.'
+  player_name_too_long: '&4Nama pemain lebih dari 16 karakter, dimana tidak muat pada sign. Itu juga lebih panjang dari yang diperbolekan Mojang untuk nama pemain.'
+  plugin_reloaded: '&6Memuat ulang file konfigurasi!'
+  sign_no_longer_part_of_protection: '&4Sign yang dipilih tidak lagi menjadi milik blok yang dilindungi.'
+  updated_sign: '&6Memperbarui sign!'
+protection:
+  add_more_users_sign_instead: '&4Hanya boleh ada satu sign [Private] pada sebuah proteksi. Tambahkan saja sign [More Users].'
+  bypassed: '&6Kamu baru saja melewati proteksi {0}.'
+  cannot_change_sign: '&4Kamu tidak dapat mengubah sign di dekat kontainer yang sudah diklaim.'
+  chest_hint: '&6Tempatkan sign pada chest ini untuk melindunginya.'
+  claimed_container: '&6Mengklaim kontainer ini. Tidak ada orang lain yang dapat mengaksesnya.'
+  claimed_manually: '&6Berhasil membuat klaim. Hanya orang tercantum pada sign yang dapat mengaksesnya.'
+  expired: '&6Proteksi blok ini sudah kadaluwarsa karena pemiliknya tidak aktif.'
+  in_wilderness: '&4Kamu tidak dapat membuat proteksi disini: kamu berada di hutan belantara.'
+  is_claimed_by: '&6Blok ini sudah diklaim oleh {0}.'
+  no_access: '&4Kamu tidak dapat menggunakan blok ini, itu dilidungi oleh {0}.'
+  no_permission_for_claim: '&4Kamu tidak punya izin untuk mengklaim kontainer, maaf.'
+  not_nearby: '&4Tidak ada block yang dapat dilindungi di dekat sini. (Shift-)klik-kanan kontainer
+    dengan sign di tangan mu untuk melindunginya.'
+tag:
+  everyone: Everyone
+  more_users: ['[More Users]', '[User Lain]']
+  private: ['[Private]', '[Pribadi]']
+  redstone: Redstone
+  timer: Timer
+updater:
+  more_information: '&6Informasi lebih lanjut: {0}'
+  unsupported_server: '&4Versi terbaru BlockLocker (versi {0}) tidak lagi mendukung versi Minecraft ini, hanya Minecraft {1}.'
+  update_available: '&6Pembaruan untuk BlockLocker (versi {0}) tersedia untuk diunduh secara manual.'
