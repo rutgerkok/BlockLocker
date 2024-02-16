@@ -46,6 +46,7 @@ protectableContainers:
 - chipped_anvil
 - cyan_shulker_box
 - crafting_table
+- crafter
 - damaged_anvil
 - dispenser
 - dropper
