@@ -3,11 +3,14 @@ package nl.rutgerkok.blocklocker.impl.event;
 import java.util.Optional;
 import java.util.Set;
 
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
-import org.bukkit.block.DoubleChest;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.Levelled;
 import org.bukkit.block.data.Waterlogged;
@@ -22,11 +25,9 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
@@ -49,7 +50,6 @@ public final class InteractListener extends EventListener {
 
     private static Set<BlockFace> AUTOPLACE_BLOCK_FACES = ImmutableSet.of(BlockFace.NORTH, BlockFace.EAST,
             BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP);
-    private static Set<InventoryType> COMPLEX_SEARCH_INVENTORY = ImmutableSet.of(InventoryType.CHEST);
 
     public InteractListener(BlockLockerPluginImpl plugin) {
         super(plugin);
@@ -123,53 +123,20 @@ public final class InteractListener extends EventListener {
     }
 
     /**
-     * Gets the block the inventory is stored in, or null if the inventory is not
-     * stored in a block.
+     * Gets the block the inventory is currently positioned at. Note: even for
+     * inventories in entities, this will return a block.
      *
-     * @param inventory The inventory.
-     * @return The block, or null.
+     * @param inventory
+     *            The inventory.
+     * @return The block, or null if the inventory doesn't have a location (only
+     *         custom inventories as far as I know).
      */
     private Block getInventoryBlockOrNull(Inventory inventory) {
-        // Performs a fast Block object fetch for containers with only a single block, avoiding the need to fetch a
-        // BlockState. When creating a BlockState Spigot will create a snapshot, which is a rather slow process.
-
-        if(!COMPLEX_SEARCH_INVENTORY.contains(inventory.getType())) {
-            Location inventoryLoc = inventory.getLocation();
-            if (inventoryLoc != null) {
-                return inventoryLoc.getBlock();
-            }
-            return null; // Custom GUI
+        Location location = inventory.getLocation();
+        if (location == null) {
+            return null;
         }
-
-        // Complex search trick for Single Chest
-        // If this is a single chest, we can do same fast fetch just like above
-        if(inventory.getType() == InventoryType.CHEST){
-            Location inventoryLoc = inventory.getLocation();
-            if(inventoryLoc != null){
-                Location invBlockLoc = inventoryLoc.clone();
-                invBlockLoc.setX(inventoryLoc.getBlockX());
-                invBlockLoc.setY(inventoryLoc.getBlockY());
-                invBlockLoc.setZ(inventoryLoc.getBlockZ());
-                // If the two Locations are the same, it means it is not a double chest;
-                // The DoubleChest inventory location is similar like 94.5 64 88.5 (.5)
-                if(inventoryLoc.equals(invBlockLoc)){
-                    return inventoryLoc.getBlock();
-                }
-            }
-        }
-
-        // We've exhausted our means, and now we'll have to use the slowest method just like before.
-        InventoryHolder holder = inventory.getHolder();
-        if (holder instanceof BlockState) {
-            return ((BlockState) holder).getBlock();
-        }
-        if (holder instanceof DoubleChest) {
-            InventoryHolder leftHolder = ((DoubleChest) holder).getLeftSide();
-            if (leftHolder instanceof BlockState) {
-                return ((BlockState) leftHolder).getBlock();
-            }
-        }
-        return null;
+        return location.getBlock();
     }
 
     private org.bukkit.block.data.type.Sign getRotatedSignPost(Player player, Material signMaterial) {
@@ -304,7 +271,7 @@ public final class InteractListener extends EventListener {
     @EventHandler(ignoreCancelled = true)
     public void onInventoryMoveItemEvent(InventoryMoveItemEvent event) {
         Block from = getInventoryBlockOrNull(event.getSource());
-        if(from != null) {
+        if (from != null) {
             if (isRedstoneDenied(from)) {
                 event.setCancelled(true);
                 return;
