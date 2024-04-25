@@ -84,14 +84,22 @@ protectableDoors:
 - bamboo_door
 - birch_door
 - cherry_door
+- copper_door
 - crimson_door
 - dark_oak_door
+- exposed_copper_door
 - iron_door
 - jungle_door
 - mangrove_door
 - oak_door
+- oxidized_copper_door
 - spruce_door
 - warped_door
+- waxed_copper_door
+- waxed_exposed_copper_door
+- waxed_oxidized_copper_door
+- waxed_weathered_copper_door
+- weathered_copper_door
 
 # All protections (except doors) that consist not only of the block listed here,
 # but also of a supporting block. This is normally the block directly below.
