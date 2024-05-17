@@ -1,36 +1,35 @@
 command:
-  cannot_be_used_by_console: '&4Bu komutu panelde kullanamazsınız.'
-  cannot_edit_owner: '&4 Kilidin sahibini değiştiremezsiniz. Değiştirmek yerine tabelayı kırmalısınız.'
-  line_number_out_of_bounds: '&4Lütfen 2-4 arası bir kilit numarası girin.' (Kilit numaranız, kilitlemiş olduğunuz blokların tabela açıklamalarını değiştirirken yardımcı olur.)'
-  no_permission: '&4Bu komutu kullanamazsınız.'
-  no_sign_selected: '&4 Önce kilitli bloklarınızdan bir tanesinin tabelasını seçmelisiniz.'
-  player_name_too_long: '&4 Oyuncu ismi 16 karakterden fazla. Tabelaya sığamayacak kadar çok. Ayrıca Mojang bu kadar fazla karakterli isimlerin kullanımını yasakladı.'
-  plugin_reloaded: '&6Reloaded the configuration files!'
-  sign_no_longer_part_of_protection: '&4 Seçilen tabela korunan bir bloğa ait değil.'
-  updated_sign: '&6Tabelayı güncelledin.'
+  cannot_be_used_by_console: "Bu komut konsol tarafından kullanılamaz. Üzgünüm!"
+  cannot_edit_owner: "&4Korumanın sahibini değiştiremezsiniz. Bunun yerine tabelayı kırın."
+  line_number_out_of_bounds: "&4Lütfen 2 ile 4 arasında bir satır numarası girin, dahil."
+  no_sign_selected: "&4Önce korunan bloklardan birindeki tabelaya sağ tıklayarak seçmelisiniz."
+  no_permission: "&4Bu komutu çalıştırmak için izniniz yok. Üzgünüm!"
+  player_name_too_long: "&4Oyuncu adı 16 karakterden fazla, bu da tabelaya sığmıyor. Ayrıca, Mojang'ın izin verdiği oyuncu adlarından daha uzun."
+  plugin_reloaded: "&6Yapılandırma dosyaları yeniden yüklendi!"
+  sign_no_longer_part_of_protection: "&4Seçilen tabela artık korunan bir bloğa ait değil."
+  updated_sign: "&6Tabela güncellendi!"
 protection:
-  add_more_users_sign_instead: '&4Kilitlenebilir bir blokta [Özel] Tabelası varsa tek bir kişi kullanabilir. Daha çok kişinin kullanması için [Çok Kullanıcı] Tabelası koyun.'
-  bypassed: '&6You have just bypassed a protection of {0}.'
-  cannot_change_sign: '&4Yakınında claim'li bir blok varken tabelayı değiştiremezsiniz.'
-  chest_hint: '&6Bu sandığa diğer oyuncuların erişmesini engellemek için üstüne bir tabela koyun.'
-  claimed_container: '&6Bu sandığı kilitlediniz. Sandığa sadece siz erişebilirsiniz.'
-  claimed_manually: '&6Yeni bir claim oluşturuldu. Sadece tabelada ismi geçen kullanıcılıar bu sandığa erişebilir.'
-  expired: '&6Bu bloğun kilidi sahibinin inaktifliğinden dolayı kaldırıldı.'
-  in_wilderness: '&4Burada bir kilit oluşturamazsın.'
-  is_claimed_by: '&6Bu claimin sahibi: {0}.'
-  no_access: '&4Bu bloğu kullanamazsın. Bu bloğun sahibi: {0}.'
-  no_permission_for_claim: '&4 Bu sandığa erişimin yok.'
-  not_nearby: '&4Burada kilitlenecek bir blok yok, bir bloğun üstüne elinde herhangi bir tabela varken (Shift'e basarak) Sağ tıkla.' 
-  selected_sign: '&6 Tabelayı özelleştirmek için: "/blocklocker <Kilit Numarası> <Ad>" ya da &n[Redstone]&r&6 &n[Everyone]&r&6.} komutlarını kullanabilirsiniz.'
+  add_more_users_sign_instead: "&4Bir korumada yalnızca bir [Özel] tabelası olabilir. Bunun yerine bir [Ekstra Kullanıcı] tabelası ekleyin."
+  bypassed: "&6{0} adlı korumayı atlattınız."
+  can_only_add_protection_sign: "&4Bir korumada yalnızca bir [Özel] ve sıfır veya daha fazla [Ekstra Kullanıcı] tabelası olabilir. Diğer tabelalara izin verilmez."
+  cannot_change_sign: "&4Bir talep edilen konteynerın yakınındaki tabelayı değiştiremezsiniz."
+  chest_hint: "&6Bu sandığın üzerine tabela koyarak koruyun."
+  claimed_container: "&6Bu konteynerı talep ettiniz. Başka kimse erişemez."
+  claimed_manually: "&6Bir talep oluşturuldu. Sadece tabelada listelenen kişiler erişebilir."
+  expired: "&6Bu bloğun koruması sahibin etkin olmaması nedeniyle süresi doldu."
+  in_wilderness: "&4Burada bir koruma oluşturamazsınız: vahşi alandasınız."
+  is_claimed_by: "&6Bu blok {0} tarafından talep edildi."
+  no_access: "&4Bu bloğu kullanamazsınız, {0} tarafından korunuyor."
+  no_permission_for_claim: "&4Bir konteynerı talep etme izniniz yok, üzgünüm."
+  not_nearby: "&4Yakınında korunabilir bir blok yok. Bir tabela taşıyarak bir konteynera (Shift-)sağ tıklayın."
 tag:
-  everyone: ['Herkes', 'Everyone']
-  more_users: ['[Çok Kullanıcılı]', '[More Users]']
-  private: ['[Özel]', '[Private]']
-  redstone: ['Kızıl Taş', 'Redstone']
-  timer: ['Zamanlayıcı', 'Timer']
+  everyone: "Herkes"
+  timer: "Zamanlayıcı"
+  redstone: "Kızıltaş"
+  private: "[Özel]"
+  more_users: "[Ekstra Kullanıcı]"
 updater:
-  more_information: '&6More information: {0}'
-  unsupported_server: '&4The latest version of BlockLocker (version {0}) no longer
-    supports this Minecraft version, only Minecraft {1}.'
-  update_available: '&6An update for BlockLocker (version {0}) is available for manual
-    download.'
+  more_information: "&6Daha fazla bilgi: {0}"
+  unsupported_server: "&4${project.name} 'ın en son sürümü ({0} sürümü) artık bu Minecraft sürümünü desteklemiyor, sadece Minecraft {1}."
+  update_available: "&6${project.name} için bir güncelleme (sürüm {0}) manuel indirme için mevcut."
+  updated_automatically: "&6${project.name} için bir güncelleme mevcut (sürüm {0}). Sunucuyu yeniden başlattığınızda otomatik olarak yüklenecek."
