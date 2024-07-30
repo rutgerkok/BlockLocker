@@ -132,9 +132,14 @@ protectableAttachables:
 - spruce_trapdoor
 - warped_fence_gate
 - warped_trapdoor
-
-
-
+- copper_trapdoor
+- exposed_copper_trapdoor
+- weathered_copper_trapdoor
+- oxidized_copper_trapdoor
+- waxed_copper_trapdoor
+- waxed_exposed_copper_trapdoor
+- waxed_weathered_copper_trapdoor
+- waxed_oxidized_copper_trapdoor
 
 # The default amount of seconds a door stays open before closing automatically.
 # Players can override this value by putting a [Timer:X] tag on the sign, where
