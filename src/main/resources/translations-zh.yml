@@ -25,7 +25,7 @@ protection:
   not_nearby: "&4附近没有可被保护的方块, 手持告示牌按住Shift并右键容器来保护它."
 tag:
   everyone: 
-    - "Everyon"
+    - "Everyone"
     - "所有人"
   timer: 
     - "Timer"
