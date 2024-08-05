@@ -1,6 +1,6 @@
 # Translation file for the Simplified Chinese language. Translations by Halogly.
 command:
-  cannot_be_used_by_console: "該命令無法通過控制檯輸出."
+  cannot_be_used_by_console: "該命令無法通過控制枱輸出."
   cannot_edit_owner: "&4你不能編輯使用者."
   line_number_out_of_bounds: "&4請輸入2~4之間的行號(包括2和4)."
   no_sign_selected: "&4你需要右鍵來選擇告示牌."
@@ -18,7 +18,7 @@ protection:
   claimed_container: "&6已鎖定此容器. 其他人將無法使用."
   claimed_manually: "&6已創建訪問權限. 只有名單上的人才能訪問."
   expired: "&6由於該方塊的擁有者不活躍, 保護已失效."
-  in_wilderness: "&4你不能在這裡創建保護."
+  in_wilderness: "&4你不能在這裏創建保護."
   is_claimed_by: "&6這個方塊屬於 {0}."
   no_access: "&4你不能使用這個方塊, 它屬於 {0}."
   no_permission_for_claim: "&4你沒有權限."
@@ -43,4 +43,4 @@ updater:
   more_information: "&6更多信息: {0}"
   unsupported_server: "&4最新版本的 ${project.name} (version {0}) 不再支持這個Minecraft版本, 需要Minecraft {1} 版本."
   update_available: "&6新版本 ${project.name} (version {0}) 已經可用, 需要手動下載."
-  updated_automatically: "&6${project.name} 有可用更新 (version {0}), 重啟服務器以自動安裝."
+  updated_automatically: "&6${project.name} 有可用更新 (version {0}), 重啓服務器以自動安裝."
