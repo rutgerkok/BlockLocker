@@ -28,7 +28,7 @@ tag:
     - "所有人"
     - "Everyone"
   timer:
-    - "定時"
+    - "計時"
     - "Timer"
   redstone:
     - "紅石"
@@ -40,7 +40,7 @@ tag:
     - "[更多]"
     - "[More Users]"
 updater:
-  more_information: "&6更多信息: {0}"
+  more_information: "&6更多資訊: {0}"
   unsupported_server: "&4最新版本的 ${project.name} (version {0}) 不再支持這個Minecraft版本, 需要Minecraft {1} 版本."
   update_available: "&6新版本 ${project.name} (version {0}) 已經可用, 需要手動下載."
-  updated_automatically: "&6${project.name} 有可用更新 (version {0}), 重啟服務器以自動安裝."
+  updated_automatically: "&6${project.name} 有可用更新 (version {0}), 重啟伺服器以自動更新."
