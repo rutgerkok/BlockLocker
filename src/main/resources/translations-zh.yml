@@ -24,21 +24,21 @@ protection:
   no_permission_for_claim: "&4你没有权限."
   not_nearby: "&4附近没有可被保护的方块, 手持告示牌按住Shift并右键容器来保护它."
 tag:
-  everyone: 
-    - "Everyone"
+  everyone:
     - "所有人"
-  timer: 
-    - "Timer"
+    - "Everyone"
+  timer:
     - "定时"
-  redstone: 
-    - "Redstone"
+    - "Timer"
+  redstone:
     - "红石"
-  private: 
-    - "[Private]"
+    - "Redstone"
+  private:
     - "[私有]"
-  more_users: 
-    - "[More Users]"
+    - "[Private]"
+  more_users:
     - "[更多]"
+    - "[More Users]"
 updater:
   more_information: "&6更多信息: {0}"
   unsupported_server: "&4最新版本的 ${project.name} (version {0}) 不再支持这个Minecraft版本, 需要Minecraft {1} 版本."
