@@ -2,7 +2,7 @@
 command:
   cannot_be_used_by_console: "该命令无法通过控制台输出."
   cannot_edit_owner: "&4你不能编辑使用者."
-  line_number_out_of_bounds: "&4请输入2~4之间的行号(包括2和4)."
+  line_number_out_of_bounds: "&4请输入2~4之间的行数(包括2和4)."
   no_sign_selected: "&4你需要右键来选择告示牌."
   no_permission: "&4你没有权限."
   player_name_too_long: "&4玩家名称过长."
