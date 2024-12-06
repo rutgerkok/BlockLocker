@@ -1,0 +1,33 @@
+command:
+  cannot_be_used_by_console: Xin lỗi!, câu lệnh này không thể sử dụng trong bảng điều khiển.
+  cannot_edit_owner: '&4Bạn không thể thay đổi chủ sở hữu của khối được bảo vệ. Thay vào đó hãy phá hủy cái báng'
+  line_number_out_of_bounds: '&4Xin hãy nhập số dòng giữa 2 và 4.'
+  no_permission: '&4Xin lỗi, nhưng bạn không có quyền để thực hiên câu lệnh này.'
+  no_sign_selected: '&4Bạn phải chọn một cái bảng trên một khối mà bạn đã bảo vệ trước bằng cách đúp chuột phải vào nó.'
+  player_name_too_long: '&4Tên người chơi dài hơn 16 ký tự, nó không đủ chỗ ở trên bảng. Tên này cũng dài hơn giới hạn cho phép của Mojang đối với tên người chơi.'
+  plugin_reloaded: '&6Đã tải lại tệp cài đặt'
+  sign_no_longer_part_of_protection: '&4Bảng đã chọn không còn thuộc về khối được bảo vệ nữa.'
+  updated_sign: '&6Đã cập nhật bảng.'
+protection:
+  add_more_users_sign_instead: '&4Chỉ có thể có một bảng [Riêng tư]. Thêm bảng [Thêm Người Chơi] để thêm nhiều người hơn.'
+  bypassed: '&6Bạn đã bỏ qua các hạn chế truy cập của {0}.'
+  cannot_change_sign: '&4Bạn không thể thay đổi một cái bảng gần một thùng chứa đồ đã có chủ sở hữu.'
+  chest_hint: '&6Đặt một cái bảng trên cái rương này để bảo vệ nó.'
+  claimed_container: '&6Thùng chứa đồ này đã được bảo vệ. Không ai có thể mở được nó.'
+  claimed_manually: '&6Thúng chứa đồ đã được bảo vệ. Chỉ có những người được liệt kê mới mở được nó.'
+  expired: '&6Sự bảo vệ của khối này đã hết hạn vì chủ sỡ hữu của nó đã không hoạt động trong một thời gian dài.'
+  in_wilderness: '&4Bạn không thể bảo vệ khối này: bạn đang ở vùng hoang dã.'
+  is_claimed_by: '&6Khối này đã được sở hữu bởi {0}.'
+  no_access: '&4Bạn không thể sử dụng khối này, nó đang được bảo vệ bởi {0}.'
+  no_permission_for_claim: '&4Xin lỗi, bạn không có quyền sở hữu thùng chứa dồ.'
+  not_nearby: '&4Không có khối nào ở gần có thể được bảo vệ. (Shift-)chuột phải vào một thùng chứa đồ với một cái bảng ở trên tay để bảo vệ nó.'
+tag:
+  everyone: Mọi người
+  more_users: '[Thêm Người Chơi]'
+  private: '[Riêng Tư]'
+  redstone: Đá đỏ
+  timer: Thời gian
+updater:
+  more_information: '&6Thông tin thêm: {0}'
+  unsupported_server: '&4Phiên bản mới nhất của BlockLocker (version {0}) Không còn hỗ trợ phiên bản Minecraft này nữa, chỉ hỗ trợ Minecraft phiên bản {1}.'
+  update_available: '&6Một phiên của BlockLocker (version {0}) đã có sẵn để tải thủ công.'
