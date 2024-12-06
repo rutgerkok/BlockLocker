@@ -1,47 +1,46 @@
-# Translation file for the Chinese language. Translations by by 2125368097.
+# Translation file for the Simplified Chinese language. Translations by Halogly.
 command:
-  cannot_be_used_by_console: 这个命令不能被控制台使用.
-  cannot_edit_owner: '&4你不能编辑拥有者.'
-  line_number_out_of_bounds: '&4请在2-4之间选择一个数字来编辑木牌.'
-  no_permission: '&4你没有执行此命令的权限.'
-  no_sign_selected: '&c你应该右击选择一个木牌.'
-  player_name_too_long: '&c玩家的名字过长.'
-  plugin_reloaded: '&a重载配置!'
-  sign_no_longer_part_of_protection: '&4所选的木牌不属于被保护物品的一部分.'
-  updated_sign: '&a更新木牌!'
+  cannot_be_used_by_console: "该命令无法通过控制台输出."
+  cannot_edit_owner: "&4你不能编辑使用者."
+  line_number_out_of_bounds: "&4请输入2~4之间的行数(包括2和4)."
+  no_sign_selected: "&4你需要右键来选择告示牌."
+  no_permission: "&4你没有权限."
+  player_name_too_long: "&4玩家名称过长."
+  plugin_reloaded: "&6已重新加载配置文件!"
+  sign_no_longer_part_of_protection: "&4选择的告示牌不再属于被保护的方块."
+  updated_sign: "&6已更新告示牌!"
 protection:
-  add_more_users_sign_instead: '&a你只添加了[私有]木牌,再放置一个木牌来支持更多人.'
-  bypassed: '&6你绕过了 {0} 的保护.'
-  can_only_add_protection_sign: "&4在保护中的方块只能放置一个的[私有]和零或更多的[更多使用者]."
-  cannot_change_sign: '&4你不能改变木牌.'
-  chest_hint: '&6用木牌右击箱子来保护它.'
-  claimed_container: '&6已创建私有物品.'
-  claimed_manually: '&6只有木牌上的玩家才能访问它.'
-  expired: '&6这个木牌的保护已经过期了.'
-  in_wilderness: '&4你不能创建私有物品.'
-  is_claimed_by: '&6这个物品被 {0} 所拥有.'
-  no_access: '&4你不能使用这个物品,它被 {0} 的保护中.'
-  no_permission_for_claim: '&4你没有这样做的权限.'
-  not_nearby: '&4附近没有物品被保护,你可以右击木牌来保护物品.'
-  selected_sign: '&6你选择了一个木牌,输入"/blocklocker <行数> <名字>"来编辑木牌.'
+  add_more_users_sign_instead: "&4只能有一个 [私有] 标签. 添加 [更多] 标签来添加更多人."
+  bypassed: "&6你绕过了 {0} 的访问限制."
+  can_only_add_protection_sign: "&4只能有一个 [私有] 标签和零或多个 [更多] 标签. 不允许其他标签."
+  cannot_change_sign: "&4你不能编辑."
+  chest_hint: "&6手持告示牌并右键箱子来锁定箱子."
+  claimed_container: "&6已成功上锁. 其他人将无法使用."
+  claimed_manually: "&6已成功上锁. 只有名单上的人才能访问."
+  expired: "&6由于该方块的拥有者不活跃, 保护已失效."
+  in_wilderness: "&4你不能在这里创建保护."
+  is_claimed_by: "&6这个方块属于 {0}."
+  no_access: "&4你不能使用这个方块, 它属于 {0}."
+  no_permission_for_claim: "&4你没有权限."
+  not_nearby: "&4附近没有可被保护的方块, 手持告示牌按住Shift并右键容器来保护它."
 tag:
-  everyone: 
-  - '所有人'
-  - 'Everyone'
-  more_users:
-  - '[更多使用者]'
-  - '[More Users]'
+  everyone:
+    - "所有人"
+    - "Everyone"
+  timer:
+    - "定时"
+    - "Timer"
+  redstone:
+    - "红石"
+    - "Redstone"
   private:
-  - '[私有]'
-  - '[Private]'
-  redstone: 
-  - '红石'
-  - 'Redstone'
-  timer: 
-  - '计时'
-  - 'Timer'
+    - "[私有]"
+    - "[Private]"
+  more_users:
+    - "[更多]"
+    - "[More Users]"
 updater:
-  more_information: '&6更多信息: {0}'
-  unsupported_server: '&4最新版本的BlockLocker(版本 {0}) 不支持这个服务器版本,只支持MC {1}.'
-  update_available: '&6一个BlockLocker(version {0})的更新现在可选下载了.'
-  updated_automatically: "&6检测到一个BlockLocker(version {0})的更新,在服务器重启时它将自动安装."
+  more_information: "&6更多信息: {0}"
+  unsupported_server: "&4最新版本的 ${project.name} (version {0}) 不再支持这个Minecraft版本, 需要Minecraft {1} 版本."
+  update_available: "&6新版本 ${project.name} (version {0}) 已经可用, 需要手动下载."
+  updated_automatically: "&6${project.name} 有可用更新 (version {0}), 重启服务器以自动更新."

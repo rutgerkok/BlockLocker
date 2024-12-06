@@ -1,28 +1,28 @@
-# Translation file for the Taiwan(China) Traditional Chinese language. Translations by Halogly.
+# Translation file for the Hong Kong(China) Traditional Chinese language. Translations by Halogly.
 command:
   cannot_be_used_by_console: "該命令無法通過控制台輸出."
   cannot_edit_owner: "&4你不能編輯使用者."
   line_number_out_of_bounds: "&4請輸入2~4之間的行數(包括2和4)."
-  no_sign_selected: "&4你需要右鍵來選擇告示牌."
+  no_sign_selected: "&4你需要右鍵來選擇指示牌."
   no_permission: "&4你沒有權限."
   player_name_too_long: "&4玩家名稱過長."
   plugin_reloaded: "&6已重新加載配置文件!"
-  sign_no_longer_part_of_protection: "&4選擇的告示牌不再屬於被保護的方塊."
-  updated_sign: "&6已更新告示牌!"
+  sign_no_longer_part_of_protection: "&4選擇的指示牌不再屬於被保護的方塊."
+  updated_sign: "&6已更新指示牌!"
 protection:
   add_more_users_sign_instead: "&4只能有一個 [私有] 標示. 添加 [更多] 標示來添加更多人."
   bypassed: "&6你繞過了 {0} 的訪問限制."
   can_only_add_protection_sign: "&4只能有一個 [私有] 標示和零或多個 [更多] 標示. 不允許其他標示."
   cannot_change_sign: "&4你不能編輯."
-  chest_hint: "&6手持告示牌並右鍵箱子來鎖定箱子."
+  chest_hint: "&6手持指示牌並右鍵箱子來鎖定箱子."
   claimed_container: "&6已成功上鎖. 其他人將無法使用."
   claimed_manually: "&6已成功上鎖. 只有名單上的人才能訪問."
   expired: "&6由於該方塊的擁有者不活躍, 保護已失效."
-  in_wilderness: "&4你不能在這裡創建保護."
+  in_wilderness: "&4你不能在這裏創建保護."
   is_claimed_by: "&6這個方塊屬於 {0}."
   no_access: "&4你不能使用這個方塊, 它屬於 {0}."
   no_permission_for_claim: "&4你沒有權限."
-  not_nearby: "&4附近沒有可被保護的方塊, 手持告示牌按住Shift並右鍵容器來保護它."
+  not_nearby: "&4附近沒有可被保護的方塊, 手持指示牌按住Shift並右鍵容器來保護它."
 tag:
   everyone:
     - "所有人"
@@ -43,4 +43,4 @@ updater:
   more_information: "&6更多資訊: {0}"
   unsupported_server: "&4最新版本的 ${project.name} (version {0}) 不再支持這個Minecraft版本, 需要Minecraft {1} 版本."
   update_available: "&6新版本 ${project.name} (version {0}) 已經可用, 需要手動下載."
-  updated_automatically: "&6${project.name} 有可用更新 (version {0}), 重啟伺服器以自動更新."
+  updated_automatically: "&6${project.name} 有可用更新 (version {0}), 重啓伺服器以自動更新."
