@@ -1,58 +1,34 @@
 package nl.rutgerkok.blocklocker.impl.protection;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-
+import com.google.common.collect.Lists;
+import nl.rutgerkok.blocklocker.ProtectionSign;
+import nl.rutgerkok.blocklocker.profile.Profile;
+import nl.rutgerkok.blocklocker.profile.TimerProfile;
+import nl.rutgerkok.blocklocker.protection.Protection;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Openable;
 
-import com.google.common.collect.Lists;
-
-import nl.rutgerkok.blocklocker.ProtectionSign;
-import nl.rutgerkok.blocklocker.profile.Profile;
-import nl.rutgerkok.blocklocker.profile.TimerProfile;
-import nl.rutgerkok.blocklocker.protection.Protection;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Base class for protection implementations.
- *
  */
 abstract class AbstractProtection implements Protection {
 
-    /**
-     * Checks if the instance is of {@link Openable} that will open correctly when
-     * you call {@link Openable#setOpen(boolean)}. For barrels, opening them using
-     * {@link Openable#setOpen(boolean)} won't show the inventory, so those
-     * shouldn't be considered openable.
-     *
-     * @param blockData
-     *            The block data.
-     * @return True if the block data is openable in a way that is functional.
-     */
-    protected static boolean isFunctionalOpenable(BlockData blockData) {
-        if (!(blockData instanceof Openable)) {
-            return false;
-        }
-        if (blockData.getMaterial() == Material.BARREL) {
-            return false; // Barrels are openable in Bukkit since 1.19, but then the inventory won't show up
-        }
-        return true;
-    }
     private Optional<Collection<Profile>> allAllowed = Optional.empty();
     private Optional<Profile> owner = Optional.empty();
-
     private Optional<Collection<ProtectionSign>> allSigns = Optional.empty();
 
     /**
      * Constructor for creating the protection with all signs already looked up.
      * Collection may not be empty.
      *
-     * @param signs
-     *            All signs.
+     * @param signs All signs.
      */
     AbstractProtection(Collection<ProtectionSign> signs) {
         Validate.notEmpty(signs);
@@ -64,8 +40,7 @@ abstract class AbstractProtection implements Protection {
      * up. Not all signs are found yet. If it turns out that all signs are
      * needed, {@link #fetchSigns()} will be called.
      *
-     * @param sign
-     *            A sign attached to the protection.
+     * @param sign A sign attached to the protection.
      */
     AbstractProtection(ProtectionSign sign) {
         if (sign.getType().isMainSign()) {
@@ -74,6 +49,25 @@ abstract class AbstractProtection implements Protection {
                 this.owner = Optional.of(profiles.get(0));
             }
         }
+    }
+
+    /**
+     * Checks if the instance is of {@link Openable} that will open correctly when
+     * you call {@link Openable#setOpen(boolean)}. For barrels, opening them using
+     * {@link Openable#setOpen(boolean)} won't show the inventory, so those
+     * shouldn't be considered openable.
+     *
+     * @param blockData The block data.
+     * @return True if the block data is openable in a way that is functional.
+     */
+    protected static boolean isFunctionalOpenable(BlockData blockData) {
+        if (!(blockData instanceof Openable)) {
+            return false;
+        }
+        if (blockData.getMaterial() == Material.BARREL) {
+            return false; // Barrels are openable in Bukkit since 1.19, but then the inventory won't show up
+        }
+        return true;
     }
 
     private Collection<Profile> fetchAllowed(Collection<ProtectionSign> signs) {
@@ -191,5 +185,30 @@ abstract class AbstractProtection implements Protection {
         }
 
         return owner.get().includes(profile);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        if (!(other instanceof AbstractProtection that)) {
+            return false;
+        }
+
+        // Check if both sign lists are equal, ignoring order
+        Collection<ProtectionSign> otherSigns = that.getSigns();
+        Collection<ProtectionSign> ourSigns = this.getSigns();
+        return otherSigns.containsAll(ourSigns) && ourSigns.containsAll(otherSigns);
+    }
+
+    @Override
+    public int hashCode() {
+        // Make sure the hash code does not depend on the order of the signs, to mirror this.equals
+        int hashCode = 0;
+        for (ProtectionSign sign : this.getSigns()) {
+            hashCode += sign.hashCode();
+        }
+        return hashCode;
     }
 }

@@ -3,6 +3,7 @@ package nl.rutgerkok.blocklocker.impl.event;
 import java.util.Optional;
 import java.util.Set;
 
+import nl.rutgerkok.blocklocker.*;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -33,10 +34,6 @@ import org.bukkit.inventory.PlayerInventory;
 
 import com.google.common.collect.ImmutableSet;
 
-import nl.rutgerkok.blocklocker.AttackType;
-import nl.rutgerkok.blocklocker.Permissions;
-import nl.rutgerkok.blocklocker.ProtectionSign;
-import nl.rutgerkok.blocklocker.SignType;
 import nl.rutgerkok.blocklocker.Translator.Translation;
 import nl.rutgerkok.blocklocker.event.PlayerProtectionCreateEvent;
 import nl.rutgerkok.blocklocker.impl.BlockLockerPluginImpl;
@@ -48,7 +45,7 @@ import nl.rutgerkok.blocklocker.protection.Protection.SoundCondition;
 
 public final class InteractListener extends EventListener {
 
-    private static Set<BlockFace> AUTOPLACE_BLOCK_FACES = ImmutableSet.of(BlockFace.NORTH, BlockFace.EAST,
+    private static final Set<BlockFace> AUTOPLACE_BLOCK_FACES = ImmutableSet.of(BlockFace.NORTH, BlockFace.EAST,
             BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP);
 
     public InteractListener(BlockLockerPluginImpl plugin) {
@@ -85,18 +82,10 @@ public final class InteractListener extends EventListener {
         if (gameMode == null) {
             return false;
         }
-        switch (gameMode) {
-            case ADVENTURE:
-                return false;
-            case CREATIVE:
-                return true;
-            case SPECTATOR:
-                return false;
-            case SURVIVAL:
-                return true;
-            default:
-                return false; // Speculative
-        }
+        return switch (gameMode) {
+            case ADVENTURE, SPECTATOR -> false;
+            case CREATIVE, SURVIVAL -> true;
+        };
     }
 
     private boolean checkAllowed(Player player, Protection protection, boolean clickedSign) {
@@ -194,7 +183,8 @@ public final class InteractListener extends EventListener {
         }
 
         // Open (double/trap/fence) doors manually
-        boolean clickedMainBlock = plugin.getChestSettings().canProtect(clickedBlock);
+        boolean clickedMainBlock = plugin.getProtectionFinder().findProtection(clickedBlock, SearchMode.NO_SUPPORTING_BLOCKS)
+                .filter(p -> p.equals(protection)).isPresent();
         if (protection.canBeOpened() && !isSneakPlacing(player) && clickedMainBlock) {
             event.setCancelled(true);
 
@@ -299,6 +289,9 @@ public final class InteractListener extends EventListener {
 
         Player player = event.getPlayer();
         Block block = event.getClickedBlock();
+        if (block == null) {
+            return;
+        }
         Material material = block.getType();
         boolean clickedSign = Tag.STANDING_SIGNS.isTagged(material) || Tag.WALL_SIGNS.isTagged(material);
         // When using the offhand check, access checks must still be performed,
@@ -306,7 +299,7 @@ public final class InteractListener extends EventListener {
         boolean usedOffHand = event.getHand() == EquipmentSlot.OFF_HAND;
         Optional<Protection> protection = plugin.getProtectionFinder().findProtection(block);
 
-        if (!protection.isPresent()) {
+        if (protection.isEmpty()) {
             if (tryPlaceSign(event.getPlayer(), block, event.getBlockFace(), event.getHand(), SignType.PRIVATE)) {
                 event.setCancelled(true);
             }
