@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>nl.rutgerkok</groupId>
     <artifactId>blocklocker</artifactId>
-    <version>1.13-SNAPSHOT</version>
+    <version>1.13</version>
     <packaging>jar</packaging>
     <name>BlockLocker</name>
     <url>https://github.com/rutgerkok/BlockLocker</url>
