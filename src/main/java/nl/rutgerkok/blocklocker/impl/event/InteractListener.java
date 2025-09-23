@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import nl.rutgerkok.blocklocker.*;
+
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -12,6 +13,7 @@ import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.Lectern;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.Levelled;
 import org.bukkit.block.data.Waterlogged;
@@ -25,7 +27,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
-import org.bukkit.event.inventory.InventoryMoveItemEvent;
+import org.bukkit.event.inventory.InventoryMoveItemEvent;                                   
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerTakeLecternBookEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -89,7 +91,7 @@ public final class InteractListener extends EventListener {
         };
     }
 
-    private boolean checkAllowed(Player player, Protection protection, boolean clickedSign) {
+    private boolean checkAllowed(Player player, Protection protection, boolean clickedSign, Block container) {
         PlayerProfile playerProfile = plugin.getProfileFactory().fromPlayer(player);
         boolean allowed = protection.isAllowed(playerProfile);
 
@@ -104,6 +106,11 @@ public final class InteractListener extends EventListener {
             allowed = true;
             if (!clickedSign) {
                 // Only show message about bypass when not clicking a sign
+                if (container.getType() == Material.LECTERN) {
+                    if ((((Lectern) container.getState()).getInventory().contains(Material.WRITABLE_BOOK)) || (((Lectern) container.getState()).getInventory().contains(Material.WRITTEN_BOOK))) {
+                        return allowed;
+                    }
+                }
                 String ownerName = protection.getOwnerDisplayName();
                 plugin.getTranslator().sendMessage(player, Translation.PROTECTION_BYPASSED, ownerName);
             }
@@ -204,6 +211,21 @@ public final class InteractListener extends EventListener {
 
     private void handleDisallowed(PlayerInteractEvent event, Protection protection, boolean clickedSign,
             boolean usedOffHand) {
+        Block clickedBlock = event.getClickedBlock();
+        Player player = event.getPlayer();
+        Material heldBlock = player.getInventory().getItemInMainHand().getType();
+
+        // Handle lectern logic, especially if there is no book inserted.
+        if (clickedBlock.getType() == Material.LECTERN) {
+            if ((heldBlock != Material.WRITABLE_BOOK) && (heldBlock != Material.WRITTEN_BOOK)) {
+                return;
+            } else {
+                if ((((Lectern) clickedBlock.getState()).getInventory().contains(Material.WRITABLE_BOOK)) || (((Lectern) clickedBlock.getState()).getInventory().contains(Material.WRITTEN_BOOK))) {
+                    return;
+                }
+            }
+        }
+
         event.setCancelled(true);
 
         if (usedOffHand) {
@@ -211,7 +233,6 @@ public final class InteractListener extends EventListener {
             return;
         }
 
-        Player player = event.getPlayer();
         if (clickedSign) {
             plugin.getTranslator()
                     .sendMessage(player, Translation.PROTECTION_IS_CLAIMED_BY, protection.getOwnerDisplayName());
@@ -289,16 +310,17 @@ public final class InteractListener extends EventListener {
 
         Block block = event.getLectern().getBlock();
         Optional<Protection> protection = plugin.getProtectionFinder().findProtection(block);
-        boolean allowed = checkAllowed(player, protection.get(), true);
+        boolean allowed = checkAllowed(player, protection.get(), false, block);
+        boolean innerCheck = protection.get().isAllowed(plugin.getProfileFactory().fromPlayer(player));
+        
         if (!allowed) {
-            if (player.hasPermission(Permissions.CAN_BYPASS)) {
-                plugin.getTranslator().sendMessage(player, Translation.PROTECTION_BYPASSED, protection.get().getOwnerDisplayName());
-            } else {
-                event.setCancelled(true);
-                plugin.getTranslator().sendMessage(player, Translation.PROTECTION_NO_ACCESS, protection.get().getOwnerDisplayName());
-            }
+            event.setCancelled(true);
+            plugin.getTranslator().sendMessage(player, Translation.PROTECTION_NO_ACCESS, protection.get().getOwnerDisplayName());
         } else {
-            
+            if (!innerCheck && player.hasPermission(Permissions.CAN_BYPASS)) {
+                String ownerName = protection.get().getOwnerDisplayName();
+                plugin.getTranslator().sendMessage(player, Translation.PROTECTION_BYPASSED, ownerName);
+            }
         }
 
     }
@@ -338,12 +360,9 @@ public final class InteractListener extends EventListener {
         plugin.getProtectionUpdater().update(protection.get(), false);
 
         // Check if player is allowed, open door
-        if (checkAllowed(player, protection.get(), clickedSign)) {
+        if (checkAllowed(player, protection.get(), clickedSign, block)) {
             handleAllowed(event, protection.get(), clickedSign, usedOffHand);
         } else {
-            if (block.getType() == Material.LECTERN) {
-                return;
-            }
             handleDisallowed(event, protection.get(), clickedSign, usedOffHand);
         }
     }
