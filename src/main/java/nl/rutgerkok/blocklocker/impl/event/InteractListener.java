@@ -288,12 +288,18 @@ public final class InteractListener extends EventListener {
         Player player = event.getPlayer();
 
         Block block = event.getLectern().getBlock();
-
         Optional<Protection> protection = plugin.getProtectionFinder().findProtection(block);
-        if (!checkAllowed(player, protection.get(), true)) {
-            event.setCancelled(true);
-            plugin.getTranslator().sendMessage(player, Translation.PROTECTION_NO_ACCESS, protection.get().getOwnerDisplayName());
-        } 
+        boolean allowed = checkAllowed(player, protection.get(), true);
+        if (!allowed) {
+            if (player.hasPermission(Permissions.CAN_BYPASS)) {
+                plugin.getTranslator().sendMessage(player, Translation.PROTECTION_BYPASSED, protection.get().getOwnerDisplayName());
+            } else {
+                event.setCancelled(true);
+                plugin.getTranslator().sendMessage(player, Translation.PROTECTION_NO_ACCESS, protection.get().getOwnerDisplayName());
+            }
+        } else {
+            
+        }
 
     }
 
