@@ -55,6 +55,7 @@ protectableContainers:
 - dropper
 - enchanting_table
 - furnace
+- lectern
 - gray_shulker_box
 - green_shulker_box
 - hopper
