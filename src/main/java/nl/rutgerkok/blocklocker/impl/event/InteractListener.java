@@ -27,6 +27,7 @@ import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerTakeLecternBookEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -277,6 +278,26 @@ public final class InteractListener extends EventListener {
     }
 
     /**
+     * Prevents players from taking the book on a protected lectern.
+     * 
+     * @param event The event object.
+     */
+
+    @EventHandler(ignoreCancelled = true)
+    public void onPlayerTakeLectern(PlayerTakeLecternBookEvent event) {
+        Player player = event.getPlayer();
+
+        Block block = event.getLectern().getBlock();
+
+        Optional<Protection> protection = plugin.getProtectionFinder().findProtection(block);
+        if (!checkAllowed(player, protection.get(), true)) {
+            event.setCancelled(true);
+            plugin.getTranslator().sendMessage(player, Translation.PROTECTION_NO_ACCESS, protection.get().getOwnerDisplayName());
+        } 
+
+    }
+
+    /**
      * Prevents access to containers.
      *
      * @param event The event object.
@@ -292,6 +313,7 @@ public final class InteractListener extends EventListener {
         if (block == null) {
             return;
         }
+
         Material material = block.getType();
         boolean clickedSign = Tag.STANDING_SIGNS.isTagged(material) || Tag.WALL_SIGNS.isTagged(material);
         // When using the offhand check, access checks must still be performed,
@@ -313,6 +335,9 @@ public final class InteractListener extends EventListener {
         if (checkAllowed(player, protection.get(), clickedSign)) {
             handleAllowed(event, protection.get(), clickedSign, usedOffHand);
         } else {
+            if (block.getType() == Material.LECTERN) {
+                return;
+            }
             handleDisallowed(event, protection.get(), clickedSign, usedOffHand);
         }
     }
@@ -411,7 +436,6 @@ public final class InteractListener extends EventListener {
             return false;
         }
         Material signMaterial = optionalSignMaterial.get();
-
         if (!plugin.getProtectionFinder().isProtectable(block)) {
             return false;
         }
