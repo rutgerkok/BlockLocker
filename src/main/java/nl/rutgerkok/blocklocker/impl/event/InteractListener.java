@@ -91,6 +91,9 @@ public final class InteractListener extends EventListener {
         };
     }
 
+    private boolean isLecternOccupied(Lectern lectern) {
+            return ((lectern.getInventory().contains(Material.WRITABLE_BOOK)) || (lectern.getInventory().contains(Material.WRITTEN_BOOK)));
+    }
     private boolean checkAllowed(Player player, Protection protection, boolean clickedSign, Block container) {
         PlayerProfile playerProfile = plugin.getProfileFactory().fromPlayer(player);
         boolean allowed = protection.isAllowed(playerProfile);
@@ -107,7 +110,7 @@ public final class InteractListener extends EventListener {
             if (!clickedSign) {
                 // Only show message about bypass when not clicking a sign
                 if (container.getType() == Material.LECTERN) {
-                    if ((((Lectern) container.getState()).getInventory().contains(Material.WRITABLE_BOOK)) || (((Lectern) container.getState()).getInventory().contains(Material.WRITTEN_BOOK))) {
+                    if (isLecternOccupied((Lectern) container.getState())) {
                         return allowed;
                     }
                 }
@@ -220,7 +223,7 @@ public final class InteractListener extends EventListener {
             if ((heldBlock != Material.WRITABLE_BOOK) && (heldBlock != Material.WRITTEN_BOOK)) {
                 return;
             } else {
-                if ((((Lectern) clickedBlock.getState()).getInventory().contains(Material.WRITABLE_BOOK)) || (((Lectern) clickedBlock.getState()).getInventory().contains(Material.WRITTEN_BOOK))) {
+                if (isLecternOccupied((Lectern) clickedBlock.getState())) {
                     return;
                 }
             }
@@ -306,10 +309,15 @@ public final class InteractListener extends EventListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerTakeLectern(PlayerTakeLecternBookEvent event) {
+        if (event == null) {
+            return;
+        }
         Player player = event.getPlayer();
-
         Block block = event.getLectern().getBlock();
         Optional<Protection> protection = plugin.getProtectionFinder().findProtection(block);
+        if (protection.isEmpty()) {
+            return;
+        }
         boolean allowed = checkAllowed(player, protection.get(), false, block);
         boolean innerCheck = protection.get().isAllowed(plugin.getProfileFactory().fromPlayer(player));
         
