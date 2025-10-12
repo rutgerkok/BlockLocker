@@ -37,41 +37,60 @@ updater: JUST_NOTIFY
 # All material names can be found here:
 # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
 protectableContainers:
+- minecraft:acacia_shelf
 - minecraft:anvil
+- minecraft:bamboo_shelf
 - minecraft:barrel
 - minecraft:beacon
+- minecraft:birch_shelf
 - minecraft:black_shulker_box
 - minecraft:blast_furnace
 - minecraft:blue_shulker_box
 - minecraft:brewing_stand
 - minecraft:brown_shulker_box
+- minecraft:cherry_shelf
 - minecraft:chest
 - minecraft:chipped_anvil
-- minecraft:cyan_shulker_box
-- minecraft:crafting_table
+- minecraft:copper_chest
 - minecraft:crafter
+- minecraft:crafting_table
+- minecraft:crimson_shelf
+- minecraft:cyan_shulker_box
 - minecraft:damaged_anvil
+- minecraft:dark_oak_shelf
 - minecraft:dispenser
 - minecraft:dropper
 - minecraft:enchanting_table
+- minecraft:exposed_copper_chest
 - minecraft:furnace
 - minecraft:gray_shulker_box
 - minecraft:green_shulker_box
 - minecraft:hopper
 - minecraft:jukebox
+- minecraft:jungle_shelf
 - minecraft:light_blue_shulker_box
 - minecraft:light_gray_shulker_box
 - minecraft:lime_shulker_box
 - minecraft:magenta_shulker_box
+- minecraft:mangrove_shelf
+- minecraft:oak_shelf
 - minecraft:orange_shulker_box
+- minecraft:oxidized_copper_chest
+- minecraft:pale_oak_shelf
 - minecraft:pink_shulker_box
 - minecraft:purple_shulker_box
 - minecraft:red_shulker_box
 - minecraft:shulker_box
 - minecraft:smoker
+- minecraft:spruce_shelf
 - minecraft:trapped_chest
+- minecraft:waxed_exposed_copper_chest
+- minecraft:waxed_oxidized_copper_chest
+- minecraft:waxed_weathered_copper_chest
+- minecraft:weathered_copper_chest
 - minecraft:white_shulker_box
 - minecraft:yellow_shulker_box
+-
 
 # When set to true, one sign protects all connected nearby blocks of the same
 # type. When false, each container requires a separate sign.
