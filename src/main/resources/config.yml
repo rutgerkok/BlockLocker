@@ -180,6 +180,7 @@ autoExpireDays: 0
 # ENDERMAN - endermans can destroy protections by picking up blocks
 # FIRE - fire can burn protections
 # GHAST - ghasts can shoot exploding fireballs
+# GOLEM - golems opening chests
 # PISTON - pistons can remove the protection signs
 # SAPLING - saplings can grow trees, destroying protection signs
 # TNT - TNT can destroy protections by exploding

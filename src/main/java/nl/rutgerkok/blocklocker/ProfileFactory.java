@@ -46,4 +46,11 @@ public interface ProfileFactory {
      * @return The profile.
      */
     Profile fromRedstone();
+
+    /**
+     * Gets the profile for golems.
+     *
+     * @return The profile.
+     */
+    Profile fromGolem();
 }

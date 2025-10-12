@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 
+import nl.rutgerkok.blocklocker.impl.event.*;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.Configuration;
@@ -25,7 +26,7 @@ import com.google.common.base.Preconditions;
 
 import nl.rutgerkok.blocklocker.BlockLockerPlugin;
 import nl.rutgerkok.blocklocker.ChestSettings;
-import nl.rutgerkok.blocklocker.HopperCache;
+import nl.rutgerkok.blocklocker.ProtectionCache;
 import nl.rutgerkok.blocklocker.ProfileFactory;
 import nl.rutgerkok.blocklocker.ProtectableBlocksSettings;
 import nl.rutgerkok.blocklocker.ProtectionFinder;
@@ -35,11 +36,6 @@ import nl.rutgerkok.blocklocker.Translator;
 import nl.rutgerkok.blocklocker.group.CombinedGroupSystem;
 import nl.rutgerkok.blocklocker.group.GroupSystem;
 import nl.rutgerkok.blocklocker.impl.blockfinder.BlockFinder;
-import nl.rutgerkok.blocklocker.impl.event.BlockDestroyListener;
-import nl.rutgerkok.blocklocker.impl.event.BlockLockerCommand;
-import nl.rutgerkok.blocklocker.impl.event.BlockPlaceListener;
-import nl.rutgerkok.blocklocker.impl.event.InteractListener;
-import nl.rutgerkok.blocklocker.impl.event.SignChangeListener;
 import nl.rutgerkok.blocklocker.impl.group.FactionsGroupSystem;
 import nl.rutgerkok.blocklocker.impl.group.GuildsGroupSystem;
 import nl.rutgerkok.blocklocker.impl.group.PermissionsGroupSystem;
@@ -65,7 +61,7 @@ public class BlockLockerPluginImpl extends JavaPlugin implements BlockLockerPlug
     private Translator translator;
     private CombinedLocationChecker combinedLocationChecker;
     private SchedulerSupport schedulerSupport;
-    private HopperCache redstoneProtectCache;
+    private ProtectionCache protectionCache;
 
     @Override
     public <E extends Event> E callEvent(E event) {
@@ -85,8 +81,8 @@ public class BlockLockerPluginImpl extends JavaPlugin implements BlockLockerPlug
     }
 
     @Override
-    public HopperCache getHopperCache() {
-        return redstoneProtectCache;
+    public ProtectionCache getProtectionCache() {
+        return protectionCache;
     }
 
     /**
@@ -204,7 +200,7 @@ public class BlockLockerPluginImpl extends JavaPlugin implements BlockLockerPlug
         BlockFinder blockFinder = BlockFinder.create(signParser, config.getConnectContainers());
         protectionFinder = new ProtectionFinderImpl(blockFinder, chestSettings);
         protectionUpdater = new ProtectionUpdaterImpl(getServer(), signParser, profileFactory);
-        redstoneProtectCache = new HopperCacheImpl(this);
+        protectionCache = new HopperCacheImpl();
     }
 
     private Translator loadTranslations(String fileName) {
@@ -250,6 +246,7 @@ public class BlockLockerPluginImpl extends JavaPlugin implements BlockLockerPlug
         plugins.registerEvents(new BlockDestroyListener(this), this);
         plugins.registerEvents(new BlockPlaceListener(this), this);
         plugins.registerEvents(new InteractListener(this), this);
+        plugins.registerEvents(new GolemListener(this), this);
         plugins.registerEvents(new SignChangeListener(this), this);
         getCommand(getName().toLowerCase(Locale.ROOT)).setExecutor(new BlockLockerCommand(this));
     }

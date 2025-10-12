@@ -13,6 +13,7 @@ public enum AttackType {
     ENDERMAN,
     BLOCK_EXPLOSION,
     FIRE,
+    GOLEM,
     GHAST,
     PISTON,
     SAPLING,

@@ -8,7 +8,7 @@ import org.apache.commons.lang.Validate;
 import org.bukkit.block.Block;
 import org.bukkit.event.Listener;
 
-import nl.rutgerkok.blocklocker.HopperCache;
+import nl.rutgerkok.blocklocker.ProtectionCache;
 import nl.rutgerkok.blocklocker.SearchMode;
 import nl.rutgerkok.blocklocker.impl.BlockLockerPluginImpl;
 import nl.rutgerkok.blocklocker.profile.Profile;
@@ -45,19 +45,19 @@ abstract class EventListener implements Listener {
     }
 
     boolean isRedstoneDenied(Block block) {
-        HopperCache.CacheFlag flag = plugin.getHopperCache().getIsRedstoneAllowed(block);
-        if (flag != HopperCache.CacheFlag.MISS_CACHE) {
-            return flag == HopperCache.CacheFlag.PROTECTED;
+        ProtectionCache.CacheFlag flag = plugin.getProtectionCache().getAllowed(block, ProtectionCache.CacheType.REDSTONE);
+        if (flag != ProtectionCache.CacheFlag.MISS_CACHE) {
+            return flag == ProtectionCache.CacheFlag.NOT_ALLOWED;
         } else {
-            Optional<Protection> protection = plugin.getProtectionFinder().findProtection(block, SearchMode.NO_SUPPORTING_BLOCKS);
-            if (!protection.isPresent()) {
-                plugin.getHopperCache().setIsRedstoneAllowed(block, false);
+            Optional<Protection> protection = plugin.getProtectionFinder().findProtection(block, SearchMode.MAIN_BLOCKS_ONLY);
+            if (protection.isEmpty()) {
+                plugin.getProtectionCache().setAllowed(block, ProtectionCache.CacheType.REDSTONE,true);
                 return false;
             }
             Profile redstone = plugin.getProfileFactory().fromRedstone();
-            boolean denied = !protection.get().isAllowed(redstone);
-            plugin.getHopperCache().setIsRedstoneAllowed(block, denied);
-            return denied;
+            boolean allowed = protection.get().isAllowed(redstone);
+            plugin.getProtectionCache().setAllowed(block, ProtectionCache.CacheType.REDSTONE, allowed);
+            return !allowed;
         }
     }
 }
