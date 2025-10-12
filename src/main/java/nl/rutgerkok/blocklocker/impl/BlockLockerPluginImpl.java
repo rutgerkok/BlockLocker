@@ -188,7 +188,7 @@ public class BlockLockerPluginImpl extends JavaPlugin implements BlockLockerPlug
 
         // Configuration
         saveDefaultConfig();
-        config = new Config(getLogger(), getConfig());
+        config = new Config(this);
 
         // Connections with external systems
         loadGroupSystems();
