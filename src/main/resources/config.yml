@@ -84,6 +84,8 @@ protectableContainers:
 - minecraft:smoker
 - minecraft:spruce_shelf
 - minecraft:trapped_chest
+- minecraft:warped_shelf
+- minecraft:waxed_copper_chest
 - minecraft:waxed_exposed_copper_chest
 - minecraft:waxed_oxidized_copper_chest
 - minecraft:waxed_weathered_copper_chest
