@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 
+import nl.rutgerkok.blocklocker.*;
 import nl.rutgerkok.blocklocker.impl.event.*;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
@@ -24,15 +25,6 @@ import org.bukkit.scheduler.BukkitTask;
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 
-import nl.rutgerkok.blocklocker.BlockLockerPlugin;
-import nl.rutgerkok.blocklocker.ChestSettings;
-import nl.rutgerkok.blocklocker.ProtectionCache;
-import nl.rutgerkok.blocklocker.ProfileFactory;
-import nl.rutgerkok.blocklocker.ProtectableBlocksSettings;
-import nl.rutgerkok.blocklocker.ProtectionFinder;
-import nl.rutgerkok.blocklocker.ProtectionUpdater;
-import nl.rutgerkok.blocklocker.SignParser;
-import nl.rutgerkok.blocklocker.Translator;
 import nl.rutgerkok.blocklocker.group.CombinedGroupSystem;
 import nl.rutgerkok.blocklocker.group.GroupSystem;
 import nl.rutgerkok.blocklocker.impl.blockfinder.BlockFinder;
@@ -246,7 +238,18 @@ public class BlockLockerPluginImpl extends JavaPlugin implements BlockLockerPlug
         plugins.registerEvents(new BlockDestroyListener(this), this);
         plugins.registerEvents(new BlockPlaceListener(this), this);
         plugins.registerEvents(new InteractListener(this), this);
-        plugins.registerEvents(new GolemListener(this), this);
+
+        // Copper golem listener is not available on Spigot & older Minecraft versions
+        try {
+            Class.forName("io.papermc.paper.event.entity.ItemTransportingEntityValidateTargetEvent");
+            plugins.registerEvents(new GolemListener(this), this);
+        } catch (ClassNotFoundException e) {
+            if (!config.allowDestroyBy(AttackType.GOLEM)) {
+                getLogger().warning("Failed to register copper golem listener. Paper 1.21.10+ is required for this" +
+                        " to function. Add GOLEM to allowDestroyBy in the config.yml to disable this warning.");
+            }
+        }
+
         plugins.registerEvents(new SignChangeListener(this), this);
         getCommand(getName().toLowerCase(Locale.ROOT)).setExecutor(new BlockLockerCommand(this));
     }
