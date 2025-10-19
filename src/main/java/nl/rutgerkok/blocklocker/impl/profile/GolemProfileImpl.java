@@ -1,25 +1,24 @@
 package nl.rutgerkok.blocklocker.impl.profile;
 
-import java.util.Date;
-
 import com.google.common.base.Preconditions;
-
 import nl.rutgerkok.blocklocker.SecretSignEntry;
 import nl.rutgerkok.blocklocker.profile.Profile;
 
-class RedstoneProfileImpl implements Profile {
+import java.util.Date;
 
-    static final String REDSTONE_KEY = "r";
+class GolemProfileImpl implements Profile {
+
+    static final String GOLEM_KEY = "go";
 
     private final String translatedTag;
 
     /**
-     * Creates a new [Redstone]-profile.
+     * Creates a new [Golem]-profile.
      *
      * @param translatedTag
-     *            Usually "Redstone", may be localized.
+     *            Usually "Golem", may be localized.
      */
-    RedstoneProfileImpl(String translatedTag) {
+    GolemProfileImpl(String translatedTag) {
         this.translatedTag = translatedTag;
     }
 
@@ -44,7 +43,7 @@ class RedstoneProfileImpl implements Profile {
 
     @Override
     public void getSaveObject(SecretSignEntry entry) {
-        entry.setBoolean(REDSTONE_KEY, true);
+        entry.setBoolean(GOLEM_KEY, true);
     }
 
     /**
@@ -52,13 +51,13 @@ class RedstoneProfileImpl implements Profile {
      */
     @Override
     public int hashCode() {
-        return 4;
+        return 4000;
     }
 
     @Override
     public boolean includes(Profile other) {
         Preconditions.checkNotNull(other);
-        return other instanceof RedstoneProfileImpl;
+        return other instanceof GolemProfileImpl;
     }
 
     @Override

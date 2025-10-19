@@ -45,7 +45,7 @@ public interface BlockLockerPlugin {
      * Gets the cache that stores whether a block is protected or not.
      * @return The cache.
      */
-    HopperCache getHopperCache();
+    ProtectionCache getProtectionCache();
 
     /**
      * Gets the location checkers, which are used to prevent players from placing chests in the wilderness.

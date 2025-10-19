@@ -28,7 +28,9 @@ public final class ProfileFactoryImpl implements ProfileFactory {
     private final List<String> everyoneTagList;
     private final GroupSystem groupSystem;
     private final Profile redstoneProfile;
+    private final Profile golemProfile;
     private final List<String> redstoneTagList;
+    private final List<String> golemTagList;
     private final List<String> timerTagStart;
     private final Translator translator;
 
@@ -38,14 +40,17 @@ public final class ProfileFactoryImpl implements ProfileFactory {
 
         this.everyoneTagList = new ArrayList<>();
         this.redstoneTagList = new ArrayList<>();
+        this.golemTagList = new ArrayList<>();
         this.timerTagStart = new ArrayList<>();
 
         translator.getAllWithoutColor(Translation.TAG_EVERYONE).forEach(value -> this.everyoneTagList.add("[" + value + "]"));
         translator.getAllWithoutColor(Translation.TAG_REDSTONE).forEach(value -> this.redstoneTagList.add("[" + value + "]"));
+        translator.getAllWithoutColor(Translation.TAG_GOLEM).forEach(value -> this.golemTagList.add("[" + value + "]"));
         translator.getAllWithoutColor(Translation.TAG_TIMER).forEach(value -> this.timerTagStart.add("[" + value + ":"));
 
         this.everyoneProfile = new EveryoneProfileImpl(translator.get(Translation.TAG_EVERYONE));
         this.redstoneProfile = new RedstoneProfileImpl(translator.get(Translation.TAG_REDSTONE));
+        this.golemProfile = new GolemProfileImpl(translator.get(Translation.TAG_GOLEM));
     }
 
     /**
@@ -78,6 +83,11 @@ public final class ProfileFactoryImpl implements ProfileFactory {
             // [Redstone]
             if (redstoneTagList.stream().anyMatch(s -> s.equalsIgnoreCase(stripped))) {
                 return new RedstoneProfileImpl(stripped.substring(1, stripped.length() - 1));
+            }
+
+            // [Golem]
+            if (golemTagList.stream().anyMatch(s -> s.equalsIgnoreCase(stripped))) {
+                return new GolemProfileImpl(stripped.substring(1, stripped.length() - 1));
             }
 
             // [Timer:X]
@@ -136,6 +146,10 @@ public final class ProfileFactoryImpl implements ProfileFactory {
         return this.redstoneProfile;
     }
 
+    @Override
+    public Profile fromGolem() {
+        return this.golemProfile;
+    }
 
 
     /**
@@ -164,6 +178,12 @@ public final class ProfileFactoryImpl implements ProfileFactory {
         Optional<Boolean> isRedstone = object.getBoolean(RedstoneProfileImpl.REDSTONE_KEY);
         if (isRedstone.isPresent()) {
             return Optional.of(this.redstoneProfile);
+        }
+
+        // [Golems]
+        Optional<Boolean> isGolem = object.getBoolean(GolemProfileImpl.GOLEM_KEY);
+        if (isGolem.isPresent()) {
+            return Optional.of(this.golemProfile);
         }
 
         // Timer

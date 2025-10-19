@@ -106,10 +106,10 @@ public final class Updater {
         }, CHECK_INTERVAL);
     }
 
-    private void updateInstallSync(UpdateCheckResult result) throws IOException {
+    private void notifyUpdateAvailable(UpdateCheckResult result) throws IOException {
         Optional<String> minecraftVersion = getMinecraftVersion();
 
-        if (result.getMinecraftVersions().containsAll(ImmutableSet.of(minecraftVersion.get()))) {
+        if (minecraftVersion.isEmpty() || result.getMinecraftVersions().containsAll(ImmutableSet.of(minecraftVersion.get()))) {
             // Notify that an update is available
             notifyServer(new UpdateResult(Status.MANUAL_UPDATE, result));
         } else {
@@ -126,7 +126,7 @@ public final class Updater {
             UpdateChecker checker = new UpdateChecker();
             UpdateCheckResult result = checker.checkForUpdatesSync(plugin);
             if (result.needsUpdate()) {
-                updateInstallSync(result);
+                notifyUpdateAvailable(result);
             } else {
                 notifyServer(new UpdateResult(Status.NO_UPDATE, result));
             }

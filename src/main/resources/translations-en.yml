@@ -27,6 +27,9 @@ tag:
   everyone: "Everyone"
   timer: "Timer"
   redstone: "Redstone"
+  golem:
+    - Golem
+    - Golems
   private: "[Private]"
   more_users: "[More Users]"
 updater:

@@ -15,6 +15,8 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Lectern;
 import org.bukkit.block.Sign;
+import org.bukkit.*;
+import org.bukkit.block.*;
 import org.bukkit.block.data.Levelled;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.block.data.type.WallSign;

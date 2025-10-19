@@ -38,6 +38,7 @@ public abstract class Translator {
         TAG_MORE_USERS,
         TAG_PRIVATE,
         TAG_REDSTONE,
+        TAG_GOLEM,
         TAG_TIMER,
         UPDATER_MORE_INFORMATION,
         UPDATER_UNSUPPORTED_SERVER,

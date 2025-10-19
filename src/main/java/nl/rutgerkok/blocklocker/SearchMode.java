@@ -13,6 +13,10 @@ package nl.rutgerkok.blocklocker;
  */
 public enum SearchMode {
     /**
+     * Ignores both {@link #NO_SIGNS signs} and {@link #NO_SUPPORTING_BLOCKS supporting blocks}.
+     */
+    MAIN_BLOCKS_ONLY,
+    /**
      * Ignores blocks that are solely part of the protection because they are
      * supporting another block.
      */
@@ -36,7 +40,7 @@ public enum SearchMode {
      *         otherwise.
      */
     public boolean searchForSupportingBlocks() {
-        return this != NO_SUPPORTING_BLOCKS;
+        return this != NO_SUPPORTING_BLOCKS && this != MAIN_BLOCKS_ONLY;
     }
 
     /**
@@ -47,6 +51,6 @@ public enum SearchMode {
      *         otherwise.
      */
     public boolean searchForSigns() {
-        return this != NO_SIGNS;
+        return this != NO_SIGNS && this != MAIN_BLOCKS_ONLY;
     }
 }

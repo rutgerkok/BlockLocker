@@ -3,41 +3,52 @@ package nl.rutgerkok.blocklocker.impl;
 import java.util.concurrent.TimeUnit;
 
 import org.bukkit.block.Block;
-import org.bukkit.plugin.Plugin;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
-import nl.rutgerkok.blocklocker.HopperCache;
+import nl.rutgerkok.blocklocker.ProtectionCache;
 
-final class HopperCacheImpl implements HopperCache {
+final class HopperCacheImpl implements ProtectionCache {
 
     private static final long EXPIRE_TIME_SECONDS = 10;
-    private Cache<Block, Boolean> accessCaching;
+    private final Cache<Block, Boolean> redstoneCache;
+    private final Cache<Block, Boolean> golemCache;
 
-    HopperCacheImpl(Plugin plugin) {
-        accessCaching = CacheBuilder.newBuilder().initialCapacity(1000)
+    HopperCacheImpl() {
+        redstoneCache = CacheBuilder.newBuilder().initialCapacity(1000)
+                .maximumSize(5000)
+                .expireAfterWrite(EXPIRE_TIME_SECONDS, TimeUnit.SECONDS)
+                .build();
+        golemCache = CacheBuilder.newBuilder().initialCapacity(1000)
                 .maximumSize(5000)
                 .expireAfterWrite(EXPIRE_TIME_SECONDS, TimeUnit.SECONDS)
                 .build();
     }
 
-    @Override
-    public CacheFlag getIsRedstoneAllowed(Block block) {
-        Boolean isLocked = accessCaching.getIfPresent(block);
+    private Cache<Block, Boolean> getCache(CacheType cacheType) {
+        return switch (cacheType) {
+            case REDSTONE -> this.redstoneCache;
+            case GOLEM -> this.golemCache;
+        };
+    }
 
-        if (isLocked == null) {
+    @Override
+    public CacheFlag getAllowed(Block block, CacheType cacheType) {
+        Boolean isAllowed = getCache(cacheType).getIfPresent(block);
+
+        if (isAllowed == null) {
             return CacheFlag.MISS_CACHE;
         }
-        if (isLocked == true) {
-            return CacheFlag.PROTECTED;
+        if (isAllowed) {
+            return CacheFlag.ALLOWED;
         } else {
-            return CacheFlag.NOT_PROTECTED;
+            return CacheFlag.NOT_ALLOWED;
         }
     }
 
     @Override
-    public void setIsRedstoneAllowed(Block block, boolean locked) {
-        accessCaching.put(block, locked);
+    public void setAllowed(Block block, CacheType cacheType, boolean allowed) {
+        getCache(cacheType).put(block, allowed);
     }
 }
