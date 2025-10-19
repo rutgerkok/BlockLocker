@@ -63,6 +63,7 @@ protectableContainers:
 - minecraft:enchanting_table
 - minecraft:exposed_copper_chest
 - minecraft:furnace
+- minecraft:lectern
 - minecraft:gray_shulker_box
 - minecraft:green_shulker_box
 - minecraft:hopper
@@ -92,7 +93,6 @@ protectableContainers:
 - minecraft:weathered_copper_chest
 - minecraft:white_shulker_box
 - minecraft:yellow_shulker_box
--
 
 # When set to true, one sign protects all connected nearby blocks of the same
 # type. When false, each container requires a separate sign.

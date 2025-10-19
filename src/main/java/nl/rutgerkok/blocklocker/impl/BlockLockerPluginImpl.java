@@ -222,7 +222,7 @@ public class BlockLockerPluginImpl extends JavaPlugin implements BlockLockerPlug
     @Override
     public void onEnable() {
         loadServices();
-
+        
         // Events
         registerEvents();
 
