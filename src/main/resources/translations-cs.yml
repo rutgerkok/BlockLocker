@@ -39,6 +39,9 @@ tag:
   more_users:
     - "[More Users]"
     - "[Více uživatelů]"
+  golem:
+    - Golem
+    - Golems
 updater:
   more_information: "&6Více informací: {0}"
   unsupported_server: "&4Nejnovější verze ${project.name} (verze {0}) již nepodporuje tuto verzi Minecraftu, pouze Minecraft {1}."

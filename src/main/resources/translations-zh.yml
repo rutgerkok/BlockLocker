@@ -39,6 +39,9 @@ tag:
   more_users:
     - "[更多]"
     - "[More Users]"
+  golem:
+    - "Golem"
+    - "Golems"
 updater:
   more_information: "&6更多信息: {0}"
   unsupported_server: "&4最新版本的 ${project.name} (version {0}) 不再支持这个Minecraft版本, 需要Minecraft {1} 版本."

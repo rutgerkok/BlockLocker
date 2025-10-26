@@ -29,6 +29,9 @@ tag:
   redstone: "Redstone"
   private: "[Private]"
   more_users: "[More Users]"
+  golem:
+    - Golem
+    - Golems
 updater:
   more_information: "&6추가 정보: {0}"
   unsupported_server: "&4${project.name} (version {0})의 최신 버전이 이 Minecraft 버전을 지원하지 않습니다. (Minecraft {1}만)."

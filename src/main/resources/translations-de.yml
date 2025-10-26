@@ -30,6 +30,7 @@ tag:
   redstone: "Redstone"
   private: ["[Privat]", "[Private]"]
   more_users: ["[Mehr Benutzer]", "[More Users]"]
+  golem: ["Golem", "Golems"]
 updater:
   more_information: "&6Mehr Informationen: {0}"
   unsupported_server: "&4Die neueste Version von ${project.name} (Version {0}) unterstützt diese Minecraft-Version nicht mehr, sondern nur noch Minecraft {1}."

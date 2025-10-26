@@ -38,6 +38,9 @@ tag:
   more_users:
     - '[更多]'
     - '[More Users]'
+  golem:
+    - 'Golem'
+    - 'Golems'
 updater:
   more_information: '&6更多資訊：{0}'
   unsupported_server: '&4最新版本的 BlockLocker（版本 {0}）不再支援此 Minecraft 版本，需要使用 Minecraft {1}。'

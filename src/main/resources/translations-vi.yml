@@ -27,6 +27,9 @@ tag:
   private: '[Riêng Tư]'
   redstone: Đá đỏ
   timer: Thời gian
+  golem:
+    - Golem
+    - Golems
 updater:
   more_information: '&6Thông tin thêm: {0}'
   unsupported_server: '&4Phiên bản mới nhất của BlockLocker (version {0}) Không còn hỗ trợ phiên bản Minecraft này nữa, chỉ hỗ trợ Minecraft phiên bản {1}.'

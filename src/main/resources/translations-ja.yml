@@ -30,6 +30,9 @@ tag:
   redstone: "レッドストーン"
   private: "[プライベート]"
   more_users: "[追加ユーザー]"
+  golem:
+    - Golem
+    - Golems
 updater:
   more_information: "&6追加の情報： {0}"
   unsupported_server: "&4最新のバージョンは${project.name} (バージョン {0}) です。このマインクラフトのバージョンはサポートされていません。マインクラフト {1} を使用してください"

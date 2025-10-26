@@ -36,6 +36,9 @@ tag:
   timer:
   - Időzítő
   - Timer
+  golem:
+  - Golem
+  - Golems
 updater:
   more_information: 'More information: {0}'
   unsupported_server: 'The latest version of BlockLocker (version {0}) no longer supports this Minecraft version, only Minecraft {1}.'

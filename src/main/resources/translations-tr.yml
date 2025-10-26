@@ -28,6 +28,9 @@ tag:
   redstone: "Kızıltaş"
   private: "[Özel]"
   more_users: "[Ekstra Kullanıcı]"
+  golem:
+    - Golem
+    - Golems
 updater:
   more_information: "&6Daha fazla bilgi: {0}"
   unsupported_server: "&4${project.name} 'ın en son sürümü ({0} sürümü) artık bu Minecraft sürümünü desteklemiyor, sadece Minecraft {1}."

@@ -32,6 +32,9 @@ tag:
   - '[Private]'
   redstone: Redstone
   timer: Timer
+  golem:
+    - Golem
+    - Golems
 updater:
   more_information: '&6Meer informatie: {0}'
   unsupported_server: '&4De nieuwste versie van BlockLocker (versie {0}) ondersteunt niet langer deze Minecraftversie, maar slechts nog Minecraft {1}.'
