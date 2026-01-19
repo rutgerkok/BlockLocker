@@ -10,21 +10,11 @@ permissions:
   blocklocker.protect:
     description: "Protect containers and doors."
     default: true
-  blocklocker.bypass:
-    description: "Bypass someone else's protection, but don't allow destroying it."
+  blocklocker.limit.bypass:
+    description: "Bypass the protection limit."
     default: op
-  blocklocker.admin:
-    description: "Edit someone's protection signs, or remove the protection entirely."
-    default: op
-  blocklocker.reload:
-    description: "Reload the plugin using /blocklocker reload."
-    default: op
-  blocklocker.wilderness:
-    description: "Place chests in the wilderness (outside of Towny claims)"
-    default: true
 commands:
   blocklocker:
     description: "Administration commands for BlockLocker."
-    permission: "blocklocker.reload"
-    usage: "/<command> reload"
+    usage: "/<command> [reload|limit]"
     aliases: "bl"

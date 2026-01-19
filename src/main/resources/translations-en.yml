@@ -23,6 +23,9 @@ protection:
   no_access: "&4You cannot use this block, it is protected by {0}."
   no_permission_for_claim: "&4You don't have permission to claim a container, sorry."
   not_nearby: "&4There is no protectable block nearby. (Shift-)right-click a container with a sign in your hand to protect it."
+  limit_reached: "&4You have reached your protection limit! (Current: {0}/{1})"
+  limit_team_reached: "&4Your team has reached its protection limit! (Current: {0}/{1})"
+  limit_info: "&6Protected blocks: {0}/{1}"
 tag:
   everyone: "Everyone"
   timer: "Timer"

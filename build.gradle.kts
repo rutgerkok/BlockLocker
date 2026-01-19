@@ -14,6 +14,8 @@ repositories {
     maven("https://rutgerkok.nl/repo")
     maven("https://repo.codemc.org/repository/maven-public/")
     maven("https://maven.enginehub.org/repo/")
+    maven("https://repo.commandapi.jorel.dev/")
+    maven("https://repo.commandapi.org/")
 }
 
 dependencies {
@@ -28,6 +30,7 @@ dependencies {
     compileOnly("com.gmail.nossr50.mcMMO:mcMMO:2.1.218")
     compileOnly("me.glaremasters:guilds:3.5.3.5-RELEASE")
     compileOnly("net.sacredlabyrinth.phaed.simpleclans:SimpleClans:2.15.1")
+    compileOnly("commons-lang:commons-lang:2.6")
 
     // Testing
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.3.1")
@@ -54,12 +57,14 @@ tasks.test {
 
 // Resource filtering to replace @version@ in plugin.yml
 tasks.processResources {
-    val props = mapOf(
-        "project" to mapOf(
-            "name" to rootProject.name,
-            "version" to version
+    val props =
+        mapOf(
+            "project" to
+                mapOf(
+                    "name" to rootProject.name,
+                    "version" to version,
+                ),
         )
-    )
     inputs.properties(props)
     filteringCharset = "UTF-8"
     filesMatching("plugin.yml") {
@@ -70,30 +75,39 @@ tasks.processResources {
 tasks.jar {
     manifest {
         attributes(
-            "paperweight-mappings-namespace" to "mojang"
+            "paperweight-mappings-namespace" to "mojang",
         )
     }
 }
 
 // Spotless configuration (standard java config)
-spotless {
-    java {
-        googleJavaFormat("1.30.0")
-        removeUnusedImports()
-        trimTrailingWhitespace()
-        endWithNewline()
-    }
-    kotlinGradle {
-        ktlint()
-        trimTrailingWhitespace()
-        endWithNewline()
+allprojects {
+    apply(plugin = "java")
+    apply(plugin = "com.diffplug.spotless")
+    apply(plugin = "io.freefair.lombok")
+    spotless {
+        java {
+            googleJavaFormat("1.30.0")
+            removeUnusedImports()
+            trimTrailingWhitespace()
+            endWithNewline()
+        }
+        kotlinGradle {
+            ktlint()
+            trimTrailingWhitespace()
+            endWithNewline()
+        }
+        json {
+            gson()
+            target("src/main/resources/**/**/*.json")
+            target("src/test/resources/**/**/*.json")
+            // npmExecutable("C:/Program Files/nodejs/npm.cmd")
+        }
     }
 }
-
 // Run-paper configuration
 tasks {
     runServer {
         minecraftVersion("1.21.4")
     }
 }
-

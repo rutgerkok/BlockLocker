@@ -189,5 +189,34 @@ autoExpireDays: 0
 # UNKNOWN - special value for all other unrecognized attacks
 allowDestroyBy: [GOLEM]
 
+# Protection limit settings
+# Controls how many protections a player or team can create
+protectionLimits:
+  # Enable protection limits
+  enabled: true
+  
+  # Default limit for all players (-1 for unlimited)
+  # Players with blocklocker.limit.bypass permission can bypass this limit
+  defaultPlayerLimit: 10
+  
+  # Per-player limits (overrides default)
+  # Format: 'PlayerName: limit'
+  playerLimits:
+    # ExamplePlayer: 50
+    # AdminPlayer: -1
+  
+  # Enable team-based limits
+  # When enabled, all members of a team share a protection limit
+  teamLimitsEnabled: false
+  
+  # Default limit for all teams (-1 for unlimited)
+  defaultTeamLimit: 50
+  
+  # Per-team limits (overrides default)
+  # Format: 'TeamName: limit'
+  teamLimits:
+    # VIPTeam: 100
+    # AdminTeam: -1
+
 # Don't change this, used to check when the config needs to be rewritten
 configVersion: 2

@@ -51,6 +51,7 @@ public class BlockLockerPluginImpl extends JavaPlugin implements BlockLockerPlug
   private CombinedLocationChecker combinedLocationChecker;
   private SchedulerSupport schedulerSupport;
   private ProtectionCache protectionCache;
+  private ProtectionLimitManager protectionLimitManager;
 
   @Override
   public <E extends Event> E callEvent(E event) {
@@ -136,6 +137,15 @@ public class BlockLockerPluginImpl extends JavaPlugin implements BlockLockerPlug
     return translator;
   }
 
+  /**
+   * Gets the protection limit manager.
+   *
+   * @return The protection limit manager.
+   */
+  public ProtectionLimitManager getProtectionLimitManager() {
+    return protectionLimitManager;
+  }
+
   private void loadGroupSystems() {
     this.combinedGroupSystem = new CombinedGroupSystem();
     this.combinedGroupSystem.addSystem(new PermissionsGroupSystem());
@@ -188,6 +198,9 @@ public class BlockLockerPluginImpl extends JavaPlugin implements BlockLockerPlug
     protectionFinder = new ProtectionFinderImpl(blockFinder, chestSettings);
     protectionUpdater = new ProtectionUpdaterImpl(getServer(), signParser, profileFactory);
     protectionCache = new HopperCacheImpl();
+
+    // Protection limits
+    protectionLimitManager = new ProtectionLimitManager(this, config);
   }
 
   private Translator loadTranslations(String fileName) {
@@ -220,6 +233,11 @@ public class BlockLockerPluginImpl extends JavaPlugin implements BlockLockerPlug
 
     // Events
     registerEvents();
+
+    // Protection limit commands
+    if (config.isProtectionLimitsEnabled()) {
+      new ProtectionLimitCommands(this).register();
+    }
 
     // Updater
     new Updater(config.getUpdatePreference(), translator, this).startUpdater();
@@ -264,6 +282,11 @@ public class BlockLockerPluginImpl extends JavaPlugin implements BlockLockerPlug
     keepGroupSystems.forEach(this.combinedGroupSystem::addSystem);
     keepLocationCheckers.forEach(this.combinedLocationChecker::addChecker);
     this.chestSettings.getExtraProtectables().addAll(keepProtectables);
+
+    // Reload protection limits
+    if (this.protectionLimitManager != null) {
+      this.protectionLimitManager.reload();
+    }
   }
 
   @Override

@@ -13,6 +13,7 @@ import nl.rutgerkok.blocklocker.ProtectionType;
 import nl.rutgerkok.blocklocker.impl.updater.UpdatePreference;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
@@ -31,6 +32,12 @@ final class Config {
         CONNECT_CONTAINERS = "connectContainers",
         AUTO_EXPIRE_DAYS = "autoExpireDays",
         ALLOW_DESTROY_BY = "allowDestroyBy",
+        PROTECTION_LIMITS_ENABLED = "protectionLimits.enabled",
+        DEFAULT_PLAYER_LIMIT = "protectionLimits.defaultPlayerLimit",
+        PLAYER_LIMITS = "protectionLimits.playerLimits",
+        TEAM_LIMITS_ENABLED = "protectionLimits.teamLimitsEnabled",
+        DEFAULT_TEAM_LIMIT = "protectionLimits.defaultTeamLimit",
+        TEAM_LIMITS = "protectionLimits.teamLimits",
         CONFIG_VERSION = "configVersion";
   }
 
@@ -49,6 +56,14 @@ final class Config {
 
   private final UpdatePreference updatePreference;
 
+  // Protection limit settings
+  private final boolean protectionLimitsEnabled;
+  private final int defaultPlayerLimit;
+  private final Map<String, Integer> playerLimits;
+  private final boolean teamLimitsEnabled;
+  private final int defaultTeamLimit;
+  private final Map<String, Integer> teamLimits;
+
   Config(Plugin plugin) {
     FileConfiguration config = plugin.getConfig();
     logger = plugin.getLogger();
@@ -59,6 +74,14 @@ final class Config {
     connectContainers = config.getBoolean(Key.CONNECT_CONTAINERS);
     autoExpireDays = config.getInt(Key.AUTO_EXPIRE_DAYS);
     allowDestroyBy = readAttackTypeSet(config.getStringList(Key.ALLOW_DESTROY_BY));
+
+    // Protection limits
+    protectionLimitsEnabled = config.getBoolean(Key.PROTECTION_LIMITS_ENABLED, true);
+    defaultPlayerLimit = config.getInt(Key.DEFAULT_PLAYER_LIMIT, 10);
+    playerLimits = readIntegerMap(config.getConfigurationSection(Key.PLAYER_LIMITS));
+    teamLimitsEnabled = config.getBoolean(Key.TEAM_LIMITS_ENABLED, false);
+    defaultTeamLimit = config.getInt(Key.DEFAULT_TEAM_LIMIT, 50);
+    teamLimits = readIntegerMap(config.getConfigurationSection(Key.TEAM_LIMITS));
 
     // Materials
     protectableMaterialsMap = new EnumMap<>(ProtectionType.class);
@@ -265,5 +288,81 @@ final class Config {
       logger.warning("Unknown update setting: " + string + ". Disabling automatic updater.");
       return UpdatePreference.DISABLED;
     }
+  }
+
+  /**
+   * Reads a configuration section as a map of strings to integers.
+   *
+   * @param section The configuration section, may be null.
+   * @return The map of string keys to integer values.
+   */
+  private Map<String, Integer> readIntegerMap(@Nullable ConfigurationSection section) {
+    Map<String, Integer> map = new HashMap<>();
+    if (section == null) {
+      return map;
+    }
+    for (String key : section.getKeys(false)) {
+      Object value = section.get(key);
+      if (value instanceof Number) {
+        map.put(key, ((Number) value).intValue());
+      } else {
+        logger.warning("Invalid integer value for " + key + ": " + value);
+      }
+    }
+    return map;
+  }
+
+  /**
+   * Gets whether protection limits are enabled.
+   *
+   * @return True if enabled, false otherwise.
+   */
+  boolean isProtectionLimitsEnabled() {
+    return protectionLimitsEnabled;
+  }
+
+  /**
+   * Gets the default player protection limit.
+   *
+   * @return The default limit, or -1 for unlimited.
+   */
+  int getDefaultPlayerLimit() {
+    return defaultPlayerLimit;
+  }
+
+  /**
+   * Gets the per-player limit overrides.
+   *
+   * @return Map of player names to limits.
+   */
+  Map<String, Integer> getPlayerLimits() {
+    return new HashMap<>(playerLimits);
+  }
+
+  /**
+   * Gets whether team limits are enabled.
+   *
+   * @return True if enabled, false otherwise.
+   */
+  boolean isTeamLimitsEnabled() {
+    return teamLimitsEnabled;
+  }
+
+  /**
+   * Gets the default team protection limit.
+   *
+   * @return The default limit, or -1 for unlimited.
+   */
+  int getDefaultTeamLimit() {
+    return defaultTeamLimit;
+  }
+
+  /**
+   * Gets the per-team limit overrides.
+   *
+   * @return Map of team names to limits.
+   */
+  Map<String, Integer> getTeamLimits() {
+    return new HashMap<>(teamLimits);
   }
 }
