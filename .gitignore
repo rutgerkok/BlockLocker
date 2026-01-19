@@ -1,15 +1,23 @@
-# Eclipse
-.project
-.classpath
-.settings/
+# Gradle
+.gradle/
+build/
+gradle-app.setting
+!gradle-wrapper.jar
+!gradle-wrapper.properties
 
-# IntelliJ
+# IDE
 .idea/
 *.iml
+*.iws
+*.ipr
+out/
 
-# Maven
-target/
+# OS
+.DS_Store
+Thumbs.db
 
-# Other
-*.bat
-logs/latest.log
+# Run server
+run/
+
+# Patch files
+*.patch
