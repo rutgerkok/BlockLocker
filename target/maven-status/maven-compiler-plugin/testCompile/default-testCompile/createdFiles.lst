@@ -1,0 +1,6 @@
+nl/rutgerkok/blocklocker/group/CombinedGroupSystemTest.class
+nl/rutgerkok/blocklocker/TestPlayer.class
+nl/rutgerkok/blocklocker/impl/profile/TestPlayerProfile.class
+nl/rutgerkok/blocklocker/group/CombinedGroupSystemTest$ReturnsFalseGroupSystem.class
+nl/rutgerkok/blocklocker/impl/profile/NullTranslator.class
+nl/rutgerkok/blocklocker/group/CombinedGroupSystemTest$ReturnsTrueGroupSystem.class
