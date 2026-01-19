@@ -1,5 +1,2 @@
-/**
- * Classes representing protections.
- *
- */
+/** Classes representing protections. */
 package nl.rutgerkok.blocklocker.protection;

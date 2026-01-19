@@ -5,11 +5,10 @@ import java.util.UUID;
 
 public interface PlayerProfile extends Profile {
 
-    /**
-     * Gets the unique id of this player, if any.
-     *
-     * @return The unique id.
-     */
-    Optional<UUID> getUniqueId();
-
+  /**
+   * Gets the unique id of this player, if any.
+   *
+   * @return The unique id.
+   */
+  Optional<UUID> getUniqueId();
 }

@@ -78,7 +78,15 @@ tasks.jar {
 // Spotless configuration (standard java config)
 spotless {
     java {
-        // googleJavaFormat("1.25.0")
+        googleJavaFormat("1.30.0")
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+    kotlinGradle {
+        ktlint()
+        trimTrailingWhitespace()
+        endWithNewline()
     }
 }
 
