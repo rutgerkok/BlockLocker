@@ -1,5 +1,5 @@
-# Config file of ${project.name}.
-# This file was originally created by version ${project.version}.
+# Config file of BlockLocker.
+# This file was originally created by version 1.14.1.
 
 # The language file used by the plugin. This will generate a file
 # with that name in this directory, which you can then customize
@@ -26,7 +26,7 @@
 # starting point. It is highly appreciated if you submit your
 # translations to the plugin author, so that others can use them
 # too. Danke schön, gracias, dankon and спасибо!
-languageFile: translations-en.yml
+languageFile: translations-kr.yml
 
 # The updater. Possible values:
 # JUST_NOTIFY - check for updates, notify the server admins
@@ -37,62 +37,42 @@ updater: JUST_NOTIFY
 # All material names can be found here:
 # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
 protectableContainers:
-- minecraft:acacia_shelf
-- minecraft:anvil
-- minecraft:bamboo_shelf
-- minecraft:barrel
-- minecraft:beacon
-- minecraft:birch_shelf
-- minecraft:black_shulker_box
-- minecraft:blast_furnace
-- minecraft:blue_shulker_box
-- minecraft:brewing_stand
-- minecraft:brown_shulker_box
-- minecraft:cherry_shelf
-- minecraft:chest
-- minecraft:chipped_anvil
-- minecraft:copper_chest
-- minecraft:crafter
-- minecraft:crafting_table
-- minecraft:crimson_shelf
-- minecraft:cyan_shulker_box
-- minecraft:damaged_anvil
-- minecraft:dark_oak_shelf
-- minecraft:dispenser
-- minecraft:dropper
-- minecraft:enchanting_table
-- minecraft:exposed_copper_chest
-- minecraft:furnace
-- minecraft:lectern
-- minecraft:gray_shulker_box
-- minecraft:green_shulker_box
-- minecraft:hopper
-- minecraft:jukebox
-- minecraft:jungle_shelf
-- minecraft:light_blue_shulker_box
-- minecraft:light_gray_shulker_box
-- minecraft:lime_shulker_box
-- minecraft:magenta_shulker_box
-- minecraft:mangrove_shelf
-- minecraft:oak_shelf
-- minecraft:orange_shulker_box
-- minecraft:oxidized_copper_chest
-- minecraft:pale_oak_shelf
-- minecraft:pink_shulker_box
-- minecraft:purple_shulker_box
-- minecraft:red_shulker_box
-- minecraft:shulker_box
-- minecraft:smoker
-- minecraft:spruce_shelf
-- minecraft:trapped_chest
-- minecraft:warped_shelf
-- minecraft:waxed_copper_chest
-- minecraft:waxed_exposed_copper_chest
-- minecraft:waxed_oxidized_copper_chest
-- minecraft:waxed_weathered_copper_chest
-- minecraft:weathered_copper_chest
-- minecraft:white_shulker_box
-- minecraft:yellow_shulker_box
+  - minecraft:anvil
+  - minecraft:barrel
+  - minecraft:beacon
+  - minecraft:black_shulker_box
+  - minecraft:blast_furnace
+  - minecraft:blue_shulker_box
+  - minecraft:brewing_stand
+  - minecraft:brown_shulker_box
+  - minecraft:chest
+  - minecraft:chipped_anvil
+  - minecraft:crafter
+  - minecraft:crafting_table
+  - minecraft:cyan_shulker_box
+  - minecraft:damaged_anvil
+  - minecraft:dispenser
+  - minecraft:dropper
+  - minecraft:enchanting_table
+  - minecraft:furnace
+  - minecraft:lectern
+  - minecraft:gray_shulker_box
+  - minecraft:green_shulker_box
+  - minecraft:hopper
+  - minecraft:jukebox
+  - minecraft:light_blue_shulker_box
+  - minecraft:light_gray_shulker_box
+  - minecraft:lime_shulker_box
+  - minecraft:magenta_shulker_box
+  - minecraft:orange_shulker_box
+  - minecraft:pink_shulker_box
+  - minecraft:purple_shulker_box
+  - minecraft:red_shulker_box
+  - minecraft:shulker_box
+  - minecraft:smoker
+  - minecraft:trapped_chest
+  - minecraft:white_shulker_box
+  - minecraft:yellow_shulker_box
 
 # When set to true, one sign protects all connected nearby blocks of the same
 # type. When false, each container requires a separate sign.
@@ -104,27 +84,27 @@ connectContainers: false
 # value format as described here:
 # http://minecraft.gamepedia.com/Data_values#Door
 protectableDoors:
-- minecraft:acacia_door
-- minecraft:bamboo_door
-- minecraft:birch_door
-- minecraft:cherry_door
-- minecraft:copper_door
-- minecraft:crimson_door
-- minecraft:dark_oak_door
-- minecraft:exposed_copper_door
-- minecraft:iron_door
-- minecraft:jungle_door
-- minecraft:mangrove_door
-- minecraft:oak_door
-- minecraft:oxidized_copper_door
-- minecraft:pale_oak_door
-- minecraft:spruce_door
-- minecraft:warped_door
-- minecraft:waxed_copper_door
-- minecraft:waxed_exposed_copper_door
-- minecraft:waxed_oxidized_copper_door
-- minecraft:waxed_weathered_copper_door
-- minecraft:weathered_copper_door
+  - minecraft:acacia_door
+  - minecraft:bamboo_door
+  - minecraft:birch_door
+  - minecraft:cherry_door
+  - minecraft:copper_door
+  - minecraft:crimson_door
+  - minecraft:dark_oak_door
+  - minecraft:exposed_copper_door
+  - minecraft:iron_door
+  - minecraft:jungle_door
+  - minecraft:mangrove_door
+  - minecraft:oak_door
+  - minecraft:oxidized_copper_door
+  - minecraft:pale_oak_door
+  - minecraft:spruce_door
+  - minecraft:warped_door
+  - minecraft:waxed_copper_door
+  - minecraft:waxed_exposed_copper_door
+  - minecraft:waxed_oxidized_copper_door
+  - minecraft:waxed_weathered_copper_door
+  - minecraft:weathered_copper_door
 
 # All protections (except doors) that consist not only of the block listed here,
 # but also of a supporting block. This is normally the block directly below.
@@ -134,39 +114,39 @@ protectableDoors:
 # them here) the supporting block is not the block below, but the block it is
 # attached on.
 protectableAttachables:
-- minecraft:acacia_fence_gate
-- minecraft:acacia_trapdoor
-- minecraft:bamboo_fence_gate
-- minecraft:bamboo_trapdoor
-- minecraft:birch_fence_gate
-- minecraft:birch_trapdoor
-- minecraft:cherry_fence_gate
-- minecraft:cherry_trapdoor
-- minecraft:copper_trapdoor
-- minecraft:crimson_fence_gate
-- minecraft:crimson_trapdoor
-- minecraft:dark_oak_fence_gate
-- minecraft:dark_oak_trapdoor
-- minecraft:exposed_copper_trapdoor
-- minecraft:iron_trapdoor
-- minecraft:jungle_fence_gate
-- minecraft:jungle_trapdoor
-- minecraft:mangrove_fence_gate
-- minecraft:mangrove_trapdoor
-- minecraft:oak_fence_gate
-- minecraft:oak_trapdoor
-- minecraft:oxidized_copper_trapdoor
-- minecraft:pale_oak_fence_gate
-- minecraft:pale_oak_trapdoor
-- minecraft:spruce_fence_gate
-- minecraft:spruce_trapdoor
-- minecraft:warped_fence_gate
-- minecraft:warped_trapdoor
-- minecraft:weathered_copper_trapdoor
-- minecraft:waxed_copper_trapdoor
-- minecraft:waxed_exposed_copper_trapdoor
-- minecraft:waxed_weathered_copper_trapdoor
-- minecraft:waxed_oxidized_copper_trapdoor
+  - minecraft:acacia_fence_gate
+  - minecraft:acacia_trapdoor
+  - minecraft:bamboo_fence_gate
+  - minecraft:bamboo_trapdoor
+  - minecraft:birch_fence_gate
+  - minecraft:birch_trapdoor
+  - minecraft:cherry_fence_gate
+  - minecraft:cherry_trapdoor
+  - minecraft:copper_trapdoor
+  - minecraft:crimson_fence_gate
+  - minecraft:crimson_trapdoor
+  - minecraft:dark_oak_fence_gate
+  - minecraft:dark_oak_trapdoor
+  - minecraft:exposed_copper_trapdoor
+  - minecraft:iron_trapdoor
+  - minecraft:jungle_fence_gate
+  - minecraft:jungle_trapdoor
+  - minecraft:mangrove_fence_gate
+  - minecraft:mangrove_trapdoor
+  - minecraft:oak_fence_gate
+  - minecraft:oak_trapdoor
+  - minecraft:oxidized_copper_trapdoor
+  - minecraft:pale_oak_fence_gate
+  - minecraft:pale_oak_trapdoor
+  - minecraft:spruce_fence_gate
+  - minecraft:spruce_trapdoor
+  - minecraft:warped_fence_gate
+  - minecraft:warped_trapdoor
+  - minecraft:weathered_copper_trapdoor
+  - minecraft:waxed_copper_trapdoor
+  - minecraft:waxed_exposed_copper_trapdoor
+  - minecraft:waxed_weathered_copper_trapdoor
+  - minecraft:waxed_oxidized_copper_trapdoor
 
 # The default amount of seconds a door stays open before closing automatically.
 # Players can override this value by putting a [Timer:X] tag on the sign, where
@@ -207,7 +187,7 @@ autoExpireDays: 0
 # TNT - TNT can destroy protections by exploding
 # ZOMBIE - zombies can destroy protected doors
 # UNKNOWN - special value for all other unrecognized attacks
-allowDestroyBy: []
+allowDestroyBy: [GOLEM]
 
 # Don't change this, used to check when the config needs to be rewritten
 configVersion: 2

@@ -1,0 +1,391 @@
+diff --git a/src/main/java/nl/rutgerkok/blocklocker/impl/event/InteractListener.java b/src/main/java/nl/rutgerkok/blocklocker/impl/event/InteractListener.java
+index 5411e1d..c4e7e42 100644
+--- a/src/main/java/nl/rutgerkok/blocklocker/impl/event/InteractListener.java
++++ b/src/main/java/nl/rutgerkok/blocklocker/impl/event/InteractListener.java
+@@ -47,6 +47,10 @@ import nl.rutgerkok.blocklocker.profile.PlayerProfile;
+ import nl.rutgerkok.blocklocker.profile.Profile;
+ import nl.rutgerkok.blocklocker.protection.Protection;
+ import nl.rutgerkok.blocklocker.protection.Protection.SoundCondition;
++import org.bukkit.scoreboard.Scoreboard;
++import org.bukkit.scoreboard.Team;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
+ 
+ public final class InteractListener extends EventListener {
+ 
+@@ -543,6 +547,14 @@ public final class InteractListener extends EventListener {
+         for (int i = 0; i < newLines.length; i++) {
+             frontSide.setLine(i, newLines[i]);
+         }
++        @NotNull Scoreboard board = Bukkit.getScoreboardManager().getMainScoreboard();
++        @Nullable Team team = board.getPlayerTeam(player);
++
++        if (team != null) {
++            frontSide.setLine(1, "");
++            frontSide.setLine(3, "[" + (team.getName() + "]"));
++        }
++
+         sign.update();
+ 
+         // Remove the sign from the player's hand
+diff --git a/src/main/java/nl/rutgerkok/blocklocker/impl/event/SignChangeListener.java b/src/main/java/nl/rutgerkok/blocklocker/impl/event/SignChangeListener.java
+index b6442b7..35b79cb 100644
+--- a/src/main/java/nl/rutgerkok/blocklocker/impl/event/SignChangeListener.java
++++ b/src/main/java/nl/rutgerkok/blocklocker/impl/event/SignChangeListener.java
+@@ -1,8 +1,12 @@
+ package nl.rutgerkok.blocklocker.impl.event;
+ 
+ 
++import java.awt.*;
+ import java.util.Optional;
++import java.util.logging.Logger;
+ 
++import net.kyori.adventure.text.Component;
++import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+ import org.bukkit.ChatColor;
+ import org.bukkit.block.Block;
+ import org.bukkit.block.BlockState;
+@@ -162,6 +166,14 @@ public class SignChangeListener extends EventListener {
+         if (protection.isPresent()) {
+             // Changing a sign near a container
+             handleSignNearbyProtection(event, protection.get());
++            Component afterline3Component = event.line(3);
++            if (afterline3Component == null) return;
++            String beforeline3 = PlainTextComponentSerializer.plainText().serialize(afterline3Component);
++            Sign sign = (Sign) event.getBlock().getState();
++            if (event.getSide() != Side.FRONT) return;
++            Component beforeline3Component = sign.getSide(event.getSide()).line(3);
++            String afterline3 = PlainTextComponentSerializer.plainText().serialize(beforeline3Component);
++            if (!beforeline3.equals(afterline3)) event.setCancelled(true);
+         } else {
+             // Changing a sign not nearby a container
+             handleSignNotNearbyProtection(event);
+diff --git a/src/main/resources/config.yml b/src/main/resources/config.yml
+index 45b925d..2c7d0a2 100644
+--- a/src/main/resources/config.yml
++++ b/src/main/resources/config.yml
+@@ -1,5 +1,5 @@
+-# Config file of ${project.name}.
+-# This file was originally created by version ${project.version}.
++# Config file of BlockLocker.
++# This file was originally created by version 1.14.1.
+ 
+ # The language file used by the plugin. This will generate a file
+ # with that name in this directory, which you can then customize
+@@ -26,7 +26,7 @@
+ # starting point. It is highly appreciated if you submit your
+ # translations to the plugin author, so that others can use them
+ # too. Danke schön, gracias, dankon and спасибо!
+-languageFile: translations-en.yml
++languageFile: translations-kr.yml
+ 
+ # The updater. Possible values:
+ # JUST_NOTIFY - check for updates, notify the server admins
+@@ -37,62 +37,42 @@ updater: JUST_NOTIFY
+ # All material names can be found here:
+ # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
+ protectableContainers:
+-- minecraft:acacia_shelf
+-- minecraft:anvil
+-- minecraft:bamboo_shelf
+-- minecraft:barrel
+-- minecraft:beacon
+-- minecraft:birch_shelf
+-- minecraft:black_shulker_box
+-- minecraft:blast_furnace
+-- minecraft:blue_shulker_box
+-- minecraft:brewing_stand
+-- minecraft:brown_shulker_box
+-- minecraft:cherry_shelf
+-- minecraft:chest
+-- minecraft:chipped_anvil
+-- minecraft:copper_chest
+-- minecraft:crafter
+-- minecraft:crafting_table
+-- minecraft:crimson_shelf
+-- minecraft:cyan_shulker_box
+-- minecraft:damaged_anvil
+-- minecraft:dark_oak_shelf
+-- minecraft:dispenser
+-- minecraft:dropper
+-- minecraft:enchanting_table
+-- minecraft:exposed_copper_chest
+-- minecraft:furnace
+-- minecraft:lectern
+-- minecraft:gray_shulker_box
+-- minecraft:green_shulker_box
+-- minecraft:hopper
+-- minecraft:jukebox
+-- minecraft:jungle_shelf
+-- minecraft:light_blue_shulker_box
+-- minecraft:light_gray_shulker_box
+-- minecraft:lime_shulker_box
+-- minecraft:magenta_shulker_box
+-- minecraft:mangrove_shelf
+-- minecraft:oak_shelf
+-- minecraft:orange_shulker_box
+-- minecraft:oxidized_copper_chest
+-- minecraft:pale_oak_shelf
+-- minecraft:pink_shulker_box
+-- minecraft:purple_shulker_box
+-- minecraft:red_shulker_box
+-- minecraft:shulker_box
+-- minecraft:smoker
+-- minecraft:spruce_shelf
+-- minecraft:trapped_chest
+-- minecraft:warped_shelf
+-- minecraft:waxed_copper_chest
+-- minecraft:waxed_exposed_copper_chest
+-- minecraft:waxed_oxidized_copper_chest
+-- minecraft:waxed_weathered_copper_chest
+-- minecraft:weathered_copper_chest
+-- minecraft:white_shulker_box
+-- minecraft:yellow_shulker_box
++  - minecraft:anvil
++  - minecraft:barrel
++  - minecraft:beacon
++  - minecraft:black_shulker_box
++  - minecraft:blast_furnace
++  - minecraft:blue_shulker_box
++  - minecraft:brewing_stand
++  - minecraft:brown_shulker_box
++  - minecraft:chest
++  - minecraft:chipped_anvil
++  - minecraft:crafter
++  - minecraft:crafting_table
++  - minecraft:cyan_shulker_box
++  - minecraft:damaged_anvil
++  - minecraft:dispenser
++  - minecraft:dropper
++  - minecraft:enchanting_table
++  - minecraft:furnace
++  - minecraft:lectern
++  - minecraft:gray_shulker_box
++  - minecraft:green_shulker_box
++  - minecraft:hopper
++  - minecraft:jukebox
++  - minecraft:light_blue_shulker_box
++  - minecraft:light_gray_shulker_box
++  - minecraft:lime_shulker_box
++  - minecraft:magenta_shulker_box
++  - minecraft:orange_shulker_box
++  - minecraft:pink_shulker_box
++  - minecraft:purple_shulker_box
++  - minecraft:red_shulker_box
++  - minecraft:shulker_box
++  - minecraft:smoker
++  - minecraft:trapped_chest
++  - minecraft:white_shulker_box
++  - minecraft:yellow_shulker_box
+ 
+ # When set to true, one sign protects all connected nearby blocks of the same
+ # type. When false, each container requires a separate sign.
+@@ -104,27 +84,27 @@ connectContainers: false
+ # value format as described here:
+ # http://minecraft.gamepedia.com/Data_values#Door
+ protectableDoors:
+-- minecraft:acacia_door
+-- minecraft:bamboo_door
+-- minecraft:birch_door
+-- minecraft:cherry_door
+-- minecraft:copper_door
+-- minecraft:crimson_door
+-- minecraft:dark_oak_door
+-- minecraft:exposed_copper_door
+-- minecraft:iron_door
+-- minecraft:jungle_door
+-- minecraft:mangrove_door
+-- minecraft:oak_door
+-- minecraft:oxidized_copper_door
+-- minecraft:pale_oak_door
+-- minecraft:spruce_door
+-- minecraft:warped_door
+-- minecraft:waxed_copper_door
+-- minecraft:waxed_exposed_copper_door
+-- minecraft:waxed_oxidized_copper_door
+-- minecraft:waxed_weathered_copper_door
+-- minecraft:weathered_copper_door
++  - minecraft:acacia_door
++  - minecraft:bamboo_door
++  - minecraft:birch_door
++  - minecraft:cherry_door
++  - minecraft:copper_door
++  - minecraft:crimson_door
++  - minecraft:dark_oak_door
++  - minecraft:exposed_copper_door
++  - minecraft:iron_door
++  - minecraft:jungle_door
++  - minecraft:mangrove_door
++  - minecraft:oak_door
++  - minecraft:oxidized_copper_door
++  - minecraft:pale_oak_door
++  - minecraft:spruce_door
++  - minecraft:warped_door
++  - minecraft:waxed_copper_door
++  - minecraft:waxed_exposed_copper_door
++  - minecraft:waxed_oxidized_copper_door
++  - minecraft:waxed_weathered_copper_door
++  - minecraft:weathered_copper_door
+ 
+ # All protections (except doors) that consist not only of the block listed here,
+ # but also of a supporting block. This is normally the block directly below.
+@@ -134,39 +114,39 @@ protectableDoors:
+ # them here) the supporting block is not the block below, but the block it is
+ # attached on.
+ protectableAttachables:
+-- minecraft:acacia_fence_gate
+-- minecraft:acacia_trapdoor
+-- minecraft:bamboo_fence_gate
+-- minecraft:bamboo_trapdoor
+-- minecraft:birch_fence_gate
+-- minecraft:birch_trapdoor
+-- minecraft:cherry_fence_gate
+-- minecraft:cherry_trapdoor
+-- minecraft:copper_trapdoor
+-- minecraft:crimson_fence_gate
+-- minecraft:crimson_trapdoor
+-- minecraft:dark_oak_fence_gate
+-- minecraft:dark_oak_trapdoor
+-- minecraft:exposed_copper_trapdoor
+-- minecraft:iron_trapdoor
+-- minecraft:jungle_fence_gate
+-- minecraft:jungle_trapdoor
+-- minecraft:mangrove_fence_gate
+-- minecraft:mangrove_trapdoor
+-- minecraft:oak_fence_gate
+-- minecraft:oak_trapdoor
+-- minecraft:oxidized_copper_trapdoor
+-- minecraft:pale_oak_fence_gate
+-- minecraft:pale_oak_trapdoor
+-- minecraft:spruce_fence_gate
+-- minecraft:spruce_trapdoor
+-- minecraft:warped_fence_gate
+-- minecraft:warped_trapdoor
+-- minecraft:weathered_copper_trapdoor
+-- minecraft:waxed_copper_trapdoor
+-- minecraft:waxed_exposed_copper_trapdoor
+-- minecraft:waxed_weathered_copper_trapdoor
+-- minecraft:waxed_oxidized_copper_trapdoor
++  - minecraft:acacia_fence_gate
++  - minecraft:acacia_trapdoor
++  - minecraft:bamboo_fence_gate
++  - minecraft:bamboo_trapdoor
++  - minecraft:birch_fence_gate
++  - minecraft:birch_trapdoor
++  - minecraft:cherry_fence_gate
++  - minecraft:cherry_trapdoor
++  - minecraft:copper_trapdoor
++  - minecraft:crimson_fence_gate
++  - minecraft:crimson_trapdoor
++  - minecraft:dark_oak_fence_gate
++  - minecraft:dark_oak_trapdoor
++  - minecraft:exposed_copper_trapdoor
++  - minecraft:iron_trapdoor
++  - minecraft:jungle_fence_gate
++  - minecraft:jungle_trapdoor
++  - minecraft:mangrove_fence_gate
++  - minecraft:mangrove_trapdoor
++  - minecraft:oak_fence_gate
++  - minecraft:oak_trapdoor
++  - minecraft:oxidized_copper_trapdoor
++  - minecraft:pale_oak_fence_gate
++  - minecraft:pale_oak_trapdoor
++  - minecraft:spruce_fence_gate
++  - minecraft:spruce_trapdoor
++  - minecraft:warped_fence_gate
++  - minecraft:warped_trapdoor
++  - minecraft:weathered_copper_trapdoor
++  - minecraft:waxed_copper_trapdoor
++  - minecraft:waxed_exposed_copper_trapdoor
++  - minecraft:waxed_weathered_copper_trapdoor
++  - minecraft:waxed_oxidized_copper_trapdoor
+ 
+ # The default amount of seconds a door stays open before closing automatically.
+ # Players can override this value by putting a [Timer:X] tag on the sign, where
+@@ -207,7 +187,7 @@ autoExpireDays: 0
+ # TNT - TNT can destroy protections by exploding
+ # ZOMBIE - zombies can destroy protected doors
+ # UNKNOWN - special value for all other unrecognized attacks
+-allowDestroyBy: []
++allowDestroyBy: [GOLEM]
+ 
+ # Don't change this, used to check when the config needs to be rewritten
+ configVersion: 2
+diff --git a/src/main/resources/translations-kr.yml b/src/main/resources/translations-kr.yml
+index c8e3abb..d34df3f 100644
+--- a/src/main/resources/translations-kr.yml
++++ b/src/main/resources/translations-kr.yml
+@@ -1,39 +1,40 @@
+ command:
+-  cannot_be_used_by_console: "이 명령은 콘솔에서 사용할 수 없습니다. 죄송해요!"
+-  cannot_edit_owner: "&4이 보호의 권한 소유자를 변경할 수 없습니다. 대신 표지판을 제거하십시오."
+-  line_number_out_of_bounds: "&42 이상, 4 이하의 줄 번호를 입력하십시오."
+-  no_sign_selected: "&4우선 마우스 오른쪽 버튼을 클릭하여, 보호받는 블럭의 표지판을 선택해야 합니다."
+-  no_permission: "&4당신은 이 명령을 실행할 수 있는 권한이 없습니다. 죄송해요!"
+-  player_name_too_long: "&4플레이어의 이름이 16자를 넘어 표지판에 적을 수 없습니다. 뿐만 아니라 Mojang이 허용하고 있는 플레이어 이름의 길이보다 깁니다."
+-  plugin_reloaded: "&6구성 파일을 다시 로드했습니다!"
+-  sign_no_longer_part_of_protection: "&4선택한 표지판이 더 이상 보호받는 블럭에 있지 않습니다."
+-  updated_sign: "&6표지판을 업데이트했습니다!"
++  cannot_be_used_by_console: 이 명령은 콘솔에서 사용할 수 없습니다. 죄송해요!
++  cannot_edit_owner: '&c이 보호의 권한 소유자를 변경할 수 없습니다. 대신 표지판을 제거하십시오.'
++  line_number_out_of_bounds: '&c2 이상, 4 이하의 줄 번호를 입력하십시오.'
++  no_permission: '&c당신은 이 명령을 실행할 수 있는 권한이 없습니다. 죄송해요!'
++  no_sign_selected: '&c우선 마우스 오른쪽 버튼을 클릭하여, 보호받는 블럭의 표지판을 선택해야 합니다.'
++  player_name_too_long: '&c플레이어의 이름이 16자를 넘어 표지판에 적을 수 없습니다. 뿐만 아니라 Mojang이 허용하고 있는
++    플레이어 이름의 길이보다 깁니다.'
++  plugin_reloaded: '&e구성 파일을 다시 로드했습니다!'
++  sign_no_longer_part_of_protection: '&c선택한 표지판이 더 이상 보호받는 블럭에 있지 않습니다.'
++  updated_sign: '&e표지판을 업데이트했습니다!'
+ protection:
+-  add_more_users_sign_instead: "&4한 보호 설정에는 하나의 [Private] 표지판만 설치 가능합니다. 대신 [More Users] 표지판을 추가하세요."
+-  bypassed: "&6방금 {0}의 보호를 무시하였습니다."
+-  can_only_add_protection_sign: "&4한 보호 설정에는 하나의 [Private] 표지판과 0개 또는 그 이상의 [More Users] 표지판만 설치 가능합니다. 다른 표지판은 허용되지 않습니다."
+-  cannot_change_sign: "&4보호 설정된 보관함의 표지판을 변경할 수 없습니다."
+-  chest_hint: "&6상자에 표지판을 설치해 보호하세요."
+-  claimed_container: "&6보관함을 보호 설정했습니다. 다른 누구도 이 보관함을 사용할 수 없습니다."
+-  claimed_manually: "&6보호 설정되었습니다. 표지판에 적힌 플레이어만 이 블럭을 사용할 수 있습니다."
+-  expired: "&6소유자가 비활성함에 따라 이 블록에 대한 보호는 만료되었습니다."
+-  in_wilderness: "&4여기에서 보호 설정을 할 수 없습니다: 당신은 황야에 있습니다."
+-  is_claimed_by: "&6이 블록은 {0}의 소유입니다."
+-  no_access: "&4이 블록은 {0}에게 소유되어있어서 당신이 사용할 수 없습니다."
+-  no_permission_for_claim: "&4당신은 보관함을 보호 설정할 권한이 없습니다. 죄송합니다."
+-  not_nearby: "&4가까이에 보호할 수 있는 블럭이 없습니다. 표지판을 손에 들고 웅크린 상태에서 보관함에 마우스 오른쪽 버튼을 클릭하여 보호 설정합니다."
+-  selected_sign: "&6표지판을 선택했습니다. 이 표지판을 수정하려면 채팅창에 \"/blocklocker <줄 번호> <닉네임>\"을 입력합니다. 또는 이들을 추가합니다: &n[Redstone]&r&6 &n[Everyone]&r&6.}"
++  add_more_users_sign_instead: '&c한 보호 설정에는 하나의 [Private] 표지판만 설치 가능합니다. 대신 [More
++    Users] 표지판을 추가하세요.'
++  bypassed: '&e방금 {0}의 보호를 무시하였습니다.'
++  cannot_change_sign: '&c보호 설정된 보관함의 표지판을 변경할 수 없습니다.'
++  chest_hint: '&e상자에 표지판을 설치해 보호하세요.'
++  claimed_container: '&e보관함을 보호 설정했습니다. 다른 누구도 이 보관함을 사용할 수 없습니다.'
++  claimed_manually: '&e보호 설정되었습니다. 표지판에 적힌 플레이어만 이 블럭을 사용할 수 있습니다.'
++  expired: '&e소유자가 비활성함에 따라 이 블록에 대한 보호는 만료되었습니다.'
++  in_wilderness: '&c여기에서 보호 설정을 할 수 없습니다: 당신은 황야에 있습니다.'
++  is_claimed_by: '&e이 블록은 {0}의 소유입니다.'
++  no_access: '&c이 블록은 국가에 소유되어있어서 당신이 사용할 수 없습니다.'
++  no_permission_for_claim: '&c당신은 보관함을 보호 설정할 권한이 없습니다. 죄송합니다.'
++  not_nearby: '&c가까이에 보호할 수 있는 블럭이 없습니다. 표지판을 손에 들고 웅크린 상태에서 보관함에 마우스 오른쪽 버튼을 클릭하여
++    보호 설정합니다.'
+ tag:
+-  everyone: "Everyone"
+-  timer: "Timer"
+-  redstone: "Redstone"
+-  private: "[Private]"
+-  more_users: "[More Users]"
++  everyone: Everyone
++  more_users: '[More Users]'
++  private: '[Private]'
++  redstone: Redstone
+   golem:
+     - Golem
+     - Golems
++  timer: Timer
+ updater:
+-  more_information: "&6추가 정보: {0}"
+-  unsupported_server: "&4${project.name} (version {0})의 최신 버전이 이 Minecraft 버전을 지원하지 않습니다. (Minecraft {1}만)."
+-  update_available: "&6${project.name} (version {0})에 대한 업데이트를 수동으로 다운로드할 수 있습니다."
+-  updated_automatically: "&6${project.name}에 대한 업데이트가 가능합니다(version {0}). 서버를 다시 시작하면 자동으로 설치됩니다."
+\ No newline at end of file
++  more_information: '&e추가 정보: {0}'
++  unsupported_server: '&cBlockLocker (version {0})의 최신 버전이 이 Minecraft 버전을 지원하지 않습니다.
++    (Minecraft {1}만).'
++  update_available: '&eBlockLocker (version {0})에 대한 업데이트를 수동으로 다운로드할 수 있습니다.'

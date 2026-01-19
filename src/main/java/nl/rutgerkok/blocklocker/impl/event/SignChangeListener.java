@@ -1,8 +1,12 @@
 package nl.rutgerkok.blocklocker.impl.event;
 
 
+import java.awt.*;
 import java.util.Optional;
+import java.util.logging.Logger;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -162,6 +166,14 @@ public class SignChangeListener extends EventListener {
         if (protection.isPresent()) {
             // Changing a sign near a container
             handleSignNearbyProtection(event, protection.get());
+            Component afterline3Component = event.line(3);
+            if (afterline3Component == null) return;
+            String beforeline3 = PlainTextComponentSerializer.plainText().serialize(afterline3Component);
+            Sign sign = (Sign) event.getBlock().getState();
+            if (event.getSide() != Side.FRONT) return;
+            Component beforeline3Component = sign.getSide(event.getSide()).line(3);
+            String afterline3 = PlainTextComponentSerializer.plainText().serialize(beforeline3Component);
+            if (!beforeline3.equals(afterline3)) event.setCancelled(true);
         } else {
             // Changing a sign not nearby a container
             handleSignNotNearbyProtection(event);

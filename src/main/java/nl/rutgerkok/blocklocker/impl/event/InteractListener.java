@@ -47,6 +47,10 @@ import nl.rutgerkok.blocklocker.profile.PlayerProfile;
 import nl.rutgerkok.blocklocker.profile.Profile;
 import nl.rutgerkok.blocklocker.protection.Protection;
 import nl.rutgerkok.blocklocker.protection.Protection.SoundCondition;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public final class InteractListener extends EventListener {
 
@@ -543,6 +547,14 @@ public final class InteractListener extends EventListener {
         for (int i = 0; i < newLines.length; i++) {
             frontSide.setLine(i, newLines[i]);
         }
+        @NotNull Scoreboard board = Bukkit.getScoreboardManager().getMainScoreboard();
+        @Nullable Team team = board.getPlayerTeam(player);
+
+        if (team != null) {
+            frontSide.setLine(1, "");
+            frontSide.setLine(3, "[" + (team.getName() + "]"));
+        }
+
         sign.update();
 
         // Remove the sign from the player's hand
