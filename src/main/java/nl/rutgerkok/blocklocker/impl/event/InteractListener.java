@@ -22,8 +22,7 @@ import org.bukkit.block.data.Waterlogged;
 import org.bukkit.block.data.type.WallSign;
 import org.bukkit.block.sign.Side;
 import org.bukkit.block.sign.SignSide;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Villager;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -273,15 +272,22 @@ public final class InteractListener extends EventListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityInteract(EntityInteractEvent event) {
-        // Prevents villagers from opening doors
-        if (!(event.getEntity() instanceof Villager)) {
-            return;
-        }
-        if (plugin.getChestSettings().allowDestroyBy(AttackType.VILLAGER)) {
-           return;
-        }
-        if (isProtected(event.getBlock())) {
-            event.setCancelled(true);
+        // Prevents villagers and golems from opening doors
+        Entity entity = event.getEntity();
+        if (entity instanceof Villager) {
+            if (plugin.getChestSettings().allowDestroyBy(AttackType.VILLAGER)) {
+                return;
+            }
+            if (isProtected(event.getBlock())) {
+                event.setCancelled(true);
+            }
+        } else if (entity instanceof Golem) {
+            if (plugin.getChestSettings().allowDestroyBy(AttackType.GOLEM)) {
+                return;
+            }
+            if (isProtected(event.getBlock())) {
+                event.setCancelled(true);
+            }
         }
     }
 
