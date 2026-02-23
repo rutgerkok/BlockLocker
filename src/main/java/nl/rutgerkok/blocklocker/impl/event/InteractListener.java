@@ -285,7 +285,11 @@ public final class InteractListener extends EventListener {
             if (plugin.getChestSettings().allowDestroyBy(AttackType.GOLEM)) {
                 return;
             }
-            if (isProtected(event.getBlock())) {
+            Optional<Protection> protection = plugin.getProtectionFinder().findProtection(event.getBlock(), SearchMode.MAIN_BLOCKS_ONLY);
+            if (protection.isEmpty()) {
+                return;
+            }
+            if (!protection.get().isAllowed(plugin.getProfileFactory().fromGolem())) {
                 event.setCancelled(true);
             }
         }
