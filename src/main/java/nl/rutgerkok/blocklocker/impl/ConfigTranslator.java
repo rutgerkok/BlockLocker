@@ -188,12 +188,6 @@ class ConfigTranslator extends Translator {
         needsSave = false;
     }
 
-    @Override
-    public void sendMessage(CommandSender player, Translation translation) {
-        String string = get(translation);
-        if (!string.isEmpty()) {
-            player.sendMessage(string);
-        }
-    }
+
 
 }

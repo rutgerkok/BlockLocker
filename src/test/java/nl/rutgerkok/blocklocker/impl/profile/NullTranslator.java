@@ -23,11 +23,6 @@ public class NullTranslator extends Translator {
         return key.toString();
     }
 
-    @Override
-    public void sendMessage(CommandSender player, Translation translation) {
-        player.sendMessage(get(translation));
-    }
-
 	@Override
 	public List<String> getAll(Translation key) {
 		return Arrays.asList(key.toString());
