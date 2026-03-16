@@ -1,17 +1,18 @@
 # Translation file for the Taiwan Traditional Chinese language. Translations by flandretw.
 command:
   cannot_be_used_by_console: '抱歉！此指令無法在控制台使用。'
-  cannot_edit_owner: '&4你不能變更保護的擁有者。而是只能破壞掉這個告示牌。'
+  cannot_edit_owner: '&4你不能變更保護的擁有者，請改為破壞該告示牌。'
   line_number_out_of_bounds: '&4請輸入 2～4 之間的行數（包括 2 和 4）。'
-  no_permission: '&4抱歉！你沒有執行此指令的權限。'
   no_sign_selected: '&4必須先對受保護方塊的告示牌點擊右鍵選擇。'
+  no_permission: '&4抱歉！你沒有執行此指令的權限。'
   player_name_too_long: '&4玩家名稱超過 16 個字元，告示牌無法容納。它也比 Mojang 允許的玩家名稱還要長。'
   plugin_reloaded: '&6已重新載入設定檔！'
   sign_no_longer_part_of_protection: '&4選擇的告示牌不再屬於被保護的方塊。'
   updated_sign: '&6已更新告示牌！'
 protection:
-  add_more_users_sign_instead: '&4只能有一個 [私人] 告示牌。新增 [更多] 告示牌來新增更多玩家。'
+  add_more_users_sign_instead: '&4一個保護只能有一個 [私人] 告示牌。請放置 [更多] 告示牌來加入更多玩家。'
   bypassed: '&6你剛剛繞過了 {0} 的保護。'
+  can_only_add_protection_sign: '&4保護只能有一個 [私人] 告示牌與零個或多個 [更多] 告示牌。不允許使用其他告示牌。'
   cannot_change_sign: '&4你不能編輯已認領容器的告示牌。'
   chest_hint: '&6手持告示牌，並對儲物箱點擊右鍵來認領它。'
   claimed_container: '&6已成功認領此容器。其他人將無法使用。'
@@ -32,6 +33,10 @@ tag:
   redstone:
     - '紅石'
     - 'Redstone'
+  golem:
+    - '銅魔像'
+    - 'Golem'
+    - 'Golems'
   private:
     - '[私人]'
     - '[私有]'
@@ -39,10 +44,8 @@ tag:
   more_users:
     - '[更多]'
     - '[More Users]'
-  golem:
-    - 'Golem'
-    - 'Golems'
 updater:
   more_information: '&6更多資訊：{0}'
   unsupported_server: '&4最新版本的 BlockLocker（版本 {0}）不再支援此 Minecraft 版本，需要使用 Minecraft {1}。'
   update_available: '&6新版本的 BlockLocker（版本 {0}）已可用，需要手動下載。'
+  updated_automatically: '&6BlockLocker 已有可用的更新（版本 {0}）。它將在你重新啟動伺服器時自動安裝。'
