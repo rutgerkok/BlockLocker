@@ -6,12 +6,12 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.UUID;
 
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
 import com.google.common.base.Preconditions;
 
+import nl.rutgerkok.blocklocker.Messages;
 import nl.rutgerkok.blocklocker.ProfileFactory;
 import nl.rutgerkok.blocklocker.SecretSignEntry;
 import nl.rutgerkok.blocklocker.Translator;
@@ -72,7 +72,7 @@ public final class ProfileFactoryImpl implements ProfileFactory {
      * @return The profile.
      */
     public Profile fromDisplayText(String text) {
-        final String stripped = ChatColor.stripColor(text.trim());
+        final String stripped = Messages.toPlainText(text.trim());
 
         if (stripped.length() > 2) {
             // [Everyone]

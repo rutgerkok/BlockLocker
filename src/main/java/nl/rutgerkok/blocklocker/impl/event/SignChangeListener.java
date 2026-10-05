@@ -3,7 +3,6 @@ package nl.rutgerkok.blocklocker.impl.event;
 
 import java.util.Optional;
 
-import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
@@ -12,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.SignChangeEvent;
 
+import nl.rutgerkok.blocklocker.Messages;
 import nl.rutgerkok.blocklocker.Permissions;
 import nl.rutgerkok.blocklocker.SignType;
 import nl.rutgerkok.blocklocker.Translator.Translation;
@@ -52,7 +52,7 @@ public class SignChangeListener extends EventListener {
 
         // If a sign type was already specified, don't allow changing it
         if (oldSignType.isPresent() && !oldSignType.equals(newSignType)) {
-            event.setLine(0, ChatColor.stripColor(plugin.getChestSettings()
+            event.setLine(0, Messages.toPlainText(plugin.getChestSettings()
                     .getFancyLocalizedHeader(oldSignType.get(), event.getLine(0))));
             newSignType = oldSignType;
         }
@@ -116,7 +116,7 @@ public class SignChangeListener extends EventListener {
         try {
             plugin.getLocationCheckers().checkLocationAndPermission(player, block);
         } catch (IllegalLocationException e) {
-            player.sendMessage(e.getTranslatedMessage(plugin.getTranslator()));
+            player.sendMessage(e.getTranslatedComponent(plugin.getTranslator()));
             block.breakNaturally();
             event.setCancelled(true);
             return;

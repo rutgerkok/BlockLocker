@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
@@ -17,6 +16,7 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import nl.rutgerkok.blocklocker.ChestSettings;
+import nl.rutgerkok.blocklocker.Messages;
 import nl.rutgerkok.blocklocker.ProtectionSign;
 import nl.rutgerkok.blocklocker.SignParser;
 import nl.rutgerkok.blocklocker.SignType;
@@ -67,7 +67,7 @@ class SignParserImpl implements SignParser {
     }
 
     private SignType getSignTypeOrNull(String header) {
-        final String trimmed = ChatColor.stripColor(header).trim();
+        final String trimmed = Messages.toPlainText(header).trim();
         for (SignType type : SignType.values()) {
             if (chestSettings.getSimpleLocalizedHeaders(type).stream().anyMatch(localizedHeader -> trimmed.equalsIgnoreCase(localizedHeader))) {
                 return type;

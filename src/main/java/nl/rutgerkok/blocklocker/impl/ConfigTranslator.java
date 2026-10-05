@@ -10,11 +10,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import net.kyori.adventure.text.Component;
+
+import nl.rutgerkok.blocklocker.Messages;
 import nl.rutgerkok.blocklocker.Translator;
 
 /**
@@ -55,19 +57,24 @@ class ConfigTranslator extends Translator {
 
     /**
      * Little class to hold the different representations of the translated values.
-     * The original ({@code &1foo}), the colored ({@code §1foo}) and uncolored
-     * ({@code foo}).
+     * The original ({@code <red>foo}), the MiniMessage form ({@code <red>foo}),
+     * the colored ({@code §cfoo}) and uncolored ({@code foo}) form, and the parsed
+     * component.
      *
      */
     private static class TranslationValue {
         private final String original;
+        private final String miniMessage;
         private final String uncolored;
         private final String colored;
+        private final Component component;
 
         private TranslationValue(String original) {
             this.original = original.trim();
-            this.colored = ChatColor.translateAlternateColorCodes('&', original);
-            this.uncolored = ChatColor.stripColor(colored);
+            this.miniMessage = Messages.toMiniMessage(this.original);
+            this.component = Messages.fromMiniMessage(this.miniMessage);
+            this.colored = Messages.toLegacyText(this.component);
+            this.uncolored = Messages.toPlainText(this.component);
         }
 
         public List<TranslationValue> getAll() {
@@ -112,6 +119,21 @@ class ConfigTranslator extends Translator {
         // entry in the map: if a value is missing in the config file, the
         // constructor assigns the default value
         return translations.get(key).colored;
+    }
+
+    @Override
+    public Component getComponent(Translation key) {
+        // The component is parsed when the translations are loaded, so that
+        // MiniMessage features that cannot be expressed in section-sign color
+        // codes (like gradients) survive
+        return translations.get(key).component;
+    }
+
+    @Override
+    public Component getComponent(Translation key, String... parameters) {
+        // Parse again, but now with the parameters filled in. The parameters are
+        // escaped, so that they cannot inject any formatting.
+        return Messages.fromMiniMessage(Messages.fillIn(translations.get(key).miniMessage, parameters));
     }
 
     @Override

@@ -3,8 +3,9 @@ package nl.rutgerkok.blocklocker;
 import java.util.List;
 import java.util.Locale;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+
+import net.kyori.adventure.text.Component;
 
 /**
  * Collection of translations.
@@ -57,6 +58,11 @@ public abstract class Translator {
      * Returns the translation with the given key. If no such translation
      * exists, the key is returned.
      *
+     * <p>
+     * The returned value uses section-sign color codes, so that it can be put on
+     * a sign. Use {@link #getComponent(Translation)} to get the message in a
+     * format that is suitable for sending to players.
+     *
      * @param key
      *            The key of the translation.
      * @return The translation, or the key if not found.
@@ -73,8 +79,10 @@ public abstract class Translator {
     public abstract List<String> getAll(Translation key);
 
     /**
-     * Same as {@link #getAll(Translation)}, but with
-     * {@link ChatColor#stripColor(String)} applied.
+     * Same as {@link #getAll(Translation)}, but with all colors and formatting
+     * removed. Both MiniMessage tags and legacy color codes are stripped. Use
+     * this when comparing a translation against text that a player typed on a
+     * sign.
      *
      * @param key
      * 			The key of the translation.
@@ -83,14 +91,46 @@ public abstract class Translator {
     public abstract List<String> getAllWithoutColor(Translation key);
 
     /**
-     * Same as {@link #get(Translation)}, but with
-     * {@link ChatColor#stripColor(String)} applied.
+     * Same as {@link #get(Translation)}, but with all colors and formatting
+     * removed. Both MiniMessage tags and legacy color codes are stripped.
      *
      * @param key
      *            The key of the translation.
      * @return The translation, or the key if not found.
      */
     public abstract String getWithoutColor(Translation key);
+
+    /**
+     * Gets the translation as a component, so that it can be sent to players
+     * using the Adventure API. The translation may use MiniMessage tags, legacy
+     * color codes, or a mix of both.
+     *
+     * @param key
+     *            The key of the translation.
+     * @return The translation.
+     */
+    public Component getComponent(Translation key) {
+        return Messages.toComponent(get(key));
+    }
+
+    /**
+     * Gets the translation as a component, with the given parameters filled in.
+     * The translation may use MiniMessage tags, legacy color codes, or a mix of
+     * both.
+     *
+     * <p>
+     * The parameters are escaped, so that they cannot inject any formatting.
+     *
+     * @param key
+     *            The key of the translation.
+     * @param parameters
+     *            Replacements for the message. {0} will be replaced by the first
+     *            parameter, etc.
+     * @return The translation.
+     */
+    public Component getComponent(Translation key, String... parameters) {
+        return Messages.render(get(key), parameters);
+    }
 
     /**
      * Sends the specified message translated to the given player. In case the translation is blank,
@@ -106,7 +146,7 @@ public abstract class Translator {
         if (translated.isBlank()) {
             return;
         }
-        player.sendMessage(translated);
+        player.sendMessage(getComponent(translation));
     }
 
     /**
@@ -126,9 +166,6 @@ public abstract class Translator {
         if (translated.isBlank()) {
             return;
         }
-        for (int i = 0; i < parameters.length; i++) {
-            translated = translated.replace("{" + i + "}", parameters[i]);
-        }
-        player.sendMessage(translated);
+        player.sendMessage(getComponent(translation, parameters));
     }
 }

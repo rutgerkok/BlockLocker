@@ -13,3 +13,4 @@ target/
 # Other
 *.bat
 logs/latest.log
+src/test/java/nl/rutgerkok/blocklocker/MessagesTest.java

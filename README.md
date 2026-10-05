@@ -18,6 +18,7 @@ Current features:
   * Automatically looks up UUIDs for signs from Lockette and Deadbolt when they are read.
 * Fully configurable
   * All messages can be translated.
+  * All messages support [MiniMessage](https://docs.advntr.dev/minimessage/format.html) formatting, next to the classic color codes.
   * You can change which block types can be protected. Even more complex blocks like levers work correctly.
 * Group support: adding `[MyGroup]` to the sign will allow anyone with the permission node `blocklocker.group.mygroup` (grant the lowercase node) and anyone in a scoreboard team or in a faction of MassiveCraft Factions called `MyGroup` (case insensitive).
 * Correctly handles complex blocks:
@@ -28,6 +29,32 @@ Current features:
   * Fence gate support: the sign can be attached to either the the fence gate block or the block below.
 * The owner of a protection can change the signs after creating them using the `/blocklocker <line number> <name>` command.
 * Auto-updater, so that you are notified when there is a new version available.
+
+Text formatting
+---------------
+
+Every message of this plugin can be written in [MiniMessage](https://docs.advntr.dev/minimessage/format.html)
+format. The classic color codes keep working, and both formats can be mixed inside a
+single message:
+
+```yaml
+# In your translation file
+command:
+  plugin_reloaded: "<green>Reloaded the configuration files!"   # MiniMessage
+  no_permission: "&4You don't have permission to execute this command. Sorry!"   # classic
+protection:
+  chest_hint: "<gradient:gold:yellow>Place a sign on this chest to protect it."   # gradient
+updater:
+  more_information: "<gray>More information: <click:open_url:'{0}'><underlined>{0}</underlined></click>"
+```
+
+The `{0}`, `{1}`, ... placeholders are filled in before the message is parsed, and the
+values are escaped, so a player cannot inject formatting through their name or through
+a group name.
+
+The `[Private]` and `[More Users]` tags end up on a sign, and signs only understand the
+classic color codes. Use basic colors like `<red>` for those tags; gradients and hex
+colors are not supported there.
 
 Compilation
 -----------

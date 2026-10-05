@@ -1,4 +1,8 @@
 # Translations file for the English language
+#
+# Messages may be written in MiniMessage format ("<red>Hello <bold>world</bold>")
+# or using the classic color codes ("&4Hello &lworld"). Both formats can be mixed.
+# See https://docs.advntr.dev/minimessage/format.html for the full syntax.
 command:
   cannot_be_used_by_console: "This command cannot be used by the console. Sorry!"
   cannot_edit_owner: "&4You cannot change the owner of the protection. Destroy the sign instead."

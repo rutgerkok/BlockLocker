@@ -26,6 +26,17 @@
 # starting point. It is highly appreciated if you submit your
 # translations to the plugin author, so that others can use them
 # too. Danke schön, gracias, dankon and спасибо!
+#
+# Messages may be written in MiniMessage format, like this:
+#   "<red>Hello <bold>world</bold>"
+# or using the classic color codes, like this:
+#   "&4Hello &lworld"
+# Both formats can even be mixed within a single message. See
+# https://docs.advntr.dev/minimessage/format.html for the full MiniMessage
+# syntax, which also supports gradients, hover text and clickable links.
+# Note that the [Private] and [More Users] tags are put on a sign, which
+# only supports the classic color codes; gradients and hex colors will not
+# look right there.
 languageFile: translations-en.yml
 
 # The updater. Possible values:

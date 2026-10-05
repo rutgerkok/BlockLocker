@@ -2,6 +2,8 @@ package nl.rutgerkok.blocklocker.location;
 
 import java.util.Objects;
 
+import net.kyori.adventure.text.Component;
+
 import nl.rutgerkok.blocklocker.Translator;
 import nl.rutgerkok.blocklocker.Translator.Translation;
 
@@ -45,5 +47,21 @@ public final class IllegalLocationException extends Exception {
             return translator.get(translation);
         }
         return getLocalizedMessage();
+    }
+
+    /**
+     * Gets a translated message as a component, or the original message if no
+     * translation was specified. The translation may use MiniMessage tags, legacy
+     * color codes, or a mix of both.
+     *
+     * @param translator
+     *            The translator to use.
+     * @return The message.
+     */
+    public Component getTranslatedComponent(Translator translator) {
+        if (this.translation != null) {
+            return translator.getComponent(translation);
+        }
+        return Component.text(getLocalizedMessage());
     }
 }
