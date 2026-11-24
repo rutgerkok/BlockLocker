@@ -45,7 +45,7 @@ public final class GolemListener extends EventListener {
         // Retrieve the value, and store it in the cache
         Optional<Protection> protection = plugin.getProtectionFinder().findProtection(block, SearchMode.MAIN_BLOCKS_ONLY);
         if (protection.isEmpty()) {
-            cache.setAllowed(block, ProtectionCache.CacheType.GOLEM, false);
+            cache.setAllowed(block, ProtectionCache.CacheType.GOLEM, true);
             return;
         }
         Profile golemProfile = plugin.getProfileFactory().fromGolem();
